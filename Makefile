@@ -1,3 +1,7 @@
+MAKE+=--no-print-directory
+
+############################
+
 SWIG_TARGETS=ruby python java
 # SWIG_TARGET=ruby
 
@@ -44,7 +48,7 @@ PYTHON_ROOT=/opt/local/Library/Frameworks/Python.framework/Versions/$(PYTHON_VER
 PYTHON_INCL=$(PYTHON_ROOT)/include/python$(PYTHON_VERSION)
 PYTHON_LIB=$(PYTHON_ROOT)/lib
 PYTHON_EXE=python$(PYTHON_VERSION)
-CFLAGS_SWIG_python=-I$(PYTHON_INCL)
+CFLAGS_SWIG_python=-I$(PYTHON_INCL) -Wno-deprecated-declarations
 SO_PREFIX_python=_
 SO_SUFFIX_python=so # OSX
 
@@ -119,3 +123,10 @@ target/$(SWIG_TARGET)/$(SO_PREFIX)%.$(SO_SUFFIX) : target/$(SWIG_TARGET)/%.o
 clean:
 	rm -rf target/*
 
+
+demo:
+	$(MAKE) clean all
+	@set -x; time target/bin/example1
+	@set -x; time bin/example1-ruby
+	@set -x; time bin/example1-python
+	@set -x; time bin/run-clj bin/example1-clojure

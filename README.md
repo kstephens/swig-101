@@ -91,6 +91,7 @@ print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 # Build and Run
 
 ```
+$ rbenv shell 2.3.0
 $ gmake clean all
 
 # Native Code:
