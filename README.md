@@ -97,12 +97,12 @@ $ gmake clean all
 $ target/native/example1
 323.493709999999908
 
-$ bin/example1-ruby
+$ src/example1-ruby
 323.4937099999999
 
-$ bin/example1-python
+$ src/example1-python
 323.4937099999999
 
-$ bin/run-clj bin/example1-clojure
+$ bin/run-clj src/example1-clojure
 323.4937099999999
 ```

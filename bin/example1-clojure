@@ -1,8 +1,0 @@
-;; -*- clojure -*-
-
-(clojure.lang.RT/loadLibrary "example1")
-
-(import 'example1)
-
-(println (example1/cubic_poly 2.3, 3.5, 7.11, 13.17, 19.23))
-

@@ -126,6 +126,6 @@ clean:
 demo:
 	$(MAKE) clean all
 	@set -x; time target/native/example1
-	@set -x; time bin/example1-ruby
-	@set -x; time bin/example1-python
-	@set -x; time bin/run-clj bin/example1-clojure
+	@set -x; time src/example1-ruby
+	@set -x; time src/example1-python
+	@set -x; time bin/run-clj src/example1-clojure
