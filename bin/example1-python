@@ -1,0 +1,7 @@
+#!/usr/bin/env python3.8
+
+# ENV["LD_LIBRARY_PATH"] = 'target/python'
+import example1
+
+print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
+
