@@ -48,7 +48,6 @@ PYTHON_EXE=python$(PYTHON_VERSION)
 CFLAGS_SWIG_python=-I$(PYTHON_INCL)
 SO_PREFIX_python=_
 SO_SUFFIX_python=so # OSX
-#SO_SUFFIX_python=dynlib # OSX
 
 ############################
 
