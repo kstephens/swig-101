@@ -2,7 +2,7 @@
 
 Introduction to [SWIG](http://www.swig.org/).
 
-# HOW TO
+# HOWTO
 
 ## OSX
 
