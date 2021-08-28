@@ -94,11 +94,9 @@ print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 $ rbenv shell 2.3.0
 $ gmake clean all
 
-# Native Code:
-$ target/bin/example1
+$ target/native/example1
 323.493709999999908
 
-# Ruby SWIG
 $ bin/example1-ruby
 323.4937099999999
 

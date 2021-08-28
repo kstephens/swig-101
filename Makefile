@@ -84,7 +84,7 @@ $(foreach f, $(SRCS),                     \
 	$(f:src/%.c=target/$(SWIG_TARGET)/%.c) \
 	$(f:src/%.c=target/$(SWIG_TARGET)/%.o) \
 	$(f:src/%.c=target/$(SWIG_TARGET)/$(SO_PREFIX)%.$(SO_SUFFIX)) \
-	$(f:src/%.c=target/bin/%)    \
+	$(f:src/%.c=target/native/%)    \
 )
 
 build: build-announce $(TARGET_DEPS)
@@ -100,7 +100,7 @@ target/native/%.o : src/%.c
 	@echo "\n  ### Compiling native example code:\n"
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-target/bin/% : src/%-main.c
+target/native/% : src/%-main.c
 	@mkdir -p $(dir $@)
 	@echo "\n  ### Compiling native example main program:\n"
 	$(CC) $(CFLAGS) -o $@ $< $(<:src/%-main.c=target/native/%.o)
@@ -123,10 +123,9 @@ target/$(SWIG_TARGET)/$(SO_PREFIX)%.$(SO_SUFFIX) : target/$(SWIG_TARGET)/%.o
 clean:
 	rm -rf target/*
 
-
 demo:
 	$(MAKE) clean all
-	@set -x; time target/bin/example1
+	@set -x; time target/native/example1
 	@set -x; time bin/example1-ruby
 	@set -x; time bin/example1-python
 	@set -x; time bin/run-clj bin/example1-clojure
