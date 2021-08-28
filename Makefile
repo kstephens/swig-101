@@ -157,3 +157,4 @@ demo:
 	@set -x; time src/example1-python
 	@set -x; time src/example1-guile
 	@set -x; time bin/run-clj src/example1-clojure
+	@set -x; time src/example1-tcl

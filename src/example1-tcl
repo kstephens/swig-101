@@ -2,10 +2,7 @@
 
 set env(LD_LIBRARY_PATH) "target/tcl"
 
-# load target/tcl/example1.dylib
-# load example1.dylib
-# load target/tcl/libexample1.so
-load target/tcl/example1.so
+load target/tcl/example1.so Example1
 
-cubic_poly 2.3 3.5 7.11 13.17 19.23
+puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
 
