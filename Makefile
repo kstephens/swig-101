@@ -25,7 +25,7 @@ SWIG_OPTS_x += \
 ############################
 
 CFLAGS += -g -O3 -Iinclude
-CFLAGS += -I/opt/local/include
+CFLAGS += -I/opt/local/include # OSX macports
 CFLAGS_SWIG=$(CFLAGS) $(CFLAGS_SWIG_$(SWIG_TARGET))
 #CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
