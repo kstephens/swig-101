@@ -2,12 +2,13 @@ MAKE+=--no-print-directory
 
 ############################
 
-SWIG_TARGETS=ruby python java
-# SWIG_TARGET=ruby
+SWIG_TARGETS=ruby python tcl guile java
+SWIG_TARGET=UNDEFINED
 
 SWIG_OPTS += \
 	-addextern -I- \
-	-debug-module 1,2,3,4
+	-debug-module 1,2,3,4 \
+	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
      -debug-symtabs  \
      -debug-symbols  \
@@ -24,6 +25,7 @@ SWIG_OPTS_x += \
 ############################
 
 CFLAGS += -g -O3 -Iinclude
+CFLAGS += -I/opt/local/include
 CFLAGS_SWIG=$(CFLAGS) $(CFLAGS_SWIG_$(SWIG_TARGET))
 #CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
@@ -51,6 +53,31 @@ PYTHON_EXE=python$(PYTHON_VERSION)
 CFLAGS_SWIG_python=-I$(PYTHON_INCL) -Wno-deprecated-declarations
 SO_PREFIX_python=_
 SO_SUFFIX_python=so # OSX
+
+############################
+
+TCL_VERSION=2.2
+TCL_HOME=/opt/local
+TCL_INCL=$(TCL_HOME)/include/guile/$(TCL_VERSION)
+TCL_LIB=$(TCL_HOME)/lib
+TCL_EXE=$(TCL_HOME)/bin/tclsh
+CFLAGS_SWIG_guile=-I$(TCL_INCL)
+#SO_PREFIX_tcl=lib
+#SO_SUFFIX_tcl=dylib # OSX
+SO_SUFFIX_tcl=so # OSX
+SWIG_OPTS_tcl=
+
+############################
+
+GUILE_VERSION=2.2
+GUILE_HOME=/opt/local
+GUILE_INCL=$(GUILE_HOME)/include/guile/$(GUILE_VERSION)
+GUILE_LIB=$(GUILE_HOME)/lib
+GUILE_EXE=$(GUILE_HOME)/bin/guile
+CFLAGS_SWIG_guile=-I$(GUILE_HOME)/include -I$(GUILE_INCL) -I$(GUILE_INCL)/libguile
+SO_PREFIX_guile=lib
+SO_SUFFIX_guile=so # OSX
+SWIG_OPTS_guile=-scmstub
 
 ############################
 
@@ -128,4 +155,5 @@ demo:
 	@set -x; time target/native/example1
 	@set -x; time src/example1-ruby
 	@set -x; time src/example1-python
+	@set -x; time src/example1-guile
 	@set -x; time bin/run-clj src/example1-clojure

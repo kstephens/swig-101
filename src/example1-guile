@@ -1,0 +1,9 @@
+#!/usr/bin/env guile --no-auto-compile
+!#
+
+;; (setenv "LD_LIBRARY_PATH" "target/guile")
+(load-extension "target/guile/libexample1.so" "SWIG_init")
+
+(write (cubic-poly 2.3 3.5 7.11 13.17 19.23))
+(newline)
+
