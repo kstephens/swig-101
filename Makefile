@@ -1,4 +1,4 @@
-SWIG_TARGETS=ruby python
+SWIG_TARGETS=ruby python java
 # SWIG_TARGET=ruby
 
 SWIG_OPTS += \
@@ -47,6 +47,17 @@ PYTHON_EXE=python$(PYTHON_VERSION)
 CFLAGS_SWIG_python=-I$(PYTHON_INCL)
 SO_PREFIX_python=_
 SO_SUFFIX_python=so # OSX
+
+############################
+
+JAVA_VERSION=11.0.2
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-$(JAVA_VERSION).jdk/Contents/Home
+JAVA_INCL=$(JAVA_HOME)/include
+JAVA_LIB=$(JAVA_HOME)/lib
+JAVA_EXE=$(JAVA_HOME)/bin/java
+CFLAGS_SWIG_java=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
+SO_PREFIX_java=lib
+SO_SUFFIX_java=jnilib # OSX
 
 ############################
 
