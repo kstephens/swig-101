@@ -1,6 +1,5 @@
 SWIG_TARGETS=ruby python
-SWIG_TARGET=ruby
-
+# SWIG_TARGET=ruby
 
 SWIG_OPTS += \
 	-addextern -I- \
@@ -22,9 +21,9 @@ SWIG_OPTS_x += \
 
 CFLAGS += -g -Iinclude
 CFLAGS_SWIG=$(CFLAGS) $(CFLAGS_SWIG_$(SWIG_TARGET))
-CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
+#CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
-CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
+CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX
 SO_SUFFIX=$(SO_SUFFIX_$(SWIG_TARGET))
 SO_PREFIX=$(SO_PREFIX_$(SWIG_TARGET))
 
