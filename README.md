@@ -4,7 +4,7 @@ Introduction to [SWIG](http://www.swig.org/).
 
 # HOW TO
 
-## OS-X
+## OSX
 
 * Install macports
 * sudo port install swig swig-ruby swig-python swig-java python3.8
