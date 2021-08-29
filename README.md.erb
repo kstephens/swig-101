@@ -1,0 +1,71 @@
+# swig-101
+
+Introduction to [SWIG](http://www.swig.org/).
+
+# HOWTO
+
+## OSX
+
+* Install macports
+* sudo port install swig swig-ruby swig-python swig-java python3.8
+* Install rbenv + ruby-build plugin
+* rbenv install 2.3.0
+* Install JVM 11.0.3
+* Install clojure + clojure-tools
+
+## Build
+
+```
+$ rbenv shell 2.3.0
+$ gmake clean all
+```
+
+# Examples
+
+<% %w(example1).each do | example | %>
+<%
+require 'pp'
+
+targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
+C Library | src/#{example}.c      | -
+C Header  | src/#{example}.h      | -
+C Main    | src/#{example}-native.c | target/native/#{example}
+Ruby      | src/#{example}-ruby
+Python    | src/#{example}-python
+TCL       | src/#{example}-tcl
+Guile     | src/#{example}-guile
+Clojure   | src/#{example}-clojure | bin/run-clj src/#{example}-clojure
+END
+
+# pp(targets: targets)
+%>
+
+## <%= example.capitalize %>
+
+### Source Code
+
+<% targets.each do | (target, file, cmd) | %>
+#### <%= target %>
+
+``` <%= target.split(" ").first %>
+<%= File.read(file).sub(/\n+\Z/, "\n") %>
+```
+
+<% end %>
+
+### Output
+
+<% targets.each do | (target, file, cmd) |
+  next if cmd == '-'
+  cmd ||= file
+%>
+#### <%= target %> Output
+
+```
+$ <%= cmd %>
+<%= `#{cmd}` %>
+```
+
+<% end %>
+
+<% end %>

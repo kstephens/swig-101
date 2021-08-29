@@ -165,8 +165,12 @@ target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX) : target/$(SWIG_TARGET
 	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library"
 	$(CC) $(CFLAGS_SWIG) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<
 
-clean:
-	rm -rf target/*
+#################################
+
+%.md : %.md.erb
+	erb -T 2 $< > $@
+
+#################################
 
 demo:
 	$(MAKE) clean all
@@ -176,4 +180,9 @@ demo:
 	@set -x; time src/example1-guile
 	@set -x; time src/example1-tcl
 	@set -x; time bin/run-clj src/example1-clojure
+
+#################################
+
+clean:
+	rm -rf target/*
 
