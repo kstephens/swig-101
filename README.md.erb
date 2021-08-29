@@ -71,7 +71,7 @@ END
 
 <% targets.each do | (target, file, cmd) |
 %>
-## <%= target %>
+## <%= target %> -- <%= file %>
 
 ``` <%= target.split(" ").first %>
 <%= File.read(file).sub(/\n+\Z/, "\n") %>
@@ -95,7 +95,6 @@ $ <%= cmd %>
   next if cmd == '-'
   cmd ||= file
 %>
-### <%= target %> Output
 
 ```
 $ <%= cmd %>
@@ -108,26 +107,18 @@ $ <%= cmd %>
 
 # Workflow
 
-```
+``` Sh
+# Compile Library:
+$ cc             src/X.c   -o native/X.o
 
-src/X.c  src/X.h
-|        |
-|        |\
-|        | `--> $ swig -ruby src/X.h
- `-+----'         |
-   |               `---> ruby/X.c
-    `--> $ cc src/X.c        |
-           |                 |
-            `-- native/X.o   |
-                |           /
-                +----------'
-                |
-                $ cc ruby/X.c native/X.o
-                  |
-                 /
-           ruby/X.so
-           |
-$ ruby <--'
+# Generate SWIG Wrappers:
+$ swig -ruby     src/X.h   -o ruby/X.c
+
+# Compile and Link SWIG Wrappers with Library:
+$ cc -dynamiclib ruby/X.c     native/X.o   -o ruby/X.so
+
+# Load SWIG Wrappers:
+$ ruby -e 'require "X"'
 
 ```
 

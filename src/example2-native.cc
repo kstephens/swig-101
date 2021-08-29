@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
   p.coeffs.push_back(7.11);
   p.coeffs.push_back(13.17);
   p.coeffs.push_back(19.23);
-  std::cout.precision(17);
+  std::cout.precision(16);
   std::cout << p.evaluate(2.3) << "\n";
   return 0;
 }

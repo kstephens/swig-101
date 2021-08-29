@@ -27,7 +27,7 @@ $ gmake clean all
 # Example1
 
 
-## C Header
+## C Header -- src/example1.h
 
 ``` C
 #ifdef SWIG
@@ -41,7 +41,7 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3);
 ```
 
 
-## C Library
+## C Library -- src/example1.c
 
 ``` C
 #include "example1.h"
@@ -52,7 +52,7 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3) {
 ```
 
 
-## C Main
+## C Main -- src/example1-native.c
 
 ``` C
 #include <stdio.h>
@@ -72,7 +72,7 @@ $ target/native/example1
 323.49370999999996
 ```
 
-## Ruby
+## Ruby -- src/example1-ruby
 
 ``` Ruby
 #!/usr/bin/env ruby
@@ -93,7 +93,7 @@ $ src/example1-ruby
 323.49370999999996
 ```
 
-## Python
+## Python -- src/example1-python
 
 ``` Python
 #!/usr/bin/env python3.8
@@ -114,7 +114,7 @@ $ src/example1-python
 323.49370999999996
 ```
 
-## TCL
+## TCL -- src/example1-tcl
 
 ``` TCL
 #!/usr/bin/env tclsh
@@ -132,7 +132,7 @@ $ src/example1-tcl
 323.49370999999996
 ```
 
-## Guile
+## Guile -- src/example1-guile
 
 ``` Guile
 #!/usr/bin/env guile --no-auto-compile
@@ -152,7 +152,7 @@ $ src/example1-guile
 323.49370999999996
 ```
 
-## Clojure
+## Clojure -- src/example1-clojure
 
 ``` Clojure
 ;; -*- clojure -*-
@@ -175,7 +175,6 @@ $ bin/run-clj src/example1-clojure
 ## Output
 
 
-### C Main Output
 
 ```
 $ target/native/example1
@@ -183,7 +182,6 @@ $ target/native/example1
 ```
 
 
-### Ruby Output
 
 ```
 $ src/example1-ruby
@@ -191,7 +189,6 @@ $ src/example1-ruby
 ```
 
 
-### Python Output
 
 ```
 $ src/example1-python
@@ -199,7 +196,6 @@ $ src/example1-python
 ```
 
 
-### TCL Output
 
 ```
 $ src/example1-tcl
@@ -207,7 +203,6 @@ $ src/example1-tcl
 ```
 
 
-### Guile Output
 
 ```
 $ src/example1-guile
@@ -215,7 +210,6 @@ $ src/example1-guile
 ```
 
 
-### Clojure Output
 
 ```
 $ bin/run-clj src/example1-clojure
@@ -228,7 +222,7 @@ $ bin/run-clj src/example1-clojure
 # Example2
 
 
-## C Header
+## C Header -- src/example2.h
 
 ``` C
 #ifdef SWIG
@@ -250,7 +244,7 @@ class polynomial {
 ```
 
 
-## C Library
+## C Library -- src/example2.cc
 
 ``` C
 #include "example2.h"
@@ -266,7 +260,7 @@ double polynomial::evaluate(double x) {
 ```
 
 
-## C Main
+## C Main -- src/example2-native.cc
 
 ``` C
 #include <iostream>
@@ -278,7 +272,7 @@ int main(int argc, char **argv) {
   p.coeffs.push_back(7.11);
   p.coeffs.push_back(13.17);
   p.coeffs.push_back(19.23);
-  std::cout.precision(17);
+  std::cout.precision(16);
   std::cout << p.evaluate(2.3) << "\n";
   return 0;
 }
@@ -289,10 +283,10 @@ Output:
 
 ```
 $ target/native/example2
-323.49370999999991
+323.4937099999999
 ```
 
-## Ruby
+## Ruby -- src/example2-ruby
 
 ``` Ruby
 #!/usr/bin/env ruby
@@ -319,7 +313,7 @@ class Polynomial
   def self.[] elems
     elems.inject(new){|this, x| this.coeffs << x; this}
   end
-  # Like a Proc:
+  # Proc-like:
   def to_proc
     lambda{|x| evaluate(x)}
   end
@@ -346,7 +340,7 @@ $ src/example2-ruby
 {0=>3.5, 1=>43.010000000000005, 2=>224.24, 3=>662.57, 4=>1473.38, 5=>2772.05}
 ```
 
-## Python
+## Python -- src/example2-python
 
 ``` Python
 #!/usr/bin/env python3.8
@@ -359,7 +353,7 @@ Output:
 $ src/example2-python
 ```
 
-## TCL
+## TCL -- src/example2-tcl
 
 ``` TCL
 #!/usr/bin/env tclsh
@@ -372,7 +366,7 @@ Output:
 $ src/example2-tcl
 ```
 
-## Guile
+## Guile -- src/example2-guile
 
 ``` Guile
 #!/usr/bin/env guile --no-auto-compile
@@ -386,7 +380,7 @@ Output:
 $ src/example2-guile
 ```
 
-## Clojure
+## Clojure -- src/example2-clojure
 
 ``` Clojure
 ;; -*- clojure -*-
@@ -402,15 +396,13 @@ $ bin/run-clj src/example2-clojure
 ## Output
 
 
-### C Main Output
 
 ```
 $ target/native/example2
-323.49370999999991
+323.4937099999999
 ```
 
 
-### Ruby Output
 
 ```
 $ src/example2-ruby
@@ -420,28 +412,24 @@ $ src/example2-ruby
 ```
 
 
-### Python Output
 
 ```
 $ src/example2-python
 ```
 
 
-### TCL Output
 
 ```
 $ src/example2-tcl
 ```
 
 
-### Guile Output
 
 ```
 $ src/example2-guile
 ```
 
 
-### Clojure Output
 
 ```
 $ bin/run-clj src/example2-clojure
@@ -451,27 +439,18 @@ $ bin/run-clj src/example2-clojure
 
 # Workflow
 
-```
+``` Sh
+# Compile Library:
+$ cc             src/X.c   -o native/X.o
 
-src/X.c  src/X.h
-|        |
-|        |\
-|        | \
-|        |  `--> $ swig -ruby src/X.h
-|        |         |
- `-+----'           `--> ruby/X.c
-   |                     |
-   |                      \
-   |                       \
-    `--> $ cc src/X.c       |
-           |                |
-            `-- native/X.o  |
-                |           \
-                 `-----------`--> $ cc ruby/X.c native/X.o
-                                    |
-                                     `--> ruby/X.so
-                                          |
-$ ruby <---------------------------------'
+# Generate SWIG Wrappers:
+$ swig -ruby     src/X.h   -o ruby/X.c
+
+# Compile and Link SWIG Wrappers with Library:
+$ cc -dynamiclib ruby/X.c     native/X.o   -o ruby/X.so
+
+# Load SWIG Wrappers:
+$ ruby -e 'require "X"'
 
 ```
 

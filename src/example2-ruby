@@ -22,7 +22,7 @@ class Polynomial
   def self.[] elems
     elems.inject(new){|this, x| this.coeffs << x; this}
   end
-  # Like a Proc:
+  # Proc-like:
   def to_proc
     lambda{|x| evaluate(x)}
   end
