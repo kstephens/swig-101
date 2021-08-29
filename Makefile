@@ -79,7 +79,7 @@ SWIG_SO_SUFFIX_java=jnilib # OSX
 
 ############################
 
-EXAMPLES=example1
+EXAMPLES=example1.c
 
 ############################
 
@@ -89,6 +89,8 @@ early:
 	@mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
 #################################
+
+EXAMPLE_NAME:=$(basename $(EXAMPLE))
 
 build-examples:
 	@echo "\n# Examples \n"
@@ -105,20 +107,20 @@ build-example-announce:
 #################################
 
 NATIVE_DEPS = \
-  target/native/$(EXAMPLE).o \
-  target/native/$(EXAMPLE) \
+  target/native/$(EXAMPLE_NAME).o \
+  target/native/$(EXAMPLE_NAME) \
 
 build-native: early $(NATIVE_DEPS)
 
-target/native/$(EXAMPLE).o : src/$(EXAMPLE).c
+target/native/$(EXAMPLE_NAME).o : src/$(EXAMPLE)
 	@echo "\n### Compile native code\n\n\`\`\`"
 	$(CC) $(CFLAGS) -c -o $@ $<
 	@echo "\`\`\`"
 
-target/native/$(EXAMPLE) : src/$(EXAMPLE)-native.c
+target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE))
 	@mkdir -p $(dir $@)
 	@echo "\n### Compile native program\n\n\`\`\`"
-	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE).o
+	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE_NAME).o
 	@echo "\`\`\`"
 
 #################################
@@ -131,32 +133,32 @@ build-targets : Makefile
 	done
 
 TARGET_DEPS = \
-	target/$(SWIG_TARGET)/$(EXAMPLE).c \
-	target/$(SWIG_TARGET)/$(EXAMPLE).o \
-	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE).$(SWIG_SO_SUFFIX)
+	target/$(SWIG_TARGET)/$(EXAMPLE) \
+	target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o \
+	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX)
 
 build-target: early build-target-announce $(TARGET_DEPS)
 
 build-target-announce:
 	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n"
 
-target/$(SWIG_TARGET)/$(EXAMPLE).c : src/$(EXAMPLE).h
+target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
 	@echo "\n### Generate $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
 	swig $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
 	wc -l $@
 	@echo "\`\`\`"
 
-target/$(SWIG_TARGET)/$(EXAMPLE).o : target/$(SWIG_TARGET)/$(EXAMPLE).c
+target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 	@mkdir -p $(dir $@)
 	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 	@echo "\`\`\`"
 
-target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE).o
+target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
 	@mkdir -p $(dir $@)
 	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library\n\n\`\`\`"
-	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<
+	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $<
 	@echo "\`\`\`"
 
 #################################
