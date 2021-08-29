@@ -26,6 +26,7 @@ $ gmake clean all
 
 # Example1
 
+
 ## C Header
 
 ``` C
@@ -39,6 +40,7 @@ $ gmake clean all
 double cubic_poly(double x, double c0, double c1, double c2, double c3);
 ```
 
+
 ## C Library
 
 ``` C
@@ -48,6 +50,7 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3) {
   return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
 }
 ```
+
 
 ## C Main
 
@@ -59,6 +62,14 @@ int main(int argc, char **argv) {
   printf("%.14f\n", cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23));
   return 0;
 }
+```
+
+
+Output:
+
+```
+$ target/native/example1
+323.49370999999996
 ```
 
 ## Ruby
@@ -74,6 +85,14 @@ require 'example1'
 puts Example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23)
 ```
 
+
+Output:
+
+```
+$ src/example1-ruby
+323.49370999999996
+```
+
 ## Python
 
 ``` Python
@@ -87,6 +106,14 @@ import example1
 print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
+
+Output:
+
+```
+$ src/example1-python
+323.49370999999996
+```
+
 ## TCL
 
 ``` TCL
@@ -95,6 +122,14 @@ print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 load target/tcl/example1.so Example1
 
 puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
+```
+
+
+Output:
+
+```
+$ src/example1-tcl
+323.49370999999996
 ```
 
 ## Guile
@@ -109,6 +144,14 @@ puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
 (newline)
 ```
 
+
+Output:
+
+```
+$ src/example1-guile
+323.49370999999996
+```
+
 ## Clojure
 
 ``` Clojure
@@ -121,6 +164,13 @@ puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
 (println (example1/cubic_poly 2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
+
+Output:
+
+```
+$ bin/run-clj src/example1-clojure
+323.49370999999996
+```
 
 ## Output
 
@@ -177,6 +227,7 @@ $ bin/run-clj src/example1-clojure
 
 # Example2
 
+
 ## C Header
 
 ``` C
@@ -198,6 +249,7 @@ class polynomial {
 };
 ```
 
+
 ## C Library
 
 ``` C
@@ -212,6 +264,7 @@ double polynomial::evaluate(double x) {
   return result;
 }
 ```
+
 
 ## C Main
 
@@ -229,6 +282,14 @@ int main(int argc, char **argv) {
   std::cout << p.evaluate(2.3) << "\n";
   return 0;
 }
+```
+
+
+Output:
+
+```
+$ target/native/example2
+323.49370999999991
 ```
 
 ## Ruby
@@ -275,16 +336,40 @@ x = 0..5
 pp x.zip(x.map(&p)).to_h
 ```
 
+
+Output:
+
+```
+$ src/example2-ruby
+323.4937099999999
+[3.5, 7.11, 13.17, 19.23]
+{0=>3.5, 1=>43.010000000000005, 2=>224.24, 3=>662.57, 4=>1473.38, 5=>2772.05}
+```
+
 ## Python
 
 ``` Python
 #!/usr/bin/env python3.8
 ```
 
+
+Output:
+
+```
+$ src/example2-python
+```
+
 ## TCL
 
 ``` TCL
 #!/usr/bin/env tclsh
+```
+
+
+Output:
+
+```
+$ src/example2-tcl
 ```
 
 ## Guile
@@ -294,12 +379,25 @@ pp x.zip(x.map(&p)).to_h
 !#
 ```
 
+
+Output:
+
+```
+$ src/example2-guile
+```
+
 ## Clojure
 
 ``` Clojure
 ;; -*- clojure -*-
 ```
 
+
+Output:
+
+```
+$ bin/run-clj src/example2-clojure
+```
 
 ## Output
 
@@ -352,6 +450,30 @@ $ bin/run-clj src/example2-clojure
 
 
 # Workflow
+
+```
+
+src/X.c  src/X.h
+|        |
+|        |\
+|        | \
+|        |  `--> $ swig -ruby src/X.h
+|        |         |
+ `-+----'           `--> ruby/X.c
+   |                     |
+   |                      \
+   |                       \
+    `--> $ cc src/X.c       |
+           |                |
+            `-- native/X.o  |
+                |           \
+                 `-----------`--> $ cc ruby/X.c native/X.o
+                                    |
+                                     `--> ruby/X.so
+                                          |
+$ ruby <---------------------------------'
+
+```
 
 
 
