@@ -56,8 +56,8 @@ examples = [ ]
   }
 
 targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-C Library | src/#{example_name}     | -
 C Header  | src/#{example}.h        | -
+C Library | src/#{example_name}     | -
 C Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
 Ruby      | src/#{example}-ruby    | 
 Python    | src/#{example}-python   |

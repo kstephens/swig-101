@@ -26,16 +26,6 @@ $ gmake clean all
 
 # Example1
 
-## C Library
-
-``` C
-#include "example1.h"
-
-double cubic_poly(double x, double c0, double c1, double c2, double c3) {
-  return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
-}
-```
-
 ## C Header
 
 ``` C
@@ -47,6 +37,16 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3) {
 #endif
 
 double cubic_poly(double x, double c0, double c1, double c2, double c3);
+```
+
+## C Library
+
+``` C
+#include "example1.h"
+
+double cubic_poly(double x, double c0, double c1, double c2, double c3) {
+  return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
+}
 ```
 
 ## C Main
@@ -177,24 +177,6 @@ $ bin/run-clj src/example1-clojure
 
 # Example2
 
-## C Library
-
-``` C
-#include "example2.h"
-
-void polynomial::add_coeff(double c) {
-  this->coeffs.push_back(c);
-};
-double polynomial::evaluate(double x) {
-  double result = 0, xx = 1;
-  for ( auto c : this->coeffs ) {
-    result += c * xx;
-    xx *= x;
-  }
-  return result;
-}
-```
-
 ## C Header
 
 ``` C
@@ -214,6 +196,24 @@ class polynomial {
   void add_coeff(double c);
   double evaluate(double x);
 };
+```
+
+## C Library
+
+``` C
+#include "example2.h"
+
+void polynomial::add_coeff(double c) {
+  this->coeffs.push_back(c);
+};
+double polynomial::evaluate(double x) {
+  double result = 0, xx = 1;
+  for ( auto c : this->coeffs ) {
+    result += c * xx;
+    xx *= x;
+  }
+  return result;
+}
 ```
 
 ## C Main
