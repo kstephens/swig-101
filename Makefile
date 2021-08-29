@@ -79,7 +79,9 @@ SWIG_SO_SUFFIX_java=jnilib # OSX
 
 ############################
 
-EXAMPLES=example1.c
+EXAMPLES = \
+  example1.c \
+  example2.cc
 
 ############################
 
@@ -91,6 +93,19 @@ early:
 #################################
 
 EXAMPLE_NAME:=$(basename $(EXAMPLE))
+EXAMPLE_SUFFIX:=$(suffix $(EXAMPLE))
+
+SWIG_OPTS+=$(SWIG_OPTS_SUFFIX$(EXAMPLE_SUFFIX))
+SWIG_OPTS_SUFFIX.c=
+SWIG_OPTS_SUFFIX.cc=-c++
+
+CC=$(CC_SUFFIX$(EXAMPLE_SUFFIX))
+CC_SUFFIX.c=clang
+CC_SUFFIX.cc=clang++
+
+CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
+CFLAGS_SUFFIX.c=
+CFLAGS_SUFFIX.cc=-stdlib=libc++
 
 build-examples:
 	@echo "\n# Examples \n"

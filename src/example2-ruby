@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+ENV["LD_LIBRARY_PATH"] = 'target/ruby'
+$:.unshift 'target/ruby'
+
+require 'example2'
+
+p = Example2::Polynomial.new
+p.add_coeff(3.5);
+p.add_coeff(7.11);
+p.add_coeff(13.17);
+p.add_coeff(19.23);
+puts p.evaluate(2.3)

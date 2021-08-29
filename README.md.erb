@@ -44,7 +44,7 @@ examples = [ ]
 
 <%
 
-%w(example1.c).each do | example_name |
+%w(example1.c example2.cc).each do | example_name |
   example_src     = "src/#{example_name}"
   example         = example_name.sub(/\.([^.]+)$/, '')
   example_suffix  = $1
