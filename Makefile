@@ -28,69 +28,54 @@ SWIG_OPTS_x += \
 CFLAGS += -g -O3
 CFLAGS += -Isrc
 CFLAGS += -I/opt/local/include # OSX macports
-CFLAGS_SWIG=$(CFLAGS_SWIG_$(SWIG_TARGET))
-#CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
+SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
+#SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
 CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX
-SO_SUFFIX=$(SO_SUFFIX_$(SWIG_TARGET))
-SO_PREFIX=$(SO_PREFIX_$(SWIG_TARGET))
+SWIG_SO_SUFFIX=$(SWIG_SO_SUFFIX_$(SWIG_TARGET))
+SWIG_SO_PREFIX=$(SWIG_SO_PREFIX_$(SWIG_TARGET))
 
 ############################
 
-RUBY_VERSION=2.3.0
-RUBY_ROOT=$(HOME)/.rbenv/versions/$(RUBY_VERSION)
-RUBY_INCL=$(RUBY_ROOT)/include/ruby-$(RUBY_VERSION)
-RUBY_LIB=$(RUBY_ROOT)/lib
-RUBY_EXE=$(RUBY_ROOT)/bin/ruby
-CFLAGS_SWIG_ruby=-I$(RUBY_INCL) -I$(RUBY_INCL)/x86_64-darwin18
-SO_SUFFIX_ruby=bundle # OSX
+SWIG_CFLAGS_ruby:=$(shell ruby -rrbconfig -e 'include RbConfig; puts "-I#{CONFIG["rubyhdrdir"]} -I#{CONFIG["rubyarchhdrdir"]}"')
+SWIG_SO_SUFFIX_ruby=bundle # OSX
 
 ############################
 
 PYTHON_VERSION=3.8
 PYTHON_ROOT=/opt/local/Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)
-PYTHON_INCL=$(PYTHON_ROOT)/include/python$(PYTHON_VERSION)
-PYTHON_LIB=$(PYTHON_ROOT)/lib
-PYTHON_EXE=python$(PYTHON_VERSION)
-CFLAGS_SWIG_python=-I$(PYTHON_INCL) -Wno-deprecated-declarations
-SO_PREFIX_python=_
-SO_SUFFIX_python=so # OSX
+SWIG_CFLAGS_python=-I$(PYTHON_ROOT)/include/python$(PYTHON_VERSION) -Wno-deprecated-declarations
+SWIG_SO_PREFIX_python=_
+SWIG_SO_SUFFIX_python=so # OSX
 
 ############################
 
-TCL_VERSION=2.2
-TCL_HOME=/opt/local
-TCL_INCL=$(TCL_HOME)/include/guile/$(TCL_VERSION)
-TCL_LIB=$(TCL_HOME)/lib
-TCL_EXE=$(TCL_HOME)/bin/tclsh
-CFLAGS_SWIG_guile=-I$(TCL_INCL)
-#SO_PREFIX_tcl=lib
-#SO_SUFFIX_tcl=dylib # OSX
-SO_SUFFIX_tcl=so # OSX
-SWIG_OPTS_tcl=
+TCL_HOME=:=$(abspath $(shell which tclsh)/../..)
+SWIG_CFLAGS_tcl=-I$(TCL_HOME)/include
+#SWIG_SO_PREFIX_tcl=lib
+SWIG_SO_SUFFIX_tcl=so # OSX
 
 ############################
 
 GUILE_VERSION=2.2
-GUILE_HOME=/opt/local
-GUILE_INCL=$(GUILE_HOME)/include/guile/$(GUILE_VERSION)
-GUILE_LIB=$(GUILE_HOME)/lib
+GUILE_HOME:=$(abspath $(shell which guile)/../..)
 GUILE_EXE=$(GUILE_HOME)/bin/guile
-CFLAGS_SWIG_guile=-I$(GUILE_HOME)/include -I$(GUILE_INCL) -I$(GUILE_INCL)/libguile
-SO_PREFIX_guile=lib
-SO_SUFFIX_guile=so # OSX
+GUILE_INCL=$(GUILE_HOME)/include/guile/$(GUILE_VERSION)
 SWIG_OPTS_guile=-scmstub
+SWIG_CFLAGS_guile=-I$(GUILE_INCL) -I$(GUILE_INCL)/libguile
+SWIG_SO_PREFIX_guile=lib
+SWIG_SO_SUFFIX_guile=so # OSX
 
 ############################
 
-JAVA_VERSION=11.0.2
-JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-$(JAVA_VERSION).jdk/Contents/Home
+# JAVA_VERSION=11.0.2
+JAVA_HOME:=$(abspath $(shell which java)/../..)
 JAVA_INCL=$(JAVA_HOME)/include
 JAVA_LIB=$(JAVA_HOME)/lib
 JAVA_EXE=$(JAVA_HOME)/bin/java
-CFLAGS_SWIG_java=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
-SO_PREFIX_java=lib
-SO_SUFFIX_java=jnilib # OSX
+SWIG_CFLAGS_java=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
+SWIG_SO_PREFIX_java=lib
+SWIG_SO_SUFFIX_java=jnilib # OSX
 
 ############################
 
@@ -148,7 +133,7 @@ build-targets : Makefile
 TARGET_DEPS = \
 	target/$(SWIG_TARGET)/$(EXAMPLE).c \
 	target/$(SWIG_TARGET)/$(EXAMPLE).o \
-	target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX)
+	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE).$(SWIG_SO_SUFFIX)
 
 build-target: early build-target-announce $(TARGET_DEPS)
 
@@ -165,10 +150,10 @@ target/$(SWIG_TARGET)/$(EXAMPLE).c : src/$(EXAMPLE).h
 target/$(SWIG_TARGET)/$(EXAMPLE).o : target/$(SWIG_TARGET)/$(EXAMPLE).c
 	@mkdir -p $(dir $@)
 	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
-	$(CC) $(CFLAGS) $(CFLAGS_SWIG) -c -o $@ $<
+	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 	@echo "\`\`\`"
 
-target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE).o
+target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE).o
 	@mkdir -p $(dir $@)
 	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library\n\n\`\`\`"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<

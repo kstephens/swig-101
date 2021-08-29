@@ -258,7 +258,8 @@ $ bin/run-clj src/example1-clojure
  ### Compile tcl SWIG wrapper
 
  ```
- cc -g -O3 -Isrc -c -o target/tcl/example1.o target/tcl/example1.c
+ cc -g -O3 -Isrc -I:=/opt/local/include -c -o target/tcl/example1.o  \
+  target/tcl/example1.c
  ```
 
  ### Link tcl SWIG wrapper dynamic library
