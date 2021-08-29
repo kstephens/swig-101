@@ -183,6 +183,7 @@ $ bin/run-clj src/example1-clojure
 #ifdef SWIG
 %module example2
 %include std_vector.i
+%template(VectorDouble) std::vector<double>;
 %{
 #include "example2.h"
 %}
@@ -245,12 +246,42 @@ $:.unshift 'target/ruby'
 require 'example2'
 
 p = Example2::Polynomial.new
+
 p.add_coeff(3.5);
 p.add_coeff(7.11);
 p.add_coeff(13.17);
 p.add_coeff(19.23);
-# p.coeffs = [3.5, 7.11, 13.17, 19.23]
+
 puts p.evaluate(2.3)
+
+########################################
+# Extend for convenience:
+
+# "Coercer":
+class Example2::VectorDouble
+  def self.[] elems
+    Example2::VectorDouble.new.tap do | this |
+      elems.each{|x| this << x}
+    end
+  end
+end
+
+# Like a Proc:
+class Example2::Polynomial
+  def to_proc
+    lambda{|x| evaluate(x)}
+  end
+  alias :call :evaluate
+  alias :[]   :evaluate
+end
+
+require 'pp'
+
+p = Example2::Polynomial.new
+
+p.coeffs = Example2::VectorDouble[[3.5, 7.11, 13.17, 19.23]]
+
+pp [2, -5, 7, 11].map(&p)
 ```
 
 ## Python
@@ -295,6 +326,7 @@ $ target/native/example2
 ```
 $ src/example2-ruby
 323.4937099999999
+[224.24, -2106.55, 7294.490000000001, 27270.41]
 ```
 
 
