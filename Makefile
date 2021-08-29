@@ -117,7 +117,7 @@ build-examples:
 build-example: early build-example-announce build-native build-targets
 
 build-example-announce:
-	@echo "\n## $(EXAMPLE) \n"
+	@echo "\n## Build $(EXAMPLE) \n"
 
 #################################
 
@@ -200,5 +200,5 @@ clean:
 	rm -rf target/*
 
 clean-example:
-	rm -f target/*/$(EXAMPLE_NAME)*
+	rm -rf target/*/$(EXAMPLE_NAME)*
 

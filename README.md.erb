@@ -17,45 +17,58 @@ Introduction to [SWIG](http://www.swig.org/).
 
 ```
 $ rbenv shell 2.3.0
-$ gmake clean all
+$ make clean all
 ```
 
 <%
+exit! if ENV['README_MD']
+ENV['README_MD'] = '1'
+
 require 'pp'
 
+$verbose = false
+
 def msg *args
-  $stderr.puts "  !!! README.md.erb : #{args * ' '}"
+  if $verbose
+    $stderr.puts "\n  !!! #{$$} : README.md.erb : #{args * ' '}"
+  end
 end
 
-msg "Start"
-
 def pe x
-  PP.pp(x, $stderr)
+  if $verbose
+    PP.pp(x, $stderr)
+  end
   x
 end
 
-def run cmd
-  msg "run : #{cmd.inspect}"
+def cmd cmd
+  msg "cmd : #{cmd.inspect}"
   `#{cmd}`
 end
 
 def wrap_line line, width = 78
-  words = line.split(' ')
+  words = line.strip.split(/\s+/)
   out = String.new
   line = String.new
   words.each do | word |
     if line.size + word.size > width
-      out += line + "  \\\n  "
+      out += line + " \\\n  "
       line = word
     else
-      line += ' ' + word
+      line += word + ' '
     end
   end
   out << line
 end
 
+make = `which gmake make 2>/dev/null`.split("\n").first
+
+msg "Start"
+
 examples = [ ]
 targets = nil
+
+cmd "#{make} all >/dev/null"
 %>
 
 <%
@@ -72,64 +85,85 @@ msg "Examples"
     suffix:   example_suffix,
   })
 
-pe(e: e)
+  msg "{{{ Example : #{e[:name]}"
+  pe(e: e)
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
 C Header  | src/#{example}.h        | -
 C Library | src/#{example_name}     | -
 C Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
-Ruby      | src/#{example}-ruby    | 
+Ruby      | src/#{example}-ruby     | 
 Python    | src/#{example}-python   |
 TCL       | src/#{example}-tcl      |
 Guile     | src/#{example}-guile    |
 Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
 END
 
-targets =
-  targets.
-  map do |l|
-    t = [:type, :file, :cmd].zip(l).to_h
-    t[:cmd] ||= t[:file] unless t[:cmd] == '-'
-    t
-  end
+  targets =
+    targets.
+    map do |l|
+      t = [:type, :file, :cmd].zip(l).to_h
+      t[:name] ||= t[:file]
+      if t[:cmd] == '-'
+        t[:cmd] = nil
+      else 
+        t[:cmd] ||= t[:file]
+      end
+      t
+    end
 
-pe(targets: targets)
+  pe(targets: targets)
 %>
 
 # <%= example.capitalize %>
 
 <% targets.each do | t |
-  msg "target : #{t[:file]}"
+  msg "{{{ Example : #{e[:name]} : Program : #{t[:name]}"
 %>
 ## <%= t[:type] %> -- <%= t[:file] %>
 
 ``` <%= t[:type].split(" ").first %>
 <%= File.read(t[:file]).sub(/\A\n+|\n+\Z/, "\n") %>
 ```
+
+<% if t[:cmd] %>
 ----
 
 ```
 $ <%= t[:cmd] %>
-<%= `#{t[:cmd]}` %>
+<%= cmd t[:cmd] %>
 ```
-<% msg "target : #{t[:file]} : DONE"; end %>
+<% end %>
+<%
+  msg "}}} Example : #{e[:name]} : Program : #{t[:name]}"
+end
+%>
 
 ## Output
-
-<% targets.reject{|t| t[:cmd] == '-'}.each do | t | %>
+<%
+msg "{{{ Output"
+targets.select{|t| t[:cmd]}.each do | t |
+  msg "#{e[:name]} : #{t[:name]} : Output : {{{"
+%>
 
 ```
 $ <%= t[:cmd] %>
-<%= run t[:cmd] %>
+<%= cmd t[:cmd] %>
 ```
 
-<% msg "target : #{t[:file]} : DONE" ; end %>
-
-<% msg "example : #{e[:name]} : DONE"; end %>
+<%
+  msg "}}} Example : #{e[:name]} : Output : #{t[:name]}"
+end
+%>
+<%
+  msg "}}} Example : #{e[:name]}"
+end
+msg "}}} Output"
+%>
 
 # Workflow
-<% msg "Workflow" %>
 
+<% msg "{{{ Workflow" %>
 ``` Sh
 # Compile Library:
 $ cc             src/X.c   -o native/X.o
@@ -145,19 +179,25 @@ $ ruby -e 'require "X"'
 ```
 
 <%
-e = examples.first
-pe(e: e)
-run 'gmake clean >/dev/null'
+[ examples.first ].each do | e |
 %>
 <%=
-  run "gmake clean-example build-example EXAMPLE=#{e[:name]}"
-  .gsub(' -I/opt/local/include ', ' ')
-  .split("\n")
-  .map{|l| wrap_line(l)}
-  .join("\n")
+  msg "{{{ Workflow : #{e[:name]}"
+  pe(e: e)
+  
+  cmd "#{make} clean-example EXAMPLE=#{e[:name]}"
+  cmd "#{make} build-example EXAMPLE=#{e[:name]}".
+  gsub(' -I/opt/local/include ', ' ').
+  split("\n").
+  map{|l| wrap_line(l)}.
+  join("\n")
 %>
 <%
-run 'gmake all >/dev/null'
+  msg "}}} Workflow : #{e[:name]}"
+end
+%>
+<%
+msg "}}} Workflow"
+cmd "#{make} all >/dev/null"
 msg 'DONE'
-# exit!
 %>

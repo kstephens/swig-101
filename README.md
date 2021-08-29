@@ -17,7 +17,7 @@ Introduction to [SWIG](http://www.swig.org/).
 
 ```
 $ rbenv shell 2.3.0
-$ gmake clean all
+$ make clean all
 ```
 
 
@@ -64,8 +64,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-
-Output:
+----
 
 ```
 $ target/native/example1
@@ -85,8 +84,7 @@ require 'example1'
 puts Example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23)
 ```
 
-
-Output:
+----
 
 ```
 $ src/example1-ruby
@@ -106,8 +104,7 @@ import example1
 print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
-
-Output:
+----
 
 ```
 $ src/example1-python
@@ -124,8 +121,7 @@ load target/tcl/example1.so Example1
 puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
 ```
 
-
-Output:
+----
 
 ```
 $ src/example1-tcl
@@ -144,8 +140,7 @@ $ src/example1-tcl
 (newline)
 ```
 
-
-Output:
+----
 
 ```
 $ src/example1-guile
@@ -164,16 +159,15 @@ $ src/example1-guile
 (println (example1/cubic_poly 2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
-
-Output:
+----
 
 ```
 $ bin/run-clj src/example1-clojure
 323.49370999999996
 ```
 
-## Output
 
+## Output
 
 
 ```
@@ -278,8 +272,7 @@ int main(int argc, char **argv) {
 }
 ```
 
-
-Output:
+----
 
 ```
 $ target/native/example2
@@ -330,8 +323,7 @@ x = 0..5
 pp x.zip(x.map(&p)).to_h
 ```
 
-
-Output:
+----
 
 ```
 $ src/example2-ruby
@@ -346,8 +338,7 @@ $ src/example2-ruby
 #!/usr/bin/env python3.8
 ```
 
-
-Output:
+----
 
 ```
 $ src/example2-python
@@ -359,8 +350,7 @@ $ src/example2-python
 #!/usr/bin/env tclsh
 ```
 
-
-Output:
+----
 
 ```
 $ src/example2-tcl
@@ -373,8 +363,7 @@ $ src/example2-tcl
 !#
 ```
 
-
-Output:
+----
 
 ```
 $ src/example2-guile
@@ -386,15 +375,14 @@ $ src/example2-guile
 ;; -*- clojure -*-
 ```
 
-
-Output:
+----
 
 ```
 $ bin/run-clj src/example2-clojure
 ```
 
-## Output
 
+## Output
 
 
 ```
@@ -437,6 +425,7 @@ $ bin/run-clj src/example2-clojure
 
 
 
+
 # Workflow
 
 ``` Sh
@@ -451,153 +440,139 @@ $ cc -dynamiclib ruby/X.c     native/X.o   -o ruby/X.so
 
 # Load SWIG Wrappers:
 $ ruby -e 'require "X"'
-
 ```
 
 
 
- ## example1.c
+## Build example1.c 
 
 
- ### Compile native code
+### Compile native code
 
- ```
- clang -g -O3 -Isrc -c -o target/native/example1.o src/example1.c
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -c -o target/native/example1.o src/example1.c
+```
 
- ### Compile native program
+### Compile native program
 
- ```
- clang -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
-  target/native/example1.o
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -o target/native/example1 src/example1-native.c target/native/example1.o
+```
 
- ## Build ruby SWIG wrapper
-
-
- ### Generate ruby SWIG wrapper
-
- ```
- swig -addextern -I- -ruby -o target/ruby/example1.c src/example1.h
- wc -l target/ruby/example1.c
- 2215 target/ruby/example1.c
- ```
-
- ### Compile ruby SWIG wrapper
-
- ```
- clang -g -O3 -Isrc -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0  \
-  -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0/x86_64-darwin18 -c  \
-  -o target/ruby/example1.o target/ruby/example1.c
- ```
-
- ### Link ruby SWIG wrapper dynamic library
-
- ```
- clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/ruby/example1.bundle target/native/example1.o target/ruby/example1.o
- ```
-
- ## Build python SWIG wrapper
+## Build ruby SWIG wrapper
 
 
- ### Generate python SWIG wrapper
+### Generate ruby SWIG wrapper
 
- ```
- swig -addextern -I- -python -o target/python/example1.c src/example1.h
- wc -l target/python/example1.c
- 3573 target/python/example1.c
- ```
+```
+swig -addextern -I-   -ruby -o target/ruby/example1.c src/example1.h
+wc -l target/ruby/example1.c
+    2215 target/ruby/example1.c
+```
 
- ### Compile python SWIG wrapper
+### Compile ruby SWIG wrapper
 
- ```
- clang -g -O3 -Isrc  \
-  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8  \
-  -Wno-deprecated-declarations -c -o target/python/example1.o  \
-  target/python/example1.c
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0 -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0/x86_64-darwin18 -c -o target/ruby/example1.o target/ruby/example1.c
+```
 
- ### Link python SWIG wrapper dynamic library
+### Link ruby SWIG wrapper dynamic library
 
- ```
- clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/python/_example1.so target/native/example1.o target/python/example1.o
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -dynamiclib -Wl,-undefined,dynamic_lookup  -o target/ruby/example1.bundle target/native/example1.o target/ruby/example1.o
+```
 
- ## Build tcl SWIG wrapper
+## Build python SWIG wrapper
 
 
- ### Generate tcl SWIG wrapper
+### Generate python SWIG wrapper
 
- ```
- swig -addextern -I- -tcl -o target/tcl/example1.c src/example1.h
- wc -l target/tcl/example1.c
- 2121 target/tcl/example1.c
- ```
+```
+swig -addextern -I-   -python -o target/python/example1.c src/example1.h
+wc -l target/python/example1.c
+    3573 target/python/example1.c
+```
 
- ### Compile tcl SWIG wrapper
+### Compile python SWIG wrapper
 
- ```
- clang -g -O3 -Isrc -c -o target/tcl/example1.o target/tcl/example1.c
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -I/opt/local/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8 -Wno-deprecated-declarations -c -o target/python/example1.o target/python/example1.c
+```
 
- ### Link tcl SWIG wrapper dynamic library
+### Link python SWIG wrapper dynamic library
 
- ```
- clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/tcl/example1.so target/native/example1.o target/tcl/example1.o
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -dynamiclib -Wl,-undefined,dynamic_lookup  -o target/python/_example1.so target/native/example1.o target/python/example1.o
+```
 
- ## Build guile SWIG wrapper
-
-
- ### Generate guile SWIG wrapper
-
- ```
- swig -addextern -I- -scmstub -guile -o target/guile/example1.c src/example1.h
- wc -l target/guile/example1.c
- 1583 target/guile/example1.c
- ```
-
- ### Compile guile SWIG wrapper
-
- ```
- clang -g -O3 -Isrc -I/opt/local/include/guile/2.2  \
-  -I/opt/local/include/guile/2.2/libguile -c -o target/guile/example1.o  \
-  target/guile/example1.c
- ```
-
- ### Link guile SWIG wrapper dynamic library
-
- ```
- clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/guile/libexample1.so target/native/example1.o target/guile/example1.o
- ```
-
- ## Build java SWIG wrapper
+## Build tcl SWIG wrapper
 
 
- ### Generate java SWIG wrapper
+### Generate tcl SWIG wrapper
 
- ```
- swig -addextern -I- -java -o target/java/example1.c src/example1.h
- wc -l target/java/example1.c
- 243 target/java/example1.c
- ```
+```
+swig -addextern -I-   -tcl -o target/tcl/example1.c src/example1.h
+wc -l target/tcl/example1.c
+    2121 target/tcl/example1.c
+```
 
- ### Compile java SWIG wrapper
+### Compile tcl SWIG wrapper
 
- ```
- clang -g -O3 -Isrc  \
-  -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include  \
-  -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include/darwin  \
-  -c -o target/java/example1.o target/java/example1.c
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -I/opt/local/include -c -o target/tcl/example1.o target/tcl/example1.c
+```
 
- ### Link java SWIG wrapper dynamic library
+### Link tcl SWIG wrapper dynamic library
 
- ```
- clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/java/libexample1.jnilib target/native/example1.o target/java/example1.o
- ```
+```
+clang -g -O3 -Isrc -I/opt/local/include   -dynamiclib -Wl,-undefined,dynamic_lookup  -o target/tcl/example1.so target/native/example1.o target/tcl/example1.o
+```
+
+## Build guile SWIG wrapper
+
+
+### Generate guile SWIG wrapper
+
+```
+swig -addextern -I- -scmstub  -guile -o target/guile/example1.c src/example1.h
+wc -l target/guile/example1.c
+    1583 target/guile/example1.c
+```
+
+### Compile guile SWIG wrapper
+
+```
+clang -g -O3 -Isrc -I/opt/local/include   -I/opt/local/include/guile/2.2 -I/opt/local/include/guile/2.2/libguile -c -o target/guile/example1.o target/guile/example1.c
+```
+
+### Link guile SWIG wrapper dynamic library
+
+```
+clang -g -O3 -Isrc -I/opt/local/include   -dynamiclib -Wl,-undefined,dynamic_lookup  -o target/guile/libexample1.so target/native/example1.o target/guile/example1.o
+```
+
+## Build java SWIG wrapper
+
+
+### Generate java SWIG wrapper
+
+```
+swig -addextern -I-   -java -o target/java/example1.c src/example1.h
+wc -l target/java/example1.c
+     243 target/java/example1.c
+```
+
+### Compile java SWIG wrapper
+
+```
+clang -g -O3 -Isrc -I/opt/local/include   -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include/darwin -c -o target/java/example1.o target/java/example1.c
+```
+
+### Link java SWIG wrapper dynamic library
+
+```
+clang -g -O3 -Isrc -I/opt/local/include   -dynamiclib -Wl,-undefined,dynamic_lookup  -o target/java/libexample1.jnilib target/native/example1.o target/java/example1.o
+```
+
+
+
