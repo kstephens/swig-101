@@ -254,11 +254,9 @@ puts p.evaluate(2.3)
 # Extend for convenience:
 
 class Polynomial
-  # "Coercer":
+  # Constructor:
   def self.[] elems
-    new.tap do | this |
-      elems.each{|x| this.coeffs << x}
-    end
+    elems.inject(new){|this, x| this.coeffs << x; this}
   end
   # Like a Proc:
   def to_proc
@@ -271,8 +269,10 @@ end
 require 'pp'
 
 p = Polynomial[ [3.5, 7.11, 13.17, 19.23] ]
+pp p.coeffs.to_a
 
-pp [2, -5, 7, 11].map(&p)
+x = 0..5
+pp x.zip(x.map(&p)).to_h
 ```
 
 ## Python
@@ -317,7 +317,8 @@ $ target/native/example2
 ```
 $ src/example2-ruby
 323.4937099999999
-[224.24, -2106.55, 7294.490000000001, 27270.41]
+[3.5, 7.11, 13.17, 19.23]
+{0=>3.5, 1=>43.010000000000005, 2=>224.24, 3=>662.57, 4=>1473.38, 5=>2772.05}
 ```
 
 
