@@ -24,7 +24,8 @@ SWIG_OPTS_x += \
 
 ############################
 
-CFLAGS += -g -O3 -Iinclude
+CFLAGS += -g -O3
+CFLAGS += -Isrc
 CFLAGS += -I/opt/local/include # OSX macports
 CFLAGS_SWIG=$(CFLAGS) $(CFLAGS_SWIG_$(SWIG_TARGET))
 #CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
@@ -92,60 +93,77 @@ SO_SUFFIX_java=jnilib # OSX
 
 ############################
 
-SRCS=src/example1.c
+EXAMPLES=example1
 
 ############################
 
-all: early all-targets
-
-all-targets : Makefile
-	@set -e; \
-	for t in $(SWIG_TARGETS); \
-	do \
-	  $(MAKE) --no-print-directory build SWIG_TARGET=$$t; \
-	done
-
-TARGET_DEPS=                              \
-$(foreach f, $(SRCS),                     \
-	$(f:src/%.c=target/native/%.o)    \
-	$(f:src/%.c=target/$(SWIG_TARGET)/%.c) \
-	$(f:src/%.c=target/$(SWIG_TARGET)/%.o) \
-	$(f:src/%.c=target/$(SWIG_TARGET)/$(SO_PREFIX)%.$(SO_SUFFIX)) \
-	$(f:src/%.c=target/native/%)    \
-)
-
-build: build-announce $(TARGET_DEPS)
-
-build-announce:
-	@echo "\n  ################################################"
-	@echo "\n  ### Building SWIG wrapper for $(SWIG_TARGET):\n"
+all: early build-examples
 
 early:
 	@mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
-target/native/%.o : src/%.c
-	@echo "\n  ### Compiling native example code:\n"
+#################################
+
+build-examples:
+	@echo "\n# Examples \n"
+	@for e in $(EXAMPLES) ;\
+	do \
+	  echo "\n## $$e \n" ;\
+	  $(MAKE) --no-print-directory build-example EXAMPLE=$$e ;\
+	done
+
+build-example: build-native build-targets
+
+#################################
+
+NATIVE_DEPS = \
+  target/native/$(EXAMPLE).o \
+  target/native/$(EXAMPLE) \
+
+build-native: $(NATIVE_DEPS)
+
+target/native/$(EXAMPLE).o : src/$(EXAMPLE).c
+	@echo "\n### Compile native code\n"
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-target/native/% : src/%-main.c
+target/native/$(EXAMPLE) : src/$(EXAMPLE)-native.c
 	@mkdir -p $(dir $@)
-	@echo "\n  ### Compiling native example main program:\n"
-	$(CC) $(CFLAGS) -o $@ $< $(<:src/%-main.c=target/native/%.o)
+	@echo "\n### Compile native program\n"
+	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE).o
 
-target/$(SWIG_TARGET)/%.c : include/%.h
+#################################
+
+build-targets : Makefile
+	@set -e ;\
+	for t in $(SWIG_TARGETS) ;\
+	do \
+	  $(MAKE) --no-print-directory build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
+	done
+
+TARGET_DEPS = \
+	target/$(SWIG_TARGET)/$(EXAMPLE).c \
+	target/$(SWIG_TARGET)/$(EXAMPLE).o \
+	target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX)
+
+build-target: build-target-announce $(TARGET_DEPS)
+
+build-target-announce:
+	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n"
+
+target/$(SWIG_TARGET)/$(EXAMPLE).c : src/$(EXAMPLE).h
 	@mkdir -p $(dir $@)
-	@echo "\n  ### Generating SWIG $(SWIG_TARGET) wrapper *.c:\n"
+	@echo "\n### Generate $(SWIG_TARGET) SWIG wrapper\n"
 	swig $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
 
-target/$(SWIG_TARGET)/%.o : target/$(SWIG_TARGET)/%.c
+target/$(SWIG_TARGET)/$(EXAMPLE).o : target/$(SWIG_TARGET)/$(EXAMPLE).c
 	@mkdir -p $(dir $@)
-	@echo "\n  ### Compiling SWIG $(SWIG_TARGET) wrapper *.o:\n"
+	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n"
 	$(CC) $(CFLAGS_SWIG) -c -o $@ $<
 
-target/$(SWIG_TARGET)/$(SO_PREFIX)%.$(SO_SUFFIX) : target/$(SWIG_TARGET)/%.o
+target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE).o
 	@mkdir -p $(dir $@)
-	@echo "\n  ### Linking SWIG $(SWIG_TARGET) wrapper dynamic library:\n"
-	$(CC) $(CFLAGS_SWIG) $(CFLAGS_SO) -o $@ $(<:target/$(SWIG_TARGET)/%.o=target/native/%.o) $<
+	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library"
+	$(CC) $(CFLAGS_SWIG) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<
 
 clean:
 	rm -rf target/*
@@ -156,5 +174,6 @@ demo:
 	@set -x; time src/example1-ruby
 	@set -x; time src/example1-python
 	@set -x; time src/example1-guile
-	@set -x; time bin/run-clj src/example1-clojure
 	@set -x; time src/example1-tcl
+	@set -x; time bin/run-clj src/example1-clojure
+
