@@ -22,7 +22,22 @@ $ gmake clean all
 
 <%
 require 'pp'
-# pp(targets: targets)
+
+def msg *args
+  $stderr.puts "  !!! README.md.erb : #{args * ' '}"
+end
+
+msg "Start"
+
+def pe x
+  PP.pp(x, $stderr)
+  x
+end
+
+def run cmd
+  msg "run : #{cmd.inspect}"
+  `#{cmd}`
+end
 
 def wrap_line line, width = 78
   words = line.split(' ')
@@ -40,22 +55,26 @@ def wrap_line line, width = 78
 end
 
 examples = [ ]
+targets = nil
 %>
 
 <%
+msg "Examples"
 
 %w(example1.c example2.cc).each do | example_name |
   example_src     = "src/#{example_name}"
   example         = example_name.sub(/\.([^.]+)$/, '')
   example_suffix  = $1
-  examples << {
+  examples << (e = {
     name:     example_name,
     basename: example,
     src:      example_src,
     suffix:   example_suffix,
-  }
+  })
 
-targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
+pe(e: e)
+
+  targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
 C Header  | src/#{example}.h        | -
 C Library | src/#{example_name}     | -
 C Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
@@ -65,47 +84,51 @@ TCL       | src/#{example}-tcl      |
 Guile     | src/#{example}-guile    |
 Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
 END
+
+targets =
+  targets.
+  map do |l|
+    t = [:type, :file, :cmd].zip(l).to_h
+    t[:cmd] ||= t[:file] unless t[:cmd] == '-'
+    t
+  end
+
+pe(targets: targets)
 %>
 
 # <%= example.capitalize %>
 
-<% targets.each do | (target, file, cmd) |
+<% targets.each do | t |
+  msg "target : #{t[:file]}"
 %>
-## <%= target %> -- <%= file %>
+## <%= t[:type] %> -- <%= t[:file] %>
 
-``` <%= target.split(" ").first %>
-<%= File.read(file).sub(/\n+\Z/, "\n") %>
+``` <%= t[:type].split(" ").first %>
+<%= File.read(t[:file]).sub(/\A\n+|\n+\Z/, "\n") %>
 ```
-
-<% unless cmd == '-'
-  cmd ||= file
-%>
-Output:
+----
 
 ```
-$ <%= cmd %>
-<%= `#{cmd}` %>
+$ <%= t[:cmd] %>
+<%= `#{t[:cmd]}` %>
 ```
-<% end %>
-<% end %>
+<% msg "target : #{t[:file]} : DONE"; end %>
 
 ## Output
 
-<% targets.each do | (target, file, cmd) |
-  next if cmd == '-'
-  cmd ||= file
-%>
+<% targets.reject{|t| t[:cmd] == '-'}.each do | t | %>
 
 ```
-$ <%= cmd %>
-<%= `#{cmd}` %>
+$ <%= t[:cmd] %>
+<%= run t[:cmd] %>
 ```
 
-<% end %>
+<% msg "target : #{t[:file]} : DONE" ; end %>
 
-<% end %>
+<% msg "example : #{e[:name]} : DONE"; end %>
 
 # Workflow
+<% msg "Workflow" %>
 
 ``` Sh
 # Compile Library:
@@ -119,18 +142,22 @@ $ cc -dynamiclib ruby/X.c     native/X.o   -o ruby/X.so
 
 # Load SWIG Wrappers:
 $ ruby -e 'require "X"'
-
 ```
 
 <%
-example = examples.first
-system 'gmake clean >/dev/null'
+e = examples.first
+pe(e: e)
+run 'gmake clean >/dev/null'
 %>
 <%=
-  `gmake build-example EXAMPLE=#{example[:name]}`
+  run "gmake clean-example build-example EXAMPLE=#{e[:name]}"
   .gsub(' -I/opt/local/include ', ' ')
   .split("\n")
   .map{|l| wrap_line(l)}
   .join("\n")
 %>
-<% system 'gmake >/dev/null' %>
+<%
+run 'gmake all >/dev/null'
+msg 'DONE'
+# exit!
+%>

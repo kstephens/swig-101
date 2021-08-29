@@ -199,3 +199,6 @@ demo:
 clean:
 	rm -rf target/*
 
+clean-example:
+	rm -f target/*/$(EXAMPLE_NAME)*
+
