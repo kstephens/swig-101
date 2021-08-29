@@ -167,8 +167,8 @@ target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX) : target/$(SWIG_TARGET
 
 #################################
 
-%.md : %.md.erb
-	erb -T 2 $< > $@
+%.md : %.md.erb src/*
+	erb -T 2 $@.erb > $@
 
 #################################
 

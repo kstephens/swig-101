@@ -13,17 +13,30 @@ Introduction to [SWIG](http://www.swig.org/).
 * Install JVM 11.0.3
 * Install clojure + clojure-tools
 
-# Example 1
+## Build
 
-## C Library
+```
+$ rbenv shell 2.3.0
+$ gmake clean all
+```
+
+# Examples
+
+
+
+## Example1
+
+### C Library
 
 ``` C
+#include "example1.h"
+
 double cubic_poly(double x, double c0, double c1, double c2, double c3) {
   return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
 }
 ```
 
-## C Header / SWIG Interface Spec
+### C Header
 
 ``` C
 #ifdef SWIG
@@ -36,21 +49,19 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3) {
 double cubic_poly(double x, double c0, double c1, double c2, double c3);
 ```
 
-## C Native
+### C Main
 
 ``` C
 #include <stdio.h>
 #include "example1.h"
 
 int main(int argc, char **argv) {
-  printf("%.15f\n", cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23));
+  printf("%.14f\n", cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23));
   return 0;
 }
 ```
 
-# Calling through SWIG
-
-## Ruby
+### Ruby
 
 ``` Ruby
 #!/usr/bin/env ruby
@@ -63,7 +74,7 @@ require 'example1'
 puts Example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23)
 ```
 
-## Python
+### Python
 
 ``` Python
 #!/usr/bin/env python3.8
@@ -76,7 +87,29 @@ import example1
 print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
-## Clojure
+### TCL
+
+``` TCL
+#!/usr/bin/env tclsh
+
+load target/tcl/example1.so Example1
+
+puts [cubic_poly 2.3 3.5 7.11 13.17 19.23]
+```
+
+### Guile
+
+``` Guile
+#!/usr/bin/env guile --no-auto-compile
+!#
+
+(load-extension "target/guile/libexample1.so" "SWIG_init")
+
+(write (cubic-poly 2.3 3.5 7.11 13.17 19.23))
+(newline)
+```
+
+### Clojure
 
 ``` Clojure
 ;; -*- clojure -*-
@@ -88,21 +121,55 @@ print(example1.cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23))
 (println (example1/cubic_poly 2.3, 3.5, 7.11, 13.17, 19.23))
 ```
 
-# Build and Run
+
+### Output
+
+
+#### C Main Output
 
 ```
-$ rbenv shell 2.3.0
-$ gmake clean all
-
 $ target/native/example1
-323.493709999999908
-
-$ src/example1-ruby
-323.4937099999999
-
-$ src/example1-python
-323.4937099999999
-
-$ bin/run-clj src/example1-clojure
-323.4937099999999
+323.49370999999996
 ```
+
+
+#### Ruby Output
+
+```
+$ src/example1-ruby
+323.49370999999996
+```
+
+
+#### Python Output
+
+```
+$ src/example1-python
+323.49370999999996
+```
+
+
+#### TCL Output
+
+```
+$ src/example1-tcl
+323.49370999999996
+```
+
+
+#### Guile Output
+
+```
+$ src/example1-guile
+323.49370999999996
+```
+
+
+#### Clojure Output
+
+```
+$ bin/run-clj src/example1-clojure
+323.49370999999996
+```
+
+

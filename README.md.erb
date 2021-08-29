@@ -42,10 +42,8 @@ END
 
 ## <%= example.capitalize %>
 
-### Source Code
-
 <% targets.each do | (target, file, cmd) | %>
-#### <%= target %>
+### <%= target %>
 
 ``` <%= target.split(" ").first %>
 <%= File.read(file).sub(/\n+\Z/, "\n") %>
