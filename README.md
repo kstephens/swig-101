@@ -175,7 +175,8 @@ $ bin/run-clj src/example1-clojure
 # Workflow
 
 
- ## example1
+
+ ## example1.c
 
 
  ### Compile native code

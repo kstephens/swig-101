@@ -20,21 +20,8 @@ $ rbenv shell 2.3.0
 $ gmake clean all
 ```
 
-<% %w(example1).each do | example | %>
 <%
 require 'pp'
-
-targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-C Library | src/#{example}.c        | -
-C Header  | src/#{example}.h        | -
-C Main    | src/#{example}-native.c | target/native/#{example}
-Ruby      | src/#{example}-ruby    | 
-Python    | src/#{example}-python   |
-TCL       | src/#{example}-tcl      |
-Guile     | src/#{example}-guile    |
-Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
-END
-
 # pp(targets: targets)
 
 def wrap_line line, width = 78
@@ -51,6 +38,33 @@ def wrap_line line, width = 78
   end
   out << line
 end
+
+examples = [ ]
+%>
+
+<%
+
+%w(example1.c).each do | example_name |
+  example_src     = "src/#{example_name}"
+  example         = example_name.sub(/\.([^.]+)$/, '')
+  example_suffix  = $1
+  examples << {
+    name:     example_name,
+    basename: example,
+    src:      example_src,
+    suffix:   example_suffix,
+  }
+
+targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
+C Library | src/#{example_name}     | -
+C Header  | src/#{example}.h        | -
+C Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
+Ruby      | src/#{example}-ruby    | 
+Python    | src/#{example}-python   |
+TCL       | src/#{example}-tcl      |
+Guile     | src/#{example}-guile    |
+Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
+END
 %>
 
 # <%= example.capitalize %>
@@ -83,10 +97,12 @@ $ <%= cmd %>
 
 # Workflow
 
-<% example = 'example1' %>
-<% system 'gmake clean >/dev/null' %>
+<%
+example = examples.first
+system 'gmake clean >/dev/null'
+%>
 <%=
-  `gmake build-example EXAMPLE=#{example}`
+  `gmake build-example EXAMPLE=#{example[:name]}`
   .gsub(' -I/opt/local/include ', ' ')
   .split("\n")
   .map{|l| wrap_line(l)}
