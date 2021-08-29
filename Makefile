@@ -1,4 +1,5 @@
 MAKE+=--no-print-directory
+MAKEFLAGS+=--no-print-directory
 
 ############################
 
@@ -7,9 +8,9 @@ SWIG_TARGET=UNDEFINED
 
 SWIG_OPTS += \
 	-addextern -I- \
-	-debug-module 1,2,3,4 \
 	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
+     -debug-module 1,2,3,4 \
      -debug-symtabs  \
      -debug-symbols  \
      -debug-csymbols \
@@ -27,7 +28,7 @@ SWIG_OPTS_x += \
 CFLAGS += -g -O3
 CFLAGS += -Isrc
 CFLAGS += -I/opt/local/include # OSX macports
-CFLAGS_SWIG=$(CFLAGS) $(CFLAGS_SWIG_$(SWIG_TARGET))
+CFLAGS_SWIG=$(CFLAGS_SWIG_$(SWIG_TARGET))
 #CFLAGS_SWIG += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
 CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX
@@ -108,11 +109,13 @@ build-examples:
 	@echo "\n# Examples \n"
 	@for e in $(EXAMPLES) ;\
 	do \
-	  echo "\n## $$e \n" ;\
 	  $(MAKE) --no-print-directory build-example EXAMPLE=$$e ;\
 	done
 
-build-example: build-native build-targets
+build-example: early build-example-announce build-native build-targets
+
+build-example-announce:
+	@echo "\n## $(EXAMPLE) \n"
 
 #################################
 
@@ -120,16 +123,18 @@ NATIVE_DEPS = \
   target/native/$(EXAMPLE).o \
   target/native/$(EXAMPLE) \
 
-build-native: $(NATIVE_DEPS)
+build-native: early $(NATIVE_DEPS)
 
 target/native/$(EXAMPLE).o : src/$(EXAMPLE).c
-	@echo "\n### Compile native code\n"
+	@echo "\n### Compile native code\n\n\`\`\`"
 	$(CC) $(CFLAGS) -c -o $@ $<
+	@echo "\`\`\`"
 
 target/native/$(EXAMPLE) : src/$(EXAMPLE)-native.c
 	@mkdir -p $(dir $@)
-	@echo "\n### Compile native program\n"
+	@echo "\n### Compile native program\n\n\`\`\`"
 	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE).o
+	@echo "\`\`\`"
 
 #################################
 
@@ -145,30 +150,34 @@ TARGET_DEPS = \
 	target/$(SWIG_TARGET)/$(EXAMPLE).o \
 	target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX)
 
-build-target: build-target-announce $(TARGET_DEPS)
+build-target: early build-target-announce $(TARGET_DEPS)
 
 build-target-announce:
 	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n"
 
 target/$(SWIG_TARGET)/$(EXAMPLE).c : src/$(EXAMPLE).h
 	@mkdir -p $(dir $@)
-	@echo "\n### Generate $(SWIG_TARGET) SWIG wrapper\n"
+	@echo "\n### Generate $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
 	swig $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
+	wc -l $@
+	@echo "\`\`\`"
 
 target/$(SWIG_TARGET)/$(EXAMPLE).o : target/$(SWIG_TARGET)/$(EXAMPLE).c
 	@mkdir -p $(dir $@)
-	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n"
-	$(CC) $(CFLAGS_SWIG) -c -o $@ $<
+	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
+	$(CC) $(CFLAGS) $(CFLAGS_SWIG) -c -o $@ $<
+	@echo "\`\`\`"
 
 target/$(SWIG_TARGET)/$(SO_PREFIX)$(EXAMPLE).$(SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE).o
 	@mkdir -p $(dir $@)
-	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library"
-	$(CC) $(CFLAGS_SWIG) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<
+	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library\n\n\`\`\`"
+	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE).o $<
+	@echo "\`\`\`"
 
 #################################
 
-%.md : %.md.erb src/*
-	erb -T 2 $@.erb > $@
+%.md : all %.md.erb src/* Makefile
+	erb -T 2 $@.erb | sed -E -e 's@$(HOME)@$$HOME@g' > $@
 
 #################################
 

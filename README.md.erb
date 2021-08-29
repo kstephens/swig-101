@@ -10,7 +10,7 @@ Introduction to [SWIG](http://www.swig.org/).
 * sudo port install swig swig-ruby swig-python swig-java python3.8
 * Install rbenv + ruby-build plugin
 * rbenv install 2.3.0
-* Install JVM 11.0.3
+* Install JVM 11.0.2
 * Install clojure + clojure-tools
 
 ## Build
@@ -20,30 +20,43 @@ $ rbenv shell 2.3.0
 $ gmake clean all
 ```
 
-# Examples
-
 <% %w(example1).each do | example | %>
 <%
 require 'pp'
 
 targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-C Library | src/#{example}.c      | -
-C Header  | src/#{example}.h      | -
+C Library | src/#{example}.c        | -
+C Header  | src/#{example}.h        | -
 C Main    | src/#{example}-native.c | target/native/#{example}
-Ruby      | src/#{example}-ruby
-Python    | src/#{example}-python
-TCL       | src/#{example}-tcl
-Guile     | src/#{example}-guile
-Clojure   | src/#{example}-clojure | bin/run-clj src/#{example}-clojure
+Ruby      | src/#{example}-ruby    | 
+Python    | src/#{example}-python   |
+TCL       | src/#{example}-tcl      |
+Guile     | src/#{example}-guile    |
+Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
 END
 
 # pp(targets: targets)
+
+def wrap_line line, width = 78
+  words = line.split(' ')
+  out = String.new
+  line = String.new
+  words.each do | word |
+    if line.size + word.size > width
+      out += line + "  \\\n  "
+      line = word
+    else
+      line += ' ' + word
+    end
+  end
+  out << line
+end
 %>
 
-## <%= example.capitalize %>
+# <%= example.capitalize %>
 
 <% targets.each do | (target, file, cmd) | %>
-### <%= target %>
+## <%= target %>
 
 ``` <%= target.split(" ").first %>
 <%= File.read(file).sub(/\n+\Z/, "\n") %>
@@ -51,13 +64,13 @@ END
 
 <% end %>
 
-### Output
+## Output
 
 <% targets.each do | (target, file, cmd) |
   next if cmd == '-'
   cmd ||= file
 %>
-#### <%= target %> Output
+### <%= target %> Output
 
 ```
 $ <%= cmd %>
@@ -67,3 +80,15 @@ $ <%= cmd %>
 <% end %>
 
 <% end %>
+
+# Workflow
+
+<% example = 'example1' %>
+<% system 'gmake clean >/dev/null' %>
+<%=
+  `gmake build-example EXAMPLE=#{example}`
+  .gsub(' -I/opt/local/include ', ' ')
+  .split("\n")
+  .map{|l| wrap_line(l)}
+  .join("\n")
+%>
