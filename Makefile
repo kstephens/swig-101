@@ -105,7 +105,7 @@ CC_SUFFIX.cc=clang++
 
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 CFLAGS_SUFFIX.c=
-CFLAGS_SUFFIX.cc=-stdlib=libc++
+CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
 
 build-examples:
 	@echo "\n# Examples \n"
@@ -191,6 +191,8 @@ demo:
 	@set -x; time src/example1-guile
 	@set -x; time src/example1-tcl
 	@set -x; time bin/run-clj src/example1-clojure
+
+	@set -x; time target/native/example2
 
 #################################
 

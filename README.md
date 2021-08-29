@@ -22,6 +22,8 @@ $ gmake clean all
 
 
 
+
+
 # Example1
 
 ## C Library
@@ -172,6 +174,159 @@ $ bin/run-clj src/example1-clojure
 
 
 
+
+# Example2
+
+## C Library
+
+``` C
+#include "example2.h"
+
+void polynomial::add_coeff(double c) {
+  this->coeffs.push_back(c);
+};
+double polynomial::evaluate(double x) {
+  double result = 0, xx = 1;
+  for ( auto c : this->coeffs ) {
+    result += c * xx;
+    xx *= x;
+  }
+  return result;
+}
+```
+
+## C Header
+
+``` C
+#ifdef SWIG
+%module example2
+%include std_vector.i
+%{
+#include "example2.h"
+%}
+#endif
+
+#include <vector>
+
+class polynomial {
+ public:
+  std::vector<double> coeffs;
+  void add_coeff(double c);
+  double evaluate(double x);
+};
+```
+
+## C Main
+
+``` C
+#include <iostream>
+#include "example2.h"
+
+int main(int argc, char **argv) {
+  polynomial p;
+  p.add_coeff(3.5);
+  p.add_coeff(7.11);
+  p.add_coeff(13.17);
+  p.add_coeff(19.23);
+  std::cout.precision(17);
+  std::cout << p.evaluate(2.3) << "\n";
+  return 0;
+}
+```
+
+## Ruby
+
+``` Ruby
+#!/usr/bin/env ruby
+
+ENV["LD_LIBRARY_PATH"] = 'target/ruby'
+$:.unshift 'target/ruby'
+
+require 'example2'
+
+p = Example2::Polynomial.new
+p.add_coeff(3.5);
+p.add_coeff(7.11);
+p.add_coeff(13.17);
+p.add_coeff(19.23);
+# p.coeffs = [3.5, 7.11, 13.17, 19.23]
+puts p.evaluate(2.3)
+```
+
+## Python
+
+``` Python
+#!/usr/bin/env python3.8
+```
+
+## TCL
+
+``` TCL
+#!/usr/bin/env tclsh
+```
+
+## Guile
+
+``` Guile
+#!/usr/bin/env guile --no-auto-compile
+!#
+```
+
+## Clojure
+
+``` Clojure
+;; -*- clojure -*-
+```
+
+
+## Output
+
+
+### C Main Output
+
+```
+$ target/native/example2
+323.49370999999991
+```
+
+
+### Ruby Output
+
+```
+$ src/example2-ruby
+323.4937099999999
+```
+
+
+### Python Output
+
+```
+$ src/example2-python
+```
+
+
+### TCL Output
+
+```
+$ src/example2-tcl
+```
+
+
+### Guile Output
+
+```
+$ src/example2-guile
+```
+
+
+### Clojure Output
+
+```
+$ bin/run-clj src/example2-clojure
+```
+
+
+
 # Workflow
 
 
@@ -182,13 +337,13 @@ $ bin/run-clj src/example1-clojure
  ### Compile native code
 
  ```
- cc -g -O3 -Isrc -c -o target/native/example1.o src/example1.c
+ clang -g -O3 -Isrc -c -o target/native/example1.o src/example1.c
  ```
 
  ### Compile native program
 
  ```
- cc -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
+ clang -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
   target/native/example1.o
  ```
 
@@ -206,7 +361,7 @@ $ bin/run-clj src/example1-clojure
  ### Compile ruby SWIG wrapper
 
  ```
- cc -g -O3 -Isrc -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0  \
+ clang -g -O3 -Isrc -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0  \
   -I$HOME/.rbenv/versions/2.3.0/include/ruby-2.3.0/x86_64-darwin18 -c  \
   -o target/ruby/example1.o target/ruby/example1.c
  ```
@@ -214,7 +369,7 @@ $ bin/run-clj src/example1-clojure
  ### Link ruby SWIG wrapper dynamic library
 
  ```
- cc -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/ruby/example1.bundle target/native/example1.o target/ruby/example1.o
  ```
 
@@ -232,7 +387,7 @@ $ bin/run-clj src/example1-clojure
  ### Compile python SWIG wrapper
 
  ```
- cc -g -O3 -Isrc  \
+ clang -g -O3 -Isrc  \
   -I/opt/local/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8  \
   -Wno-deprecated-declarations -c -o target/python/example1.o  \
   target/python/example1.c
@@ -241,7 +396,7 @@ $ bin/run-clj src/example1-clojure
  ### Link python SWIG wrapper dynamic library
 
  ```
- cc -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/python/_example1.so target/native/example1.o target/python/example1.o
  ```
 
@@ -259,13 +414,13 @@ $ bin/run-clj src/example1-clojure
  ### Compile tcl SWIG wrapper
 
  ```
- cc -g -O3 -Isrc -c -o target/tcl/example1.o target/tcl/example1.c
+ clang -g -O3 -Isrc -c -o target/tcl/example1.o target/tcl/example1.c
  ```
 
  ### Link tcl SWIG wrapper dynamic library
 
  ```
- cc -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/tcl/example1.so target/native/example1.o target/tcl/example1.o
  ```
 
@@ -283,7 +438,7 @@ $ bin/run-clj src/example1-clojure
  ### Compile guile SWIG wrapper
 
  ```
- cc -g -O3 -Isrc -I/opt/local/include/guile/2.2  \
+ clang -g -O3 -Isrc -I/opt/local/include/guile/2.2  \
   -I/opt/local/include/guile/2.2/libguile -c -o target/guile/example1.o  \
   target/guile/example1.c
  ```
@@ -291,7 +446,7 @@ $ bin/run-clj src/example1-clojure
  ### Link guile SWIG wrapper dynamic library
 
  ```
- cc -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/guile/libexample1.so target/native/example1.o target/guile/example1.o
  ```
 
@@ -309,7 +464,7 @@ $ bin/run-clj src/example1-clojure
  ### Compile java SWIG wrapper
 
  ```
- cc -g -O3 -Isrc  \
+ clang -g -O3 -Isrc  \
   -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include  \
   -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include/darwin  \
   -c -o target/java/example1.o target/java/example1.c
@@ -318,6 +473,6 @@ $ bin/run-clj src/example1-clojure
  ### Link java SWIG wrapper dynamic library
 
  ```
- cc -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/java/libexample1.jnilib target/native/example1.o target/java/example1.o
  ```

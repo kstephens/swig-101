@@ -1,5 +1,6 @@
 #ifdef SWIG
 %module example2
+%include std_vector.i
 %{
 #include "example2.h"
 %}
