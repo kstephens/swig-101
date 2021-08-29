@@ -12,7 +12,6 @@
 class polynomial {
  public:
   std::vector<double> coeffs;
-  void add_coeff(double c);
   double evaluate(double x);
 };
 

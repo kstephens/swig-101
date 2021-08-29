@@ -194,7 +194,6 @@ $ bin/run-clj src/example1-clojure
 class polynomial {
  public:
   std::vector<double> coeffs;
-  void add_coeff(double c);
   double evaluate(double x);
 };
 ```
@@ -204,9 +203,6 @@ class polynomial {
 ``` C
 #include "example2.h"
 
-void polynomial::add_coeff(double c) {
-  this->coeffs.push_back(c);
-};
 double polynomial::evaluate(double x) {
   double result = 0, xx = 1;
   for ( auto c : this->coeffs ) {
@@ -225,10 +221,10 @@ double polynomial::evaluate(double x) {
 
 int main(int argc, char **argv) {
   polynomial p;
-  p.add_coeff(3.5);
-  p.add_coeff(7.11);
-  p.add_coeff(13.17);
-  p.add_coeff(19.23);
+  p.coeffs.push_back(3.5);
+  p.coeffs.push_back(7.11);
+  p.coeffs.push_back(13.17);
+  p.coeffs.push_back(19.23);
   std::cout.precision(17);
   std::cout << p.evaluate(2.3) << "\n";
   return 0;
@@ -244,30 +240,27 @@ ENV["LD_LIBRARY_PATH"] = 'target/ruby'
 $:.unshift 'target/ruby'
 
 require 'example2'
+include Example2
 
-p = Example2::Polynomial.new
-
-p.add_coeff(3.5);
-p.add_coeff(7.11);
-p.add_coeff(13.17);
-p.add_coeff(19.23);
+p = Polynomial.new
+p.coeffs << 3.5
+p.coeffs << 7.11
+p.coeffs << 13.17
+p.coeffs << 19.23
 
 puts p.evaluate(2.3)
 
 ########################################
 # Extend for convenience:
 
-# "Coercer":
-class Example2::VectorDouble
+class Polynomial
+  # "Coercer":
   def self.[] elems
-    Example2::VectorDouble.new.tap do | this |
-      elems.each{|x| this << x}
+    new.tap do | this |
+      elems.each{|x| this.coeffs << x}
     end
   end
-end
-
-# Like a Proc:
-class Example2::Polynomial
+  # Like a Proc:
   def to_proc
     lambda{|x| evaluate(x)}
   end
@@ -277,9 +270,7 @@ end
 
 require 'pp'
 
-p = Example2::Polynomial.new
-
-p.coeffs = Example2::VectorDouble[[3.5, 7.11, 13.17, 19.23]]
+p = Polynomial[ [3.5, 7.11, 13.17, 19.23] ]
 
 pp [2, -5, 7, 11].map(&p)
 ```
