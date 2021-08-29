@@ -50,7 +50,7 @@ SWIG_SO_SUFFIX_python=so # OSX
 
 ############################
 
-TCL_HOME=:=$(abspath $(shell which tclsh)/../..)
+TCL_HOME:=$(abspath $(shell which tclsh)/../..)
 SWIG_CFLAGS_tcl=-I$(TCL_HOME)/include
 #SWIG_SO_PREFIX_tcl=lib
 SWIG_SO_SUFFIX_tcl=so # OSX
