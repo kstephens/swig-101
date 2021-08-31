@@ -3,6 +3,6 @@
 
 (load-extension "target/guile/libexample1.so" "SWIG_init")
 
-(write (cubic-poly 2.3 3.5 7.11 13.17 19.23))
+(write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
 (newline)
 

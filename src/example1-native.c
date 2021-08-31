@@ -2,6 +2,6 @@
 #include "example1.h"
 
 int main(int argc, char **argv) {
-  printf("%.14f\n", cubic_poly(2.3, 3.5, 7.11, 13.17, 19.23));
+  printf("%g\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
   return 0;
 }

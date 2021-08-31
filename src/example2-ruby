@@ -7,12 +7,13 @@ require 'example2'
 include Example2
 
 p = Polynomial.new
-p.coeffs << 3.5
-p.coeffs << 7.11
-p.coeffs << 13.17
-p.coeffs << 19.23
+p.coeffs << 3.0
+p.coeffs << 5.0
+p.coeffs << 7.0
+p.coeffs << 11.0
+p.coeffs << -13.0
 
-puts p.evaluate(2.3)
+puts p.evaluate(2.0)
 
 ########################################
 # Extend for convenience:
@@ -32,7 +33,7 @@ end
 
 require 'pp'
 
-p = Polynomial[ [3.5, 7.11, 13.17, 19.23] ]
+p = Polynomial[ [3.0, 5.0, 7.0, 11.0, -13.0] ]
 pp p.coeffs.to_a
 
 x = 0..5
