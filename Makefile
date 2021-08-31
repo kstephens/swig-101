@@ -1,3 +1,5 @@
+#!bin/build
+
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 
@@ -114,10 +116,12 @@ build-examples:
 	  $(MAKE) --no-print-directory build-example EXAMPLE=$$e ;\
 	done
 
-build-example: early build-example-announce build-native build-targets
+build-example: early build-example-begin build-native build-targets build-example-end
 
-build-example-announce:
-	@echo "\n## Build $(EXAMPLE) \n"
+build-example-begin:
+	@echo "\n# Build $(EXAMPLE) \n"
+
+build-example-end:
 
 #################################
 
@@ -125,18 +129,22 @@ NATIVE_DEPS = \
   target/native/$(EXAMPLE_NAME).o \
   target/native/$(EXAMPLE_NAME) \
 
-build-native: early $(NATIVE_DEPS)
+build-native: early build-native-begin $(NATIVE_DEPS) build-native-end
+
+build-native-begin:
+	@echo "\n## Build $(EXAMPLE) Native Code\n\`\`\`"
+
+build-native-end:
+	@echo "\`\`\`\n"
 
 target/native/$(EXAMPLE_NAME).o : src/$(EXAMPLE)
-	@echo "\n### Compile native code\n\n\`\`\`"
+	@echo "\n# Compile native library:"
 	$(CC) $(CFLAGS) -c -o $@ $<
-	@echo "\`\`\`"
 
 target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE))
 	@mkdir -p $(dir $@)
-	@echo "\n### Compile native program\n\n\`\`\`"
+	@echo "\n# Compile and link native program:"
 	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE_NAME).o
-	@echo "\`\`\`"
 
 #################################
 
@@ -152,29 +160,30 @@ TARGET_DEPS = \
 	target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o \
 	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX)
 
-build-target: early build-target-announce $(TARGET_DEPS)
+build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
-build-target-announce:
-	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n"
+build-target-begin:
+	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n\`\`\`"
+
+build-target-end:
+	@echo "\`\`\`\n"
 
 target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
-	@echo "\n### Generate $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
+	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper:"
 	swig $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
+	@echo ''
 	wc -l $@
-	@echo "\`\`\`"
 
 target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 	@mkdir -p $(dir $@)
-	@echo "\n### Compile $(SWIG_TARGET) SWIG wrapper\n\n\`\`\`"
+	@echo "\n# Compile $(SWIG_TARGET) SWIG wrapper:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
-	@echo "\`\`\`"
 
 target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
 	@mkdir -p $(dir $@)
-	@echo "\n### Link $(SWIG_TARGET) SWIG wrapper dynamic library\n\n\`\`\`"
+	@echo "\n# Link $(SWIG_TARGET) SWIG wrapper dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $<
-	@echo "\`\`\`"
 
 #################################
 
@@ -200,5 +209,5 @@ clean:
 	rm -rf target/*
 
 clean-example:
-	rm -rf target/*/$(EXAMPLE_NAME)*
+	rm -rfv target/*/$(EXAMPLE_NAME)*
 

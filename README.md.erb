@@ -9,15 +9,15 @@ Introduction to [SWIG](http://www.swig.org/).
 * Install macports
 * sudo port install swig swig-ruby swig-python swig-java python3.8
 * Install rbenv + ruby-build plugin
-* rbenv install 2.3.0
+* rbenv install 2.7.1
 * Install JVM 11.0.2
 * Install clojure + clojure-tools
 
 ## Build
 
 ```
-$ rbenv shell 2.3.0
-$ make clean all
+$ rbenv shell 2.7.1
+$ bin/build clean all
 ```
 
 <%
@@ -27,23 +27,27 @@ ENV['README_MD'] = '1'
 require 'pp'
 
 $verbose = false
+$pe  = $verbose # || true
+$msg = $verbose # || true
 
 def msg *args
-  if $verbose
+  if $msg
     $stderr.puts "\n  !!! #{$$} : README.md.erb : #{args * ' '}"
   end
 end
 
 def pe x
-  if $verbose
+  if $verbose or $pe
     PP.pp(x, $stderr)
+    $stderr.flush
   end
   x
 end
 
 def cmd cmd
   msg "cmd : #{cmd.inspect}"
-  `#{cmd}`
+  system "#{cmd} >tmp/cmd.out 2>&1"
+  File.read("tmp/cmd.out")
 end
 
 def wrap_line line, width = 78
@@ -57,11 +61,13 @@ def wrap_line line, width = 78
     else
       line += word + ' '
     end
+    # pe(word: word, words: words)
   end
   out << line
 end
 
 make = `which gmake make 2>/dev/null`.split("\n").first
+make = 'bin/build'
 
 msg "Start"
 
@@ -78,20 +84,22 @@ msg "Examples"
   example_src     = "src/#{example_name}"
   example         = example_name.sub(/\.([^.]+)$/, '')
   example_suffix  = $1
+  lang = example_suffix.upcase
   examples << (e = {
     name:     example_name,
     basename: example,
     src:      example_src,
     suffix:   example_suffix,
+    lang:     lang,
   })
 
   msg "{{{ Example : #{e[:name]}"
   pe(e: e)
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-C Header  | src/#{example}.h        | -
-C Library | src/#{example_name}     | -
-C Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
+#{lang} Header  | src/#{example}.h        | -
+#{lang} Library | src/#{example_name}     | -
+#{lang} Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
 Ruby      | src/#{example}-ruby     | 
 Python    | src/#{example}-python   |
 TCL       | src/#{example}-tcl      |
@@ -164,19 +172,11 @@ msg "}}} Output"
 # Workflow
 
 <% msg "{{{ Workflow" %>
-``` Sh
-# Compile Library:
-$ cc             src/X.c   -o native/X.o
 
-# Generate SWIG Wrappers:
-$ swig -ruby     src/X.h   -o ruby/X.c
-
-# Compile and Link SWIG Wrappers with Library:
-$ cc -dynamiclib ruby/X.c     native/X.o   -o ruby/X.so
-
-# Load SWIG Wrappers:
-$ ruby -e 'require "X"'
-```
+* Compile native library
+* Generate SWIG wrappers for target language
+* Compile and link SWIG wrappers for target language with native library
+* Load SWIG wrappers into target language
 
 <%
 [ examples.first ].each do | e |
@@ -185,12 +185,16 @@ $ ruby -e 'require "X"'
   msg "{{{ Workflow : #{e[:name]}"
   pe(e: e)
   
-  cmd "#{make} clean-example EXAMPLE=#{e[:name]}"
-  cmd "#{make} build-example EXAMPLE=#{e[:name]}".
-  gsub(' -I/opt/local/include ', ' ').
-  split("\n").
-  map{|l| wrap_line(l)}.
-  join("\n")
+  # cmd "#{make} clean-example EXAMPLE=#{e[:name]}"
+  cmd "#{make} clean"
+  out = cmd "#{make} build-example EXAMPLE=#{e[:name]}"
+  # pe(s: out)
+  out = out.
+  gsub('/opt/local/bin/gmake', 'make').
+  gsub(' -I/opt/local/include ', ' ')
+  lines = out.split("\n", 999999)
+  # pe(lines: lines)
+  lines.map{|l| wrap_line(l)}.join("\n")
 %>
 <%
   msg "}}} Workflow : #{e[:name]}"

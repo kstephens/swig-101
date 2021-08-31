@@ -1,8 +1,6 @@
 #!/bin/sh
 # set -xe
-JAVA_VERSION=11.0.2
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-${JAVA_VERSION}.jdk/Contents/Home
-export JAVA_CMD="$JAVA_HOME/bin/java"
+export JAVA_CMD="$(which java)"
 export LD_LIBRARY_PATH="target/java:$LD_LIBRARY_PATH"
 export CLASSPATH="target/java:$CLASSPATH"
 PATH="${JAVA_HOME}/bin:$PATH"

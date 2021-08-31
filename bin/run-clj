@@ -1,5 +1,5 @@
 #!/bin/sh
 # set -x
 target_path="$(/bin/pwd)/target/java"
-export CLASSPATH="$target_path:$(clojure -Spath)"
+export CLASSPATH="$target_path:$(clojure -Spath):$CLASSPATH"
 exec bin/run-java clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$target_path" -M "$@"
