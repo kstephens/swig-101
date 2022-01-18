@@ -10,7 +10,7 @@ Introduction to [SWIG](http://www.swig.org/).
 * sudo port install swig swig-ruby swig-python swig-java python3.8
 * Install rbenv + ruby-build plugin
 * rbenv install 2.7.1
-* Install JVM 11.0.2
+* Install JVM 11.0
 * Install clojure + clojure-tools
 
 ## Build
@@ -80,16 +80,16 @@ cmd "#{make} all >/dev/null"
 <%
 msg "Examples"
 
-%w(example1.c example2.cc).each do | example_name |
-  example_src     = "src/#{example_name}"
-  example         = example_name.sub(/\.([^.]+)$/, '')
-  example_suffix  = $1
-  lang = example_suffix.upcase
+%w(example1.c example2.cc).each do | name |
+  src       = "src/#{name}"
+  basename  = name.sub(/\.([^.]+)$/, '')
+  suffix    = $1
+  lang = suffix.upcase
   examples << (e = {
-    name:     example_name,
-    basename: example,
-    src:      example_src,
-    suffix:   example_suffix,
+    name:     name,
+    basename: basename,
+    src:      src,
+    suffix:   suffix,
     lang:     lang,
   })
 
@@ -97,14 +97,14 @@ msg "Examples"
   pe(e: e)
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-#{lang} Header  | src/#{example}.h        | -
-#{lang} Library | src/#{example_name}     | -
-#{lang} Main    | src/#{example}-native.#{example_suffix} | target/native/#{example}
-Ruby      | src/#{example}-ruby     | 
-Python    | src/#{example}-python   |
-TCL       | src/#{example}-tcl      |
-Guile     | src/#{example}-guile    |
-Clojure   | src/#{example}-clojure  | bin/run-clj src/#{example}-clojure
+#{lang} Header  | src/#{basename}.h  | -
+#{lang} Library | src/#{name}        | -
+#{lang} Main    | src/#{basename}-native.#{suffix} | target/native/#{basename}
+Ruby            | src/#{basename}-ruby     | 
+Python          | src/#{basename}-python   |
+TCL             | src/#{basename}-tcl      |
+Guile           | src/#{basename}-guile    |
+Clojure         | src/#{basename}-clojure  | bin/run-clj src/#{basename}-clojure
 END
 
   targets =
@@ -123,7 +123,7 @@ END
   pe(targets: targets)
 %>
 
-# <%= example.capitalize %>
+# <%= basename.capitalize %>
 
 <% targets.each do | t |
   msg "{{{ Example : #{e[:name]} : Program : #{t[:name]}"
