@@ -7,7 +7,6 @@ Introduction to [SWIG](http://www.swig.org/).
 ## OSX
 
 * Install macports
-* sudo port install swig swig-ruby swig-python swig-java python3.8
 * Install rbenv + ruby-build plugin
 * rbenv install 2.7.1
 * Install JVM 11.0.2
@@ -17,6 +16,7 @@ Introduction to [SWIG](http://www.swig.org/).
 
 ```
 $ rbenv shell 2.7.1
+$ bin/build macports-prereq 
 $ bin/build clean all
 ```
 

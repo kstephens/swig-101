@@ -31,6 +31,7 @@ CFLAGS += -g -O3
 CFLAGS += -Isrc
 CFLAGS += -I/opt/local/include # OSX macports
 SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
+SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
 #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
 CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX
@@ -39,14 +40,16 @@ SWIG_SO_PREFIX=$(SWIG_SO_PREFIX_$(SWIG_TARGET))
 
 ############################
 
-SWIG_CFLAGS_ruby:=$(shell ruby -rrbconfig -e 'include RbConfig; puts "-I#{CONFIG["rubyhdrdir"]} -I#{CONFIG["rubyarchhdrdir"]}"')
+SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
 SWIG_SO_SUFFIX_ruby=bundle # OSX
 
 ############################
 
-PYTHON_VERSION=3.8
-PYTHON_ROOT=/opt/local/Library/Frameworks/Python.framework/Versions/$(PYTHON_VERSION)
-SWIG_CFLAGS_python=-I$(PYTHON_ROOT)/include/python$(PYTHON_VERSION) -Wno-deprecated-declarations
+PYTHON_VERSION=3.9
+PYTHON_EXE=$(shell which python3)
+SWIG_CFLAGS_python=$(shell python$(PYTHON_VERSION)-config --cflags) -Wno-deprecated-declarations
+SWIG_LDFLAGS_python=$(shell python$(PYTHON_VERSION)-config --ldflags)
+SWIG_OPTS_python=-py3
 SWIG_SO_PREFIX_python=_
 SWIG_SO_SUFFIX_python=so # OSX
 
@@ -62,9 +65,9 @@ SWIG_SO_SUFFIX_tcl=so # OSX
 GUILE_VERSION=2.2
 GUILE_HOME:=$(abspath $(shell which guile)/../..)
 GUILE_EXE=$(GUILE_HOME)/bin/guile
-GUILE_INCL=$(GUILE_HOME)/include/guile/$(GUILE_VERSION)
 SWIG_OPTS_guile=-scmstub
-SWIG_CFLAGS_guile=-I$(GUILE_INCL) -I$(GUILE_INCL)/libguile
+SWIG_CFLAGS_guile=$(shell guile-config compile)
+SWIG_LDFLAGS_guile=$(shell guile-config link)
 SWIG_SO_PREFIX_guile=lib
 SWIG_SO_SUFFIX_guile=so # OSX
 
@@ -106,6 +109,7 @@ CC_SUFFIX.c=clang
 CC_SUFFIX.cc=clang++
 
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
+#LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
 CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
 
@@ -183,7 +187,7 @@ target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
 	@mkdir -p $(dir $@)
 	@echo "\n# Link $(SWIG_TARGET) SWIG wrapper dynamic library:"
-	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $<
+	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
 
 #################################
 
@@ -202,6 +206,11 @@ demo:
 	@set -x; time bin/run-clj src/example1-clojure
 
 	@set -x; time target/native/example2
+
+#################################
+
+macports-prereq:
+	sudo port install $(SWIG_TARGETS:%=swig-%)
 
 #################################
 
