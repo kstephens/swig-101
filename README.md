@@ -9,7 +9,7 @@ Introduction to [SWIG](http://www.swig.org/).
 * Install macports
 * Install rbenv + ruby-build plugin
 * rbenv install 2.7.1
-* Install JVM 11.0.2
+* Install JVM 11.0
 * Install clojure + clojure-tools
 
 ## Build
@@ -38,7 +38,9 @@ $ bin/build clean all
 #endif
 
 double cubic_poly(double x, double c0, double c1, double c2, double c3);
+
 ```
+
 
 
 ## C Library -- src/example1.c
@@ -49,7 +51,9 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3);
 double cubic_poly(double x, double c0, double c1, double c2, double c3) {
   return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
 }
+
 ```
+
 
 
 ## C Main -- src/example1-native.c
@@ -62,14 +66,18 @@ int main(int argc, char **argv) {
   printf("%g\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
   return 0;
 }
+
 ```
+
 
 ----
 
 ```
 $ target/native/example1
 129
+
 ```
+
 
 ## Ruby -- src/example1-ruby
 
@@ -82,19 +90,23 @@ $:.unshift 'target/ruby'
 require 'example1'
 
 puts Example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
+
 ```
+
 
 ----
 
 ```
 $ src/example1-ruby
 129.0
+
 ```
+
 
 ## Python -- src/example1-python
 
 ``` Python
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3.9
 
 import sys
 sys.path.append('target/python')
@@ -102,14 +114,18 @@ sys.path.append('target/python')
 import example1
 
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
+
 ```
+
 
 ----
 
 ```
 $ src/example1-python
 129.0
+
 ```
+
 
 ## TCL -- src/example1-tcl
 
@@ -119,14 +135,18 @@ $ src/example1-python
 load target/tcl/example1.so Example1
 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
+
 ```
+
 
 ----
 
 ```
 $ src/example1-tcl
 129.0
+
 ```
+
 
 ## Guile -- src/example1-guile
 
@@ -138,14 +158,18 @@ $ src/example1-tcl
 
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
 (newline)
+
 ```
+
 
 ----
 
 ```
 $ src/example1-guile
 129.0
+
 ```
+
 
 ## Clojure -- src/example1-clojure
 
@@ -157,14 +181,18 @@ $ src/example1-guile
 (import 'example1)
 
 (println (example1/cubic_poly 2.0 3.0 5.0 7.0 11.0))
+
 ```
+
 
 ----
 
 ```
 $ bin/run-clj src/example1-clojure
 129.0
+
 ```
+
 
 
 ## Output
@@ -173,6 +201,7 @@ $ bin/run-clj src/example1-clojure
 ```
 $ target/native/example1
 129
+
 ```
 
 
@@ -180,6 +209,7 @@ $ target/native/example1
 ```
 $ src/example1-ruby
 129.0
+
 ```
 
 
@@ -187,6 +217,7 @@ $ src/example1-ruby
 ```
 $ src/example1-python
 129.0
+
 ```
 
 
@@ -194,6 +225,7 @@ $ src/example1-python
 ```
 $ src/example1-tcl
 129.0
+
 ```
 
 
@@ -201,6 +233,7 @@ $ src/example1-tcl
 ```
 $ src/example1-guile
 129.0
+
 ```
 
 
@@ -208,6 +241,7 @@ $ src/example1-guile
 ```
 $ bin/run-clj src/example1-clojure
 129.0
+
 ```
 
 
@@ -235,7 +269,9 @@ class polynomial {
   std::vector<double> coeffs;
   double evaluate(double x);
 };
+
 ```
+
 
 
 ## CC Library -- src/example2.cc
@@ -251,7 +287,9 @@ double polynomial::evaluate(double x) {
   }
   return result;
 }
+
 ```
+
 
 
 ## CC Main -- src/example2-native.cc
@@ -270,14 +308,18 @@ int main(int argc, char **argv) {
   std::cout << p.evaluate(2.0) << "\n";
   return 0;
 }
+
 ```
+
 
 ----
 
 ```
 $ target/native/example2
 -79
+
 ```
+
 
 ## Ruby -- src/example2-ruby
 
@@ -322,7 +364,9 @@ pp p.coeffs.to_a
 
 x = 0..5
 pp x.zip(x.map(&p)).to_h
+
 ```
+
 
 ----
 
@@ -331,56 +375,74 @@ $ src/example2-ruby
 -79.0
 [3.0, 5.0, 7.0, 11.0, -13.0]
 {0=>3.0, 1=>13.0, 2=>-79.0, 3=>-675.0, 4=>-2489.0, 5=>-6547.0}
+
 ```
+
 
 ## Python -- src/example2-python
 
 ``` Python
 #!/usr/bin/env python3.8
+
 ```
+
 
 ----
 
 ```
 $ src/example2-python
+
 ```
+
 
 ## TCL -- src/example2-tcl
 
 ``` TCL
 #!/usr/bin/env tclsh
+
 ```
+
 
 ----
 
 ```
 $ src/example2-tcl
+
 ```
+
 
 ## Guile -- src/example2-guile
 
 ``` Guile
 #!/usr/bin/env guile --no-auto-compile
 !#
+
 ```
+
 
 ----
 
 ```
 $ src/example2-guile
+
 ```
+
 
 ## Clojure -- src/example2-clojure
 
 ``` Clojure
 ;; -*- clojure -*-
+
 ```
+
 
 ----
 
 ```
 $ bin/run-clj src/example2-clojure
+
 ```
+
 
 
 ## Output
@@ -389,6 +451,7 @@ $ bin/run-clj src/example2-clojure
 ```
 $ target/native/example2
 -79
+
 ```
 
 
@@ -398,36 +461,42 @@ $ src/example2-ruby
 -79.0
 [3.0, 5.0, 7.0, 11.0, -13.0]
 {0=>3.0, 1=>13.0, 2=>-79.0, 3=>-675.0, 4=>-2489.0, 5=>-6547.0}
+
 ```
 
 
 
 ```
 $ src/example2-python
+
 ```
 
 
 
 ```
 $ src/example2-tcl
+
 ```
 
 
 
 ```
 $ src/example2-guile
+
 ```
 
 
 
 ```
 $ bin/run-clj src/example2-clojure
+
 ```
 
 
 
 
 # Workflow
+
 
 
 * Compile native library
@@ -462,8 +531,8 @@ wc -l target/ruby/example1.c
 2215 target/ruby/example1.c 
 
 # Compile ruby SWIG wrapper: 
-clang -g -O3 -Isrc -I$HOME/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
-  -I$HOME/.rbenv/versions/2.7.1/include/ruby-2.7.0/x86_64-darwin19-c  \
+clang -g -O3 -Isrc -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
+  -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0/x86_64-darwin19-c  \
   -otarget/ruby/example1.o target/ruby/example1.c 
 
 # Link ruby SWIG wrapper dynamic library: 
@@ -476,20 +545,26 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate python SWIG wrapper: 
-swig -addextern -I- -python -o target/python/example1.c src/example1.h 
+swig -addextern -I- -py3 -python -o target/python/example1.c src/example1.h 
 
 wc -l target/python/example1.c 
 3573 target/python/example1.c 
 
 # Compile python SWIG wrapper: 
 clang -g -O3 -Isrc  \
-  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8 \
+  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9 \
+  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9 \
+  -Wno-unused-result-Wsign-compare -Wunreachable-code -fno-common -dynamic  \
+  -DNDEBUG-g -fwrapv -O3 -Wall -pipe -Os  \
+  -isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk \
   -Wno-deprecated-declarations-c -o target/python/example1.o  \
   target/python/example1.c
 
 # Link python SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/python/_example1.sotarget/native/example1.o target/python/example1.o 
+  target/python/_example1.sotarget/native/example1.o target/python/example1.o  \
+  -L/opt/local/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/config-3.9-darwin \
+  -ldl-framework CoreFoundation 
 ``` 
 
 
@@ -521,13 +596,13 @@ wc -l target/guile/example1.c
 1583 target/guile/example1.c 
 
 # Compile guile SWIG wrapper: 
-clang -g -O3 -Isrc -I/opt/local/include/guile/2.2  \
-  -I/opt/local/include/guile/2.2/libguile-c -o target/guile/example1.o  \
-  target/guile/example1.c
+clang -g -O3 -Isrc -D_THREAD_SAFE -I/opt/local/include/guile/2.2 -c -o  \
+  target/guile/example1.otarget/guile/example1.c 
 
 # Link guile SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/guile/libexample1.sotarget/native/example1.o target/guile/example1.o 
+  target/guile/libexample1.sotarget/native/example1.o target/guile/example1.o  \
+  -L/opt/local/lib-lguile-2.2 -lgc 
 ``` 
 
 
@@ -542,8 +617,8 @@ wc -l target/java/example1.c
 
 # Compile java SWIG wrapper: 
 clang -g -O3 -Isrc  \
-  -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include \
-  -I/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home/include/darwin \
+  -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include \
+  -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include/darwin \
   -c-o target/java/example1.o target/java/example1.c 
 
 # Link java SWIG wrapper dynamic library: 

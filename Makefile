@@ -214,6 +214,12 @@ macports-prereq:
 
 #################################
 
+README.md : README.md.erb
+	erb $< > $@.tmp
+	mv $@.tmp $@
+
+#################################
+
 clean:
 	rm -rf target/*
 
