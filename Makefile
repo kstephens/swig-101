@@ -2,11 +2,25 @@
 
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
+UNAME_S:=$(shell uname -s)
 
 ############################
 
+SWIG_EXE?="$(shell which swig)"
 SWIG_TARGETS=ruby python tcl guile java
 SWIG_TARGET=UNDEFINED
+
+SWIG_SO_PREFIX_DEFAULT=
+
+ifeq "$(UNAME_S)" "CYGWIN_NT-10.0"
+# https://cygwin.com/cygwin-ug-net/dll.html
+SWIG_SO_SUFFIX_DEFAULT=.dll
+CFLAGS_SO += -shared # GCC
+else
+SWIG_SO_SUFFIX_DEFAULT=.so
+#CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
+CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX, Linux
+endif
 
 SWIG_OPTS += \
 	-addextern -I- \
@@ -33,11 +47,20 @@ CFLAGS += -I/opt/local/include # OSX macports
 SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
 SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
-#CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
-CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX
+
+############################
+
 SWIG_SO_SUFFIX=$(SWIG_SO_SUFFIX_$(SWIG_TARGET))
 SWIG_SO_PREFIX=$(SWIG_SO_PREFIX_$(SWIG_TARGET))
 
+
+ifeq "$(SWIG_SO_PREFIX)" ""
+SWIG_SO_PREFIX:=$(SWIG_SO_PREFIX_DEFAULT)
+endif
+
+ifeq "$(SWIG_SO_SUFFIX)" ""
+SWIG_SO_SUFFIX:=$(SWIG_SO_SUFFIX_DEFAULT)
+endif
 ############################
 
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
@@ -46,19 +69,24 @@ SWIG_SO_SUFFIX_ruby=bundle # OSX
 ############################
 
 PYTHON_VERSION=3.9
-PYTHON_EXE=$(shell which python3)
-SWIG_CFLAGS_python=$(shell python$(PYTHON_VERSION)-config --cflags) -Wno-deprecated-declarations
-SWIG_LDFLAGS_python=$(shell python$(PYTHON_VERSION)-config --ldflags)
+PYTHON_MAJOR_VERSION=3
+PYTHON_CONFIG:=$(shell which python$(PYTHON_VERSION)-config python$(PYTHON_MAJOR_VERSION)-config python-config 2>/dev/null | head -1)
+PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | head -1)
+SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
+SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
 SWIG_OPTS_python=-py3
 SWIG_SO_PREFIX_python=_
-SWIG_SO_SUFFIX_python=so # OSX
+#SWIG_SO_SUFFIX_python=so # OSX
+
+#SWIG_CFLAGS_python=-I $(shell python$(PYTHON_VERSION)-config --cflags) -Wno-deprecated-declarations
+#SWIG_LDFLAGS_python=$(shell python$(PYTHON_VERSION)-config --ldflags)
 
 ############################
 
 TCL_HOME:=$(abspath $(shell which tclsh)/../..)
 SWIG_CFLAGS_tcl=-I$(TCL_HOME)/include
 #SWIG_SO_PREFIX_tcl=lib
-SWIG_SO_SUFFIX_tcl=so # OSX
+#SWIG_SO_SUFFIX_tcl=so # OSX
 
 ############################
 
@@ -69,7 +97,7 @@ SWIG_OPTS_guile=-scmstub
 SWIG_CFLAGS_guile=$(shell guile-config compile)
 SWIG_LDFLAGS_guile=$(shell guile-config link)
 SWIG_SO_PREFIX_guile=lib
-SWIG_SO_SUFFIX_guile=so # OSX
+#SWIG_SO_SUFFIX_guile=so # OSX
 
 ############################
 
@@ -162,7 +190,7 @@ build-targets : Makefile
 TARGET_DEPS = \
 	target/$(SWIG_TARGET)/$(EXAMPLE) \
 	target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o \
-	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX)
+	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX)
 
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
@@ -175,7 +203,7 @@ build-target-end:
 target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
 	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper:"
-	swig $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
+	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
 	@echo ''
 	wc -l $@
 
@@ -184,7 +212,7 @@ target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 	@echo "\n# Compile $(SWIG_TARGET) SWIG wrapper:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 
-target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME).$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
+target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
 	@mkdir -p $(dir $@)
 	@echo "\n# Link $(SWIG_TARGET) SWIG wrapper dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
