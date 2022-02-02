@@ -6,7 +6,7 @@ UNAME_S:=$(shell uname -s)
 
 ############################
 
-SWIG_EXE?="$(shell which swig)"
+SWIG_EXE?=$(shell which swig)
 SWIG_TARGETS=ruby python tcl guile java
 SWIG_TARGET=UNDEFINED
 
@@ -14,12 +14,12 @@ SWIG_SO_PREFIX_DEFAULT=
 
 ifeq "$(UNAME_S)" "CYGWIN_NT-10.0"
 # https://cygwin.com/cygwin-ug-net/dll.html
-SWIG_SO_SUFFIX_DEFAULT=.dll
-CFLAGS_SO += -shared # GCC
+  SWIG_SO_SUFFIX_DEFAULT=.dll
+  CFLAGS_SO += -shared # GCC
 else
-SWIG_SO_SUFFIX_DEFAULT=.so
-#CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
-CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX, Linux
+  SWIG_SO_SUFFIX_DEFAULT=.so
+  #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
+  CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX, Linux
 endif
 
 SWIG_OPTS += \
@@ -51,7 +51,7 @@ SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 ############################
 
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
-SWIG_SO_SUFFIX_ruby=bundle # OSX
+SWIG_SO_SUFFIX_ruby:=.bundle # OSX
 
 ############################
 
@@ -61,44 +61,34 @@ PYTHON_CONFIG:=$(shell which python$(PYTHON_VERSION)-config python$(PYTHON_MAJOR
 PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | head -1)
 SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
-SWIG_OPTS_python=-py3
-## < 3.10??
-#SWIG_OPTS_python+= -module $(EXAMPLE_NAME)
-#SWIG_CFLAGS_python+=-DPyInit__example1=PyInit_example1 # 3.10 HACK!!!
+SWIG_OPTS_python:=-py3
 SWIG_SO_PREFIX_python:=_
-#SWIG_SO_SUFFIX_python=so # OSX
-
-#SWIG_CFLAGS_python=-I $(shell python$(PYTHON_VERSION)-config --cflags) -Wno-deprecated-declarations
-#SWIG_LDFLAGS_python=$(shell python$(PYTHON_VERSION)-config --ldflags)
 
 ############################
 
 TCL_HOME:=$(abspath $(shell which tclsh)/../..)
-SWIG_CFLAGS_tcl=-I$(TCL_HOME)/include
-#SWIG_SO_PREFIX_tcl=lib
-#SWIG_SO_SUFFIX_tcl=so # OSX
+SWIG_CFLAGS_tcl:=-I$(TCL_HOME)/include
 
 ############################
 
-GUILE_VERSION=2.2
+GUILE_VERSION:=2.2
 GUILE_HOME:=$(abspath $(shell which guile)/../..)
-GUILE_EXE=$(GUILE_HOME)/bin/guile
+GUILE_EXE:=$(GUILE_HOME)/bin/guile
 SWIG_OPTS_guile=-scmstub
-SWIG_CFLAGS_guile=$(shell guile-config compile)
-SWIG_LDFLAGS_guile=$(shell guile-config link)
-SWIG_SO_PREFIX_guile=lib
-#SWIG_SO_SUFFIX_guile=so # OSX
+SWIG_CFLAGS_guile:=$(shell guile-config compile)
+SWIG_LDFLAGS_guile:=$(shell guile-config link)
+SWIG_SO_PREFIX_guile:=lib
 
 ############################
 
 # JAVA_VERSION=11.0.2
 JAVA_HOME:=$(abspath $(shell which java)/../..)
-JAVA_INCL=$(JAVA_HOME)/include
-JAVA_LIB=$(JAVA_HOME)/lib
-JAVA_EXE=$(JAVA_HOME)/bin/java
-SWIG_CFLAGS_java=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
-SWIG_SO_PREFIX_java=lib
-SWIG_SO_SUFFIX_java=jnilib # OSX
+JAVA_INCL:=$(JAVA_HOME)/include
+JAVA_LIB:=$(JAVA_HOME)/lib
+JAVA_EXE:=$(JAVA_HOME)/bin/java
+SWIG_CFLAGS_java:=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
+SWIG_SO_PREFIX_java:=lib
+SWIG_SO_SUFFIX_java:=.jnilib # OSX
 
 ############################
 
