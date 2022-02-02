@@ -106,7 +106,7 @@ $ src/example1-ruby
 ## Python -- src/example1-python
 
 ``` Python
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3.10
 
 import sys
 sys.path.append('target/python')
@@ -552,8 +552,8 @@ wc -l target/python/example1.c
 
 # Compile python SWIG wrapper: 
 clang -g -O3 -Isrc  \
-  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9 \
-  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9 \
+  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10 \
+  -I/opt/local/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10 \
   -Wno-unused-result-Wsign-compare -Wunreachable-code -fno-common -dynamic  \
   -DNDEBUG-g -fwrapv -O3 -Wall -pipe -Os  \
   -isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk \
@@ -563,7 +563,7 @@ clang -g -O3 -Isrc  \
 # Link python SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/python/_example1.sotarget/native/example1.o target/python/example1.o  \
-  -L/opt/local/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/config-3.9-darwin \
+  -L/opt/local/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin \
   -ldl-framework CoreFoundation 
 ``` 
 
@@ -578,7 +578,7 @@ wc -l target/tcl/example1.c
 2121 target/tcl/example1.c 
 
 # Compile tcl SWIG wrapper: 
-clang -g -O3 -Isrc -c -o target/tcl/example1.o target/tcl/example1.c 
+clang -g -O3 -Isrc -I -c -o target/tcl/example1.o target/tcl/example1.c 
 
 # Link tcl SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
@@ -596,13 +596,13 @@ wc -l target/guile/example1.c
 1583 target/guile/example1.c 
 
 # Compile guile SWIG wrapper: 
-clang -g -O3 -Isrc -D_THREAD_SAFE -I/opt/local/include/guile/2.2 -c -o  \
-  target/guile/example1.otarget/guile/example1.c 
+clang -g -O3 -Isrc -D_THREAD_SAFE guile/2.2 -c -o target/guile/example1.o  \
+  target/guile/example1.c
 
 # Link guile SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/guile/libexample1.sotarget/native/example1.o target/guile/example1.o  \
-  -L/opt/local/lib-lguile-2.2 -lgc 
+  -lguile-2.2-lgc 
 ``` 
 
 

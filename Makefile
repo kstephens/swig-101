@@ -75,8 +75,8 @@ GUILE_VERSION:=2.2
 GUILE_HOME:=$(abspath $(shell which guile)/../..)
 GUILE_EXE:=$(GUILE_HOME)/bin/guile
 SWIG_OPTS_guile=-scmstub
-SWIG_CFLAGS_guile:=$(shell guile-config compile)
-SWIG_LDFLAGS_guile:=$(shell guile-config link)
+SWIG_CFLAGS_guile:=$(shell guile-config compile) #
+SWIG_LDFLAGS_guile:=$(shell guile-config link) #
 SWIG_SO_PREFIX_guile:=lib
 
 ############################
@@ -237,7 +237,7 @@ macports-prereq:
 
 #################################
 
-README.md : README.md.erb
+README.md : README.md.erb clean
 	erb $< > $@.tmp
 	mv $@.tmp $@
 

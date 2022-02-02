@@ -191,10 +191,14 @@ msg "}}} Output"
   # pe(s: out)
   out = out.
   gsub('/opt/local/bin/gmake', 'make').
-  gsub(' -I/opt/local/include ', ' ')
+  gsub(%r{^/.*/swig}, 'swig').
+  gsub(%r{ *-I */opt/local/include/* *}, ' -I ').
+  gsub(%r{ *-L */opt/local/lib/* *}, ' -L ').
+  gsub(%r{ +-I +}, ' ').
+  gsub(%r{ +-L +}, ' ')
   lines = out.split("\n", 999999)
   # pe(lines: lines)
-  lines.map{|l| wrap_line(l)}.join("\n")
+  lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
 %>
 <%
   msg "}}} Workflow : #{e[:name]}"
