@@ -50,32 +50,22 @@ SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 
 ############################
 
-SWIG_SO_SUFFIX=$(SWIG_SO_SUFFIX_$(SWIG_TARGET))
-SWIG_SO_PREFIX=$(SWIG_SO_PREFIX_$(SWIG_TARGET))
-
-
-ifeq "$(SWIG_SO_PREFIX)" ""
-SWIG_SO_PREFIX:=$(SWIG_SO_PREFIX_DEFAULT)
-endif
-
-ifeq "$(SWIG_SO_SUFFIX)" ""
-SWIG_SO_SUFFIX:=$(SWIG_SO_SUFFIX_DEFAULT)
-endif
-############################
-
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
 SWIG_SO_SUFFIX_ruby=bundle # OSX
 
 ############################
 
-PYTHON_VERSION=3.9
+PYTHON_VERSION=3.10
 PYTHON_MAJOR_VERSION=3
 PYTHON_CONFIG:=$(shell which python$(PYTHON_VERSION)-config python$(PYTHON_MAJOR_VERSION)-config python-config 2>/dev/null | head -1)
 PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | head -1)
 SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
 SWIG_OPTS_python=-py3
-SWIG_SO_PREFIX_python=_
+## < 3.10??
+#SWIG_OPTS_python+= -module $(EXAMPLE_NAME)
+#SWIG_CFLAGS_python+=-DPyInit__example1=PyInit_example1 # 3.10 HACK!!!
+SWIG_SO_PREFIX_python:=_
 #SWIG_SO_SUFFIX_python=so # OSX
 
 #SWIG_CFLAGS_python=-I $(shell python$(PYTHON_VERSION)-config --cflags) -Wno-deprecated-declarations
@@ -127,6 +117,21 @@ early:
 
 EXAMPLE_NAME:=$(basename $(EXAMPLE))
 EXAMPLE_SUFFIX:=$(suffix $(EXAMPLE))
+
+############################
+
+SWIG_SO_SUFFIX:=$(SWIG_SO_SUFFIX_$(SWIG_TARGET))
+SWIG_SO_PREFIX:=$(SWIG_SO_PREFIX_$(SWIG_TARGET))
+
+ifeq "$(SWIG_SO_PREFIX)" ""
+SWIG_SO_PREFIX:=$(SWIG_SO_PREFIX_DEFAULT)
+endif
+
+ifeq "$(SWIG_SO_SUFFIX)" ""
+SWIG_SO_SUFFIX:=$(SWIG_SO_SUFFIX_DEFAULT)
+endif
+
+############################
 
 SWIG_OPTS+=$(SWIG_OPTS_SUFFIX$(EXAMPLE_SUFFIX))
 SWIG_OPTS_SUFFIX.c=
