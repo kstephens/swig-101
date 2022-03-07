@@ -135,6 +135,7 @@ CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 #LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
 CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
+CFLAGS_SUFFIX.cc+= -std=c++17
 
 build-examples:
 	@echo "\n# Examples \n"

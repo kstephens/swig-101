@@ -9,7 +9,7 @@
 
 #include <vector>
 
-class polynomial {
+class Polynomial {
  public:
   std::vector<double> coeffs;
   double evaluate(double x);
