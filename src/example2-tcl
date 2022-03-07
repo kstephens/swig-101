@@ -1,1 +1,9 @@
 #!/usr/bin/env tclsh
+
+load target/tcl/example2.so Example2
+
+Polynomial poly
+VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
+poly configure -coeffs c
+puts [poly evaluate 2.0]
+
