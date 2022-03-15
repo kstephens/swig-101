@@ -7,20 +7,45 @@ UNAME_S:=$(shell uname -s)
 ############################
 
 SWIG_EXE?=$(shell which swig)
-SWIG_TARGETS=ruby python tcl guile java
+SWIG_TARGETS:=python ruby tcl guile java
 SWIG_TARGET=UNDEFINED
 
+############################
+
 SWIG_SO_PREFIX_DEFAULT=
+SWIG_SO_SUFFIX_DEFAULT=.so
+
+SWIG_SO_SUFFIX_ruby:=.so # Linux
 
 ifeq "$(UNAME_S)" "CYGWIN_NT-10.0"
 # https://cygwin.com/cygwin-ug-net/dll.html
   SWIG_SO_SUFFIX_DEFAULT=.dll
   CFLAGS_SO += -shared # GCC
-else
-  SWIG_SO_SUFFIX_DEFAULT=.so
-  #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
-  CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup # OSX, Linux
 endif
+ifeq "$(UNAME_S)" "Linux"
+  # Linux: GCC 7.5.0 ???	
+  CFLAGS += -fPIC -shared
+  # CFLAGS_SO += -fPIC -shared	
+
+# target/ruby/example2.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
+# target/ruby/example2.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
+#   rb_define_virtual_variable("SWIG_TRACKINGS_COUNT", swig_ruby_trackings_count, NULL);
+SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
+
+# /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
+SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
+
+  ifeq "$(EXAMPLE)" "example2"
+    SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
+  endif
+endif
+ifeq "$(UNAME_S)" "Darwin"
+  #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
+  CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
+  SWIG_SO_SUFFIX_ruby:=.bundle
+endif
+
+############################
 
 SWIG_OPTS += \
 	-addextern -I- \
@@ -51,7 +76,6 @@ SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 ############################
 
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
-SWIG_SO_SUFFIX_ruby:=.bundle # OSX
 
 ############################
 
@@ -68,6 +92,7 @@ SWIG_SO_PREFIX_python:=_
 
 TCL_HOME:=$(abspath $(shell which tclsh)/../..)
 SWIG_CFLAGS_tcl:=-I$(TCL_HOME)/include
+SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
@@ -86,9 +111,10 @@ JAVA_HOME:=$(abspath $(shell which java)/../..)
 JAVA_INCL:=$(JAVA_HOME)/include
 JAVA_LIB:=$(JAVA_HOME)/lib
 JAVA_EXE:=$(JAVA_HOME)/bin/java
-SWIG_CFLAGS_java:=-I$(JAVA_INCL) -I$(JAVA_INCL)/darwin
+SWIG_CFLAGS_java:=-I$(JAVA_INCL) -I$(JAVA_INCL)/linux -I$(JAVA_INCL)/darwin
 SWIG_SO_PREFIX_java:=lib
 SWIG_SO_SUFFIX_java:=.jnilib # OSX
+# debian prereq: openjdk-11-jdk-headless
 
 ############################
 
@@ -130,12 +156,16 @@ SWIG_OPTS_SUFFIX.cc=-c++
 CC=$(CC_SUFFIX$(EXAMPLE_SUFFIX))
 CC_SUFFIX.c=clang
 CC_SUFFIX.cc=clang++
+# WTF: wud: broken clang install??!?!?!
+CC_SUFFIX.c=gcc
+CC_SUFFIX.cc=g++
 
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 #LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
-CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
-CFLAGS_SUFFIX.cc+= -std=c++17
+# WTF: wud: broken clang install??!?!?!
+#CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
+#CFLAGS_SUFFIX.cc+= -std=c++17
 
 build-examples:
 	@echo "\n# Examples \n"
@@ -223,13 +253,18 @@ target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX) : target
 demo:
 	$(MAKE) clean all
 	@set -x; time target/native/example1
-	@set -x; time src/example1-ruby
 	@set -x; time src/example1-python
-	@set -x; time src/example1-guile
+	@set -x; time src/example1-ruby
 	@set -x; time src/example1-tcl
+	@set -x; time src/example1-guile
 	@set -x; time bin/run-clj src/example1-clojure
 
 	@set -x; time target/native/example2
+	@set -x; time src/example2-python
+	@set -x; time src/example2-ruby
+	@set -x; time src/example2-tcl
+#	@set -x; time src/example2-guile
+#	@set -x; time bin/run-clj src/example2-clojure
 
 #################################
 

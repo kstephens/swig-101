@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-export PATH="/opt/local/libexec/gnubin:$PATH"
+export PATH="$HOME/local/bin:/opt/local/libexec/gnubin:$PATH"
 exec make "$@"
