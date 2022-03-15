@@ -156,16 +156,21 @@ SWIG_OPTS_SUFFIX.cc=-c++
 CC=$(CC_SUFFIX$(EXAMPLE_SUFFIX))
 CC_SUFFIX.c=clang
 CC_SUFFIX.cc=clang++
+ifeq "$(UNAME_S)" "Linux"
 # WTF: wud: broken clang install??!?!?!
 CC_SUFFIX.c=gcc
 CC_SUFFIX.cc=g++
+endif
 
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 #LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
+ifeq "$(UNAME_S)" "Linux"
 # WTF: wud: broken clang install??!?!?!
-#CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
-#CFLAGS_SUFFIX.cc+= -std=c++17
+else
+CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
+CFLAGS_SUFFIX.cc+= -std=c++17
+endif
 
 build-examples:
 	@echo "\n# Examples \n"
