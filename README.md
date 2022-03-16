@@ -63,7 +63,7 @@ double cubic_poly(double x, double c0, double c1, double c2, double c3) {
 #include "example1.h"
 
 int main(int argc, char **argv) {
-  printf("%g\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
+  printf("%5.2f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
   return 0;
 }
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 
 ```
 $ target/native/example1
-129
+129.00
 
 ```
 
@@ -200,7 +200,7 @@ $ bin/run-clj src/example1-clojure
 
 ```
 $ target/native/example1
-129
+129.00
 
 ```
 
@@ -264,7 +264,7 @@ $ bin/run-clj src/example1-clojure
 
 #include <vector>
 
-class polynomial {
+class Polynomial {
  public:
   std::vector<double> coeffs;
   double evaluate(double x);
@@ -279,7 +279,7 @@ class polynomial {
 ``` CC
 #include "example2.h"
 
-double polynomial::evaluate(double x) {
+double Polynomial::evaluate(double x) {
   double result = 0, xx = 1;
   for ( auto c : this->coeffs ) {
     result += c * xx;
@@ -299,13 +299,9 @@ double polynomial::evaluate(double x) {
 #include "example2.h"
 
 int main(int argc, char **argv) {
-  polynomial p;
-  p.coeffs.push_back(3.0);
-  p.coeffs.push_back(5.0);
-  p.coeffs.push_back(7.0);
-  p.coeffs.push_back(11.0);
-  p.coeffs.push_back(-13.0);
-  std::cout << p.evaluate(2.0) << "\n";
+  Polynomial p;
+  p.coeffs = { 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 };
+  std::cout << p.evaluate(2.0) << std::endl;
   return 0;
 }
 
@@ -316,7 +312,7 @@ int main(int argc, char **argv) {
 
 ```
 $ target/native/example2
--79
+-156
 
 ```
 
@@ -382,7 +378,16 @@ $ src/example2-ruby
 ## Python -- src/example2-python
 
 ``` Python
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3.10
+
+import sys
+sys.path.append('target/python')
+
+from example2 import Polynomial, VectorDouble
+
+poly = Polynomial()
+poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
+print(poly.evaluate(2.0))
 
 ```
 
@@ -391,6 +396,7 @@ $ src/example2-ruby
 
 ```
 $ src/example2-python
+-156.0
 
 ```
 
@@ -400,6 +406,13 @@ $ src/example2-python
 ``` TCL
 #!/usr/bin/env tclsh
 
+load target/tcl/example2.so Example2
+
+Polynomial poly
+VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
+poly configure -coeffs c
+puts [poly evaluate 2.0]
+
 ```
 
 
@@ -407,6 +420,7 @@ $ src/example2-python
 
 ```
 $ src/example2-tcl
+-156.0
 
 ```
 
@@ -450,7 +464,7 @@ $ bin/run-clj src/example2-clojure
 
 ```
 $ target/native/example2
--79
+-156
 
 ```
 
@@ -468,6 +482,7 @@ $ src/example2-ruby
 
 ```
 $ src/example2-python
+-156.0
 
 ```
 
@@ -475,6 +490,7 @@ $ src/example2-python
 
 ```
 $ src/example2-tcl
+-156.0
 
 ```
 
@@ -521,26 +537,6 @@ clang -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
 ``` 
 
 
-## Build ruby SWIG wrapper 
-``` 
-
-# Generate ruby SWIG wrapper: 
-swig -addextern -I- -ruby -o target/ruby/example1.c src/example1.h 
-
-wc -l target/ruby/example1.c 
-2215 target/ruby/example1.c 
-
-# Compile ruby SWIG wrapper: 
-clang -g -O3 -Isrc -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
-  -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0/x86_64-darwin19-c  \
-  -otarget/ruby/example1.o target/ruby/example1.c 
-
-# Link ruby SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/ruby/example1.bundletarget/native/example1.o target/ruby/example1.o 
-``` 
-
-
 ## Build python SWIG wrapper 
 ``` 
 
@@ -568,6 +564,26 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 
+## Build ruby SWIG wrapper 
+``` 
+
+# Generate ruby SWIG wrapper: 
+swig -addextern -I- -ruby -o target/ruby/example1.c src/example1.h 
+
+wc -l target/ruby/example1.c 
+2215 target/ruby/example1.c 
+
+# Compile ruby SWIG wrapper: 
+clang -g -O3 -Isrc -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
+  -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0/x86_64-darwin19-c  \
+  -otarget/ruby/example1.o target/ruby/example1.c 
+
+# Link ruby SWIG wrapper dynamic library: 
+clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby/example1.bundletarget/native/example1.o target/ruby/example1.o 
+``` 
+
+
 ## Build tcl SWIG wrapper 
 ``` 
 
@@ -578,7 +594,8 @@ wc -l target/tcl/example1.c
 2121 target/tcl/example1.c 
 
 # Compile tcl SWIG wrapper: 
-clang -g -O3 -Isrc -I -c -o target/tcl/example1.o target/tcl/example1.c 
+clang -g -O3 -Isrc -I/usr/include/tcl -c -o target/tcl/example1.o  \
+  target/tcl/example1.c
 
 # Link tcl SWIG wrapper dynamic library: 
 clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
@@ -618,6 +635,7 @@ wc -l target/java/example1.c
 # Compile java SWIG wrapper: 
 clang -g -O3 -Isrc  \
   -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include \
+  -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include/linux \
   -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include/darwin \
   -c-o target/java/example1.o target/java/example1.c 
 
