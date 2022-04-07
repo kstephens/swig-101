@@ -1,8 +1,10 @@
 #!/bin/sh
 # set -xe
+dir="$(/bin/pwd)"
 export JAVA_CMD="$(which java)"
-export LD_LIBRARY_PATH="target/java:$LD_LIBRARY_PATH"
-export CLASSPATH="target/java:$CLASSPATH"
+export LD_LIBRARY_PATH="$dir/target/java:$LD_LIBRARY_PATH"
+export LD_RUN_PATH="$dir/target/java:$LD_RUN_PATH"
+export CLASSPATH="$dir/target/java:$CLASSPATH"
 PATH="${JAVA_HOME}/bin:$PATH"
 javac target/java/*.java
-exec "$@"
+exec "$dir/bin/run" "$@"

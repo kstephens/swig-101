@@ -27,18 +27,6 @@ ifeq "$(UNAME_S)" "Linux"
   CFLAGS += -fPIC
   CFLAGS_SO += -shared
   # CFLAGS_SO += -fPIC -shared	
-
-# target/ruby/example2.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
-# target/ruby/example2.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
-#   rb_define_virtual_variable("SWIG_TRACKINGS_COUNT", swig_ruby_trackings_count, NULL);
-SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
-
-# /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
-SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
-
-  ifeq "$(EXAMPLE)" "example2"
-    SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
-  endif
 endif
 ifeq "$(UNAME_S)" "Darwin"
   #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
@@ -221,10 +209,27 @@ build-targets : Makefile
 	  $(MAKE) --no-print-directory build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
 	done
 
-TARGET_DEPS = \
+TARGET_DEPS:= \
 	target/$(SWIG_TARGET)/$(EXAMPLE) \
 	target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o \
 	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX)
+
+#############################
+
+ifeq "$(EXAMPLE_NAME)" "example2"
+ifeq "$(UNAME_S)" "Linux"
+# target/ruby/example2.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
+# target/ruby/example2.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
+#   rb_define_virtual_variable("SWIG_TRACKINGS_COUNT", swig_ruby_trackings_count, NULL);
+SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
+TARGET_DEPS:=$(filter-out ruby, $(TARGET_DEPS))
+# /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
+SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
+TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
+endif
+endif
+
+#############################
 
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 

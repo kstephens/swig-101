@@ -1,4 +1,4 @@
-#!/usr/bin/env guile --no-auto-compile
+#!/usr/bin/env guile
 !#
 
 (load-extension "target/guile/libexample1.so" "SWIG_init")

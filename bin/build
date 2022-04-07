@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-PATH="$(/bin/pwd)/../swig:$HOME/local/bin:$PATH"
-PATH="/opt/local/libexec/gnubin:$PATH" # macports
-exec make "$@"
+dir="$(/bin/pwd)"
+
+PATH="$dir/bin:$PATH"
+
+exec "$dir/bin/run" make "$@"
