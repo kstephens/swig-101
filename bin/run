@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+dir="$(/bin/pwd)"
+
+PATH="$dir/bin:$dir/../swig:$HOME/local/bin:$PATH"
+PATH="/opt/local/libexec/gnubin:$PATH" # macports
+
+export LD_LIBRARY_PATH="$dir/target/ruby:$LD_LIBRARY_PATH"
+export LD_RUN_PATH="$dir/target/ruby:$LD_RUN_PATH"
+
+export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
+
+exec "$@"
