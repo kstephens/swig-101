@@ -66,12 +66,14 @@ SWIG_OPTS_x += \
 
 ############################
 
-CFLAGS += -g -O3
+CFLAGS += -g
 CFLAGS += -Isrc
 CFLAGS += -I/opt/local/include # OSX macports
 SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
 SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
+CXXFLAGS += -g
+CXXFLAGS += -Isrc
 
 ############################
 
