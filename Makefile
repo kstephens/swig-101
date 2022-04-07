@@ -24,7 +24,8 @@ ifeq "$(UNAME_S)" "CYGWIN_NT-10.0"
 endif
 ifeq "$(UNAME_S)" "Linux"
   # Linux: GCC 7.5.0 ???	
-  CFLAGS += -fPIC -shared
+  CFLAGS += -fPIC
+  CFLAGS_SO += -shared
   # CFLAGS_SO += -fPIC -shared	
 
 # target/ruby/example2.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
