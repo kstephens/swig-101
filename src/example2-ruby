@@ -7,6 +7,7 @@ require 'example2'
 include Example2
 
 p = Polynomial.new
+p.coeffs << 2.0
 p.coeffs << 3.0
 p.coeffs << 5.0
 p.coeffs << 7.0
