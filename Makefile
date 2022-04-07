@@ -277,7 +277,10 @@ demo:
 #################################
 
 macports-prereq:
-	sudo port install $(SWIG_TARGETS:%=swig-%)
+	sudo port install $(SWIG_TARGETS:%=swig-%) python310 tcl guile
+
+debian-prereq:
+	sudo apt-get install swig tcl-dev guile-2.2-dev
 
 #################################
 
