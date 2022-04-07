@@ -1,1 +1,11 @@
 ;; -*- clojure -*-
+
+(clojure.lang.RT/loadLibrary "example2")
+
+(import 'example2)
+
+(def p (Polynomial.))
+(.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
+
+(prn (.getCoeffs p))
+(prn (.evaluate p 2.0))

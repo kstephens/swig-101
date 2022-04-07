@@ -7,36 +7,7 @@ require 'example2'
 include Example2
 
 p = Polynomial.new
-p.coeffs << 2.0
-p.coeffs << 3.0
-p.coeffs << 5.0
-p.coeffs << 7.0
-p.coeffs << 11.0
-p.coeffs << -13.0
+p.coeffs = VectorDouble.new([2.0, 3.0, 5.0, 7.0, 11.0, -13.0])
 
-puts p.evaluate(2.0)
-
-########################################
-# Extend for convenience:
-
-class Polynomial
-  # Constructor:
-  def self.[] elems
-    elems.inject(new){|this, x| this.coeffs << x; this}
-  end
-  # Proc-like:
-  def to_proc
-    lambda{|x| evaluate(x)}
-  end
-  alias :call :evaluate
-  alias :[]   :evaluate
-end
-
-require 'pp'
-
-p = Polynomial[ [3.0, 5.0, 7.0, 11.0, -13.0] ]
 pp p.coeffs.to_a
-
-x = 0..5
-pp x.zip(x.map(&p)).to_h
-
+puts p.evaluate(2.0)

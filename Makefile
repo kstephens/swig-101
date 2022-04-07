@@ -269,7 +269,7 @@ demo:
 	@set -x; time src/example2-ruby
 	@set -x; time src/example2-tcl
 #	@set -x; time src/example2-guile
-#	@set -x; time bin/run-clj src/example2-clojure
+	@set -x; time bin/run-clj src/example2-clojure
 
 #################################
 
