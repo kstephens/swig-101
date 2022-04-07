@@ -4,13 +4,22 @@ Introduction to [SWIG](http://www.swig.org/).
 
 # HOWTO
 
-## OSX
+## Setup
 
-* Install macports
-* Install rbenv + ruby-build plugin
+* Install rbenv + ruby-build
 * rbenv install 2.7.1
 * Install JVM 11.0
 * Install clojure + clojure-tools
+
+### Debian (Ubuntu 18.04+)
+
+* Install a Python 3.10 distribution with python3.10 in $PATH.
+* Run `bin/build debian-prereq`
+
+### OSX
+
+* Install macports
+* Run `bin/build macports-prereq`
 
 ## Build
 
@@ -151,7 +160,7 @@ $ src/example1-tcl
 ## Guile -- src/example1-guile
 
 ``` Guile
-#!/usr/bin/env guile --no-auto-compile
+#!/usr/bin/env guile
 !#
 
 (load-extension "target/guile/libexample1.so" "SWIG_init")
