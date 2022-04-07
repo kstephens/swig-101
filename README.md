@@ -180,7 +180,7 @@ $ src/example1-guile
 
 (import 'example1)
 
-(println (example1/cubic_poly 2.0 3.0 5.0 7.0 11.0))
+(prn (example1/cubic_poly 2.0 3.0 5.0 7.0 11.0))
 
 ```
 
@@ -329,37 +329,10 @@ require 'example2'
 include Example2
 
 p = Polynomial.new
-p.coeffs << 3.0
-p.coeffs << 5.0
-p.coeffs << 7.0
-p.coeffs << 11.0
-p.coeffs << -13.0
+p.coeffs = VectorDouble.new([2.0, 3.0, 5.0, 7.0, 11.0, -13.0])
 
-puts p.evaluate(2.0)
-
-########################################
-# Extend for convenience:
-
-class Polynomial
-  # Constructor:
-  def self.[] elems
-    elems.inject(new){|this, x| this.coeffs << x; this}
-  end
-  # Proc-like:
-  def to_proc
-    lambda{|x| evaluate(x)}
-  end
-  alias :call :evaluate
-  alias :[]   :evaluate
-end
-
-require 'pp'
-
-p = Polynomial[ [3.0, 5.0, 7.0, 11.0, -13.0] ]
 pp p.coeffs.to_a
-
-x = 0..5
-pp x.zip(x.map(&p)).to_h
+puts p.evaluate(2.0)
 
 ```
 
@@ -368,9 +341,8 @@ pp x.zip(x.map(&p)).to_h
 
 ```
 $ src/example2-ruby
--79.0
-[3.0, 5.0, 7.0, 11.0, -13.0]
-{0=>3.0, 1=>13.0, 2=>-79.0, 3=>-675.0, 4=>-2489.0, 5=>-6547.0}
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
 
 ```
 
@@ -387,6 +359,8 @@ from example2 import Polynomial, VectorDouble
 
 poly = Polynomial()
 poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
+
+print(list(poly.coeffs))
 print(poly.evaluate(2.0))
 
 ```
@@ -396,6 +370,7 @@ print(poly.evaluate(2.0))
 
 ```
 $ src/example2-python
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 
 ```
@@ -411,6 +386,13 @@ load target/tcl/example2.so Example2
 Polynomial poly
 VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
 poly configure -coeffs c
+
+set coeffs [poly cget -coeffs]
+for {set i 0} {$i < [$coeffs size]} {incr i} {
+    puts -nonewline [$coeffs get $i]
+    puts -nonewline " "
+}
+puts ""
 puts [poly evaluate 2.0]
 
 ```
@@ -420,6 +402,7 @@ puts [poly evaluate 2.0]
 
 ```
 $ src/example2-tcl
+2.0 3.0 5.0 7.0 11.0 -13.0 
 -156.0
 
 ```
@@ -447,6 +430,16 @@ $ src/example2-guile
 ``` Clojure
 ;; -*- clojure -*-
 
+(clojure.lang.RT/loadLibrary "example2")
+
+(import 'example2)
+
+(def p (Polynomial.))
+(.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
+
+(prn (.getCoeffs p))
+(prn (.evaluate p 2.0))
+
 ```
 
 
@@ -454,6 +447,8 @@ $ src/example2-guile
 
 ```
 $ bin/run-clj src/example2-clojure
+[2.0 3.0 5.0 7.0 11.0 -13.0]
+-156.0
 
 ```
 
@@ -472,9 +467,8 @@ $ target/native/example2
 
 ```
 $ src/example2-ruby
--79.0
-[3.0, 5.0, 7.0, 11.0, -13.0]
-{0=>3.0, 1=>13.0, 2=>-79.0, 3=>-675.0, 4=>-2489.0, 5=>-6547.0}
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
 
 ```
 
@@ -482,6 +476,7 @@ $ src/example2-ruby
 
 ```
 $ src/example2-python
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 
 ```
@@ -490,6 +485,7 @@ $ src/example2-python
 
 ```
 $ src/example2-tcl
+2.0 3.0 5.0 7.0 11.0 -13.0 
 -156.0
 
 ```
@@ -505,6 +501,8 @@ $ src/example2-guile
 
 ```
 $ bin/run-clj src/example2-clojure
+[2.0 3.0 5.0 7.0 11.0 -13.0]
+-156.0
 
 ```
 
@@ -529,10 +527,10 @@ $ bin/run-clj src/example2-clojure
 ``` 
 
 # Compile native library: 
-clang -g -O3 -Isrc -c -o target/native/example1.o src/example1.c 
+clang -g -Isrc -c -o target/native/example1.o src/example1.c 
 
 # Compile and link native program: 
-clang -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
+clang -g -Isrc -o target/native/example1 src/example1-native.c  \
   target/native/example1.o
 ``` 
 
@@ -542,12 +540,14 @@ clang -g -O3 -Isrc -o target/native/example1 src/example1-native.c  \
 
 # Generate python SWIG wrapper: 
 swig -addextern -I- -py3 -python -o target/python/example1.c src/example1.h 
+Deprecated command line option: -py3. Ignored, this option is no longer  \
+  supported.
 
 wc -l target/python/example1.c 
-3573 target/python/example1.c 
+3592 target/python/example1.c 
 
 # Compile python SWIG wrapper: 
-clang -g -O3 -Isrc  \
+clang -g -Isrc  \
   -I/opt/local/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10 \
   -I/opt/local/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10 \
   -Wno-unused-result-Wsign-compare -Wunreachable-code -fno-common -dynamic  \
@@ -557,7 +557,7 @@ clang -g -O3 -Isrc  \
   target/python/example1.c
 
 # Link python SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/python/_example1.sotarget/native/example1.o target/python/example1.o  \
   -L/opt/local/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin \
   -ldl-framework CoreFoundation 
@@ -571,15 +571,15 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -ruby -o target/ruby/example1.c src/example1.h 
 
 wc -l target/ruby/example1.c 
-2215 target/ruby/example1.c 
+2218 target/ruby/example1.c 
 
 # Compile ruby SWIG wrapper: 
-clang -g -O3 -Isrc -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
+clang -g -Isrc -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0  \
   -I/Users/kstephens/.rbenv/versions/2.7.1/include/ruby-2.7.0/x86_64-darwin19-c  \
   -otarget/ruby/example1.o target/ruby/example1.c 
 
 # Link ruby SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/ruby/example1.bundletarget/native/example1.o target/ruby/example1.o 
 ``` 
 
@@ -591,14 +591,14 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -tcl -o target/tcl/example1.c src/example1.h 
 
 wc -l target/tcl/example1.c 
-2121 target/tcl/example1.c 
+2124 target/tcl/example1.c 
 
 # Compile tcl SWIG wrapper: 
-clang -g -O3 -Isrc -I/usr/include/tcl -c -o target/tcl/example1.o  \
+clang -g -Isrc -I/usr/include/tcl -c -o target/tcl/example1.o  \
   target/tcl/example1.c
 
 # Link tcl SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/tcl/example1.sotarget/native/example1.o target/tcl/example1.o 
 ``` 
 
@@ -610,14 +610,14 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -scmstub -guile -o target/guile/example1.c src/example1.h 
 
 wc -l target/guile/example1.c 
-1583 target/guile/example1.c 
+1588 target/guile/example1.c 
 
 # Compile guile SWIG wrapper: 
-clang -g -O3 -Isrc -D_THREAD_SAFE guile/2.2 -c -o target/guile/example1.o  \
+clang -g -Isrc -D_THREAD_SAFE guile/2.2 -c -o target/guile/example1.o  \
   target/guile/example1.c
 
 # Link guile SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/guile/libexample1.sotarget/native/example1.o target/guile/example1.o  \
   -lguile-2.2-lgc 
 ``` 
@@ -630,17 +630,17 @@ clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -java -o target/java/example1.c src/example1.h 
 
 wc -l target/java/example1.c 
-243 target/java/example1.c 
+231 target/java/example1.c 
 
 # Compile java SWIG wrapper: 
-clang -g -O3 -Isrc  \
+clang -g -Isrc  \
   -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include \
   -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include/linux \
   -I/Library/Java/JavaVirtualMachines/jdk1.8.0.jdk/Contents/Home/include/darwin \
   -c-o target/java/example1.o target/java/example1.c 
 
 # Link java SWIG wrapper dynamic library: 
-clang -g -O3 -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/java/libexample1.jnilibtarget/native/example1.o target/java/example1.o 
 ``` 
 
