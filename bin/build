@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-export PATH="$HOME/local/bin:/opt/local/libexec/gnubin:$PATH"
+PATH="$(/bin/pwd)/../swig:$HOME/local/bin:$PATH"
+PATH="/opt/local/libexec/gnubin:$PATH" # macports
 exec make "$@"
