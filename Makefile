@@ -224,14 +224,14 @@ endif
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
 build-target-begin:
-	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper:\n\`\`\`"
+	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n\`\`\`"
 
 build-target-end:
 	@echo "\`\`\`\n"
 
 target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
-	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper:"
+	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper"
 	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ src/$(EXAMPLE_NAME).i
 	@echo ''
 	wc -l $@

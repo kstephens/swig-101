@@ -167,7 +167,7 @@ END
 <% targets.each do | t |
   msg "{{{ Example : #{e[:name]} : Program : #{t[:name]}"
 %>
-## <%= t[:type] %> -- <%= t[:file] %>
+## <%= t[:type] %> : <%= t[:file] %>
 
 ``` <%= t[:type].split(" ").first %>
 <%=
@@ -226,7 +226,7 @@ end
 %>
 
 <%
-[ examples.first ].each do | e |
+examples.each do | e |
 %>
 <%= run_workflow e %>
 <%
