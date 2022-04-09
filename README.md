@@ -39,8 +39,7 @@ The examples in this repo support these target languages:
 
 ```
 $ rbenv shell 2.7.1
-$ bin/build macports-prereq 
-$ bin/build clean all
+$ bin/build clean demo
 ```
 
 
@@ -53,14 +52,7 @@ $ bin/build clean all
 ## C Header -- src/example1.h
 
 ``` C
-  1   #ifdef SWIG
-  2   %module example1
-  3   %{
-  4   #include "example1.h"
-  5   %}
-  6   #endif
-  7   
-  8   double cubic_poly(double x, double c0, double c1, double c2, double c3);
+  1   double cubic_poly(double x, double c0, double c1, double c2, double c3);
 
 ```
 
@@ -100,6 +92,19 @@ $ target/native/example1
 129.00
 
 ```
+
+
+## C SWIG Interface -- src/example1.i
+
+``` C
+  1   %module example1
+  2   %include "example1.h"
+  3   %{
+  4   #include "example1.h"
+  5   %}
+
+```
+
 
 
 ## Ruby -- src/example1-ruby
@@ -276,22 +281,13 @@ $ src/example1-clojure
 ## CC Header -- src/example2.h
 
 ``` CC
-  1   #ifdef SWIG
-  2   %module example2
-  3   %include std_vector.i
-  4   %template(VectorDouble) std::vector<double>;
-  5   %{
-  6   #include "example2.h"
-  7   %}
-  8   #endif
-  9   
- 10   #include <vector>
- 11   
- 12   class Polynomial {
- 13    public:
- 14     std::vector<double> coeffs;
- 15     double evaluate(double x);
- 16   };
+  1   #include <vector>
+  2   
+  3   class Polynomial {
+  4    public:
+  5     std::vector<double> coeffs;
+  6     double evaluate(double x);
+  7   };
 
 ```
 
@@ -338,6 +334,21 @@ $ target/native/example2
 -156
 
 ```
+
+
+## CC SWIG Interface -- src/example2.i
+
+``` CC
+  1   %module example2
+  2   %include std_vector.i
+  3   %template(VectorDouble) std::vector<double>;
+  4   %include "example2.h"
+  5   %{
+  6   #include "example2.h"
+  7   %}
+
+```
+
 
 
 ## Ruby -- src/example2-ruby
@@ -434,8 +445,15 @@ $ src/example2-tcl
 ## Guile -- src/example2-guile
 
 ``` Guile
-  1   #!/usr/bin/env guile --no-auto-compile
+  1   #!/usr/bin/env guile
   2   !#
+  3   
+  4   (load-extension "target/guile/libexample2.so" "SWIG_init")
+  5   
+  6   (define p (new-Polynomial))
+  7   (Polynomial-coeffs-set p (new-VectorDouble '(2.0 3.0 5.0 7.0 11.0 -13.0)))
+  8   (write (Polynomial-coeffs-get p)) (newline)
+  9   (write (Polynomial-evaluate p 2.0)) (newline)
 
 ```
 
@@ -444,6 +462,8 @@ $ src/example2-tcl
 
 ```
 $ src/example2-guile
+#<swig-pointer std::vector< double > * 7ff180e040e0>
+-156.0
 
 ```
 
@@ -517,6 +537,8 @@ $ src/example2-tcl
 
 ```
 $ src/example2-guile
+#<swig-pointer std::vector< double > * 7fd6cdc040e0>
+-156.0
 
 ```
 
@@ -536,23 +558,24 @@ $ src/example2-clojure
 
 
 
-1. Compile native library.
-2. Generate SWIG wrapper from interface file for target language.
+1. Generate SWIG wrapper from interface file for target language.
+2. Compile native library.
 3. Compile SWIG wrapper.
 4. Link native library and SWIG wrapper into dynamic library.
 5. Load dynamic library into target language.
 
 ```
-                           2. swig -python c/example1.h \
-                                -o target/example1.c
-
-+----------------+           +----------------------+
-|  c/example1.h  +---------->|  target/example1.py  +-------.
++----------------+
+|  c/example1.i  +--.    1. swig -python c/example1.i \
++----------------+   |           -o target/example1.c
+                     |
++----------------+   |       +----------------------+
+|  c/example1.h  +---+------>|  target/example1.py  +-------.
 |----------------|           |----------------------|        |
 |  c/example1.c  |           |  target/example1.c   |        |
 +-+--------------+           +-+--------------------+        |
   |                            |                             |
-  |  1. cc -c c/example.c      | 3. cc -c target/example1.c  |
+  |  2. cc -c c/example.c      | 3. cc -c target/example1.c  |
   v                            v                             |
 +----------------+           +----------------------+        |
 |  c/example1.о  |           |  target/example1.о   |        |
@@ -603,7 +626,8 @@ clang -g -Isrc -o target/native/example1 src/example1-native.c  \
 ``` 
 
 # Generate python SWIG wrapper: 
-swig -addextern -I- -py3 -python -o target/python/example1.c src/example1.h 
+swig -addextern -I- -Isrc -py3 -python -o target/python/example1.c  \
+  src/example1.i 
 
 wc -l target/python/example1.c 
 3573 target/python/example1.c 
@@ -634,7 +658,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate ruby SWIG wrapper: 
-swig -addextern -I- -ruby -o target/ruby/example1.c src/example1.h 
+swig -addextern -I- -Isrc -ruby -o target/ruby/example1.c src/example1.i 
 
 wc -l target/ruby/example1.c 
 2215 target/ruby/example1.c 
@@ -663,7 +687,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate tcl SWIG wrapper: 
-swig -addextern -I- -tcl -o target/tcl/example1.c src/example1.h 
+swig -addextern -I- -Isrc -tcl -o target/tcl/example1.c src/example1.i 
 
 wc -l target/tcl/example1.c 
 2121 target/tcl/example1.c 
@@ -688,7 +712,8 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate guile SWIG wrapper: 
-swig -addextern -I- -scmstub -guile -o target/guile/example1.c src/example1.h 
+swig -addextern -I- -Isrc -scmstub -guile -o target/guile/example1.c  \
+  src/example1.i 
 
 wc -l target/guile/example1.c 
 1583 target/guile/example1.c 
@@ -711,7 +736,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate java SWIG wrapper: 
-swig -addextern -I- -java -o target/java/example1.c src/example1.h 
+swig -addextern -I- -Isrc -java -o target/java/example1.c src/example1.i 
 
 wc -l target/java/example1.c 
 243 target/java/example1.c 

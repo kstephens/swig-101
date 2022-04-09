@@ -37,7 +37,7 @@ endif
 ############################
 
 SWIG_OPTS += \
-	-addextern -I- \
+	-addextern -I- -Isrc \
 	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
      -debug-module 1,2,3,4 \
@@ -229,10 +229,10 @@ build-target-begin:
 build-target-end:
 	@echo "\`\`\`\n"
 
-target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).h
+target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
 	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper:"
-	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
+	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ src/$(EXAMPLE_NAME).i
 	@echo ''
 	wc -l $@
 	@echo ''
@@ -270,7 +270,7 @@ demo:
 	@set -x; $(RUN) src/example2-python
 	@set -x; $(RUN) src/example2-ruby
 	@set -x; $(RUN) src/example2-tcl
-#	@set -x; $(RUN) src/example2-guile
+	@set -x; $(RUN) src/example2-guile
 	@set -x; $(RUN) src/example2-clojure
 
 #################################

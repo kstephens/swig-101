@@ -39,8 +39,7 @@ The examples in this repo support these target languages:
 
 ```
 $ rbenv shell 2.7.1
-$ bin/build macports-prereq 
-$ bin/build clean all
+$ bin/build clean demo
 ```
 
 <%
@@ -162,14 +161,15 @@ msg "Examples"
   pe(e: e)
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-#{lang} Header  | src/#{basename}.h  | -
-#{lang} Library | src/#{name}        | -
-#{lang} Main    | src/#{basename}-native.#{suffix} | target/native/#{basename}
-Ruby            | src/#{basename}-ruby     | 
-Python          | src/#{basename}-python   |
-TCL             | src/#{basename}-tcl      |
-Guile           | src/#{basename}-guile    |
-Clojure         | src/#{basename}-clojure  |
+#{lang} Header          | src/#{basename}.h        | -
+#{lang} Library         | src/#{name}              | -
+#{lang} Main            | src/#{basename}-native.#{suffix} | target/native/#{basename}
+#{lang} SWIG Interface  | src/#{basename}.i        | -
+Ruby                    | src/#{basename}-ruby     | 
+Python                  | src/#{basename}-python   |
+TCL                     | src/#{basename}-tcl      |
+Guile                   | src/#{basename}-guile    |
+Clojure                 | src/#{basename}-clojure  |
 END
 
   targets =
