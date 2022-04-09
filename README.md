@@ -536,6 +536,7 @@ $ src/example2-clojure
 
 
 
+```
 1. Compile native library.
 2. Generate SWIG wrappers for target language.
 3. Compile and link SWIG wrappers for target language with native library.
@@ -569,6 +570,7 @@ $ src/example2-clojure
 *
 ************************************************************************
 
+```
 
 
 

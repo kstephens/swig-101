@@ -240,7 +240,9 @@ msg "}}} Output"
 
 <% msg "{{{ Workflow" %>
 
+<%= ENV['MARKDEEP'] ? "" : "```" %>
 <%= File.read("doc/workflow.md") %>
+<%= ENV['MARKDEEP'] ? "" : "```" %>
 
 <%
 [ examples.first ].each do | e |
