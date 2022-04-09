@@ -536,39 +536,49 @@ $ src/example2-clojure
 
 
 
-```
 1. Compile native library.
-2. Generate SWIG wrappers for target language.
-3. Compile and link SWIG wrappers for target language with native library.
-4. Load SWIG wrappers into target language.
+2. Generate SWIG wrapper from interface file for target language.
+3. Compile SWIG wrapper.
+4. Link native library and SWIG wrapper into dynamic library.
+5. Load dynamic library into target language.
 
-************************************************************************
-*            $ swig -python c/example1.h
-* +----------------+         +----------------------+
-* |  c/example1.h  +-------->|  python/example1.c   |
-* |  c/example1.c  |         |  python/example1.py  |------.
-* +-----+----------+         +-+--------------------+       |
-*       | $ cc -c c/example.c  | $ cc -c python/example1.c  |
-*       v                      v                            |
-* +----------------+         +----------------------+       |
-* |  c/example1.о  |         |  python/example1.о   |       |
-* +-----+----------+         +--------+-------------+       |
-*       |                             |                     |
-*       +----------------------------'                      |
-*       | $ cc -dynamiclib -о python/_example1.so \         |
-*       |    c/example1.о \                                 |
-*       |    python/example1.о                              |
-*       v                                                   |
-* +----------------------+                                  |
-* |  python/example1.sо  |                                  |
-* +-----+----------------+                                  |
-*       | $ python -m python/example1.py scripy.py          |
-*       v                                                   |
-* +----------------------+                                  |
-* |  script.py           |<--------------------------------'
-* +----------------------+
-*
-************************************************************************
+```
+                           2. swig -python c/example1.h \
+                                -o target/example1.c
+
++----------------+           +----------------------+
+|  c/example1.h  +---------->|  target/example1.py  +-------.
+|----------------|           |----------------------|        |
+|  c/example1.c  |           |  target/example1.c   |        |
++-+--------------+           +-+--------------------+        |
+  |                            |                             |
+  |  1. cc -c c/example.c      | 3. cc -c target/example1.c  |
+  v                            v                             |
++----------------+           +----------------------+        |
+|  c/example1.о  |           |  target/example1.о   |        |
++-+--------------+           +-+--------------------+        |
+  |                            |                             |
+  +---------------------------'                              |
+  |                                                          |
+  | 4. cc -dynamiclib -о target/_example1.so \               |
+  |      c/example1.о target/example1.о                      |
+  v                                                          |
++----------------------+                                     |
+|  target/example1.sо  |                                     |
++-+--------------------+                                     |
+  |                                                          |
+  +---------------------------------------------------------'
+  | 
+  | 5. python script.py
+  v                    
++------------------------------+
+| script.py                    |
+|------------------------------|
+| import sys                   |
+| sys.path.append('target')    |
+| import example1              |
+| print(example1.f(2.0, 3.0))  |
++------------------------------+
 
 ```
 

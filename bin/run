@@ -39,12 +39,12 @@ export CLASSPATH="$dir/target/java:$CLASSPATH"
 
 case "${cmd[0]}"
 in
-*-clojure|*.clj)
-  javac target/java/*.java 2>/dev/null
-  export LD_LIBRARY_PATH="$dir/target/java:$LD_LIBRARY_PATH"
-  export LD_RUN_PATH="$dir/target/java:$LD_RUN_PATH"
-  CLASSPATH="$dir/target/java:$(clojure -Spath 2>/dev/null):$CLASSPATH"
-  cmd=(clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$dir/target/java" "${cmd[@]}")
+  *-clojure|*.clj)
+    javac target/java/*.java 2>/dev/null
+    export LD_LIBRARY_PATH="$dir/target/java:$LD_LIBRARY_PATH"
+    export LD_RUN_PATH="$dir/target/java:$LD_RUN_PATH"
+    CLASSPATH="$dir/target/java:$(clojure -Spath 2>/dev/null):$CLASSPATH"
+    cmd=(clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$dir/target/java" "${cmd[@]}")
   ;;
 esac
 
