@@ -4,43 +4,17 @@ Introduction to [SWIG](http://www.swig.org/).
 
 # What is SWIG?
 
-Swig is a FFI binding generator.
+Swig is a C/C++ FFI binding generator.
 
 # Target Languages
 
-The examples in this repo support these target languages:
+The examples below target these languages:
 
 * Python
 * Ruby
 * TCL
 * Guile Scheme
 * Java (via Clojure)
-
-# HOW-TO
-
-## Setup
-
-* Install rbenv + ruby-build
-* rbenv install 2.7.1
-* Install JVM 11.0
-* Install clojure + clojure-tools
-
-### Debian (Ubuntu 18.04+)
-
-* Install a Python 3.10 distribution with python3.10 in $PATH.
-* Run `bin/build debian-prereq`
-
-### OSX
-
-* Install macports
-* Run `bin/build macports-prereq`
-
-## Build
-
-```
-$ rbenv shell 2.7.1
-$ bin/build clean demo
-```
 
 
 
@@ -78,7 +52,7 @@ $ bin/build clean demo
   2   #include "example1.h"
   3   
   4   int main(int argc, char **argv) {
-  5     printf("%5.2f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
+  5     printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
   6     return 0;
   7   }
 
@@ -89,7 +63,7 @@ $ bin/build clean demo
 
 ```
 $ target/native/example1
-129.00
+129.0
 
 ```
 
@@ -228,7 +202,7 @@ $ src/example1-clojure
 
 ```
 $ target/native/example1
-129.00
+129.0
 
 ```
 
@@ -462,7 +436,7 @@ $ src/example2-tcl
 
 ```
 $ src/example2-guile
-#<swig-pointer std::vector< double > * 7ff180e040e0>
+#<swig-pointer std::vector< double > * 7fce0fe040e0>
 -156.0
 
 ```
@@ -537,7 +511,7 @@ $ src/example2-tcl
 
 ```
 $ src/example2-guile
-#<swig-pointer std::vector< double > * 7fd6cdc040e0>
+#<swig-pointer std::vector< double > * 7fab18e040e0>
 -156.0
 
 ```
@@ -760,3 +734,29 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 
 
 
+
+# HOW-TO
+
+## Setup
+
+* Install rbenv + ruby-build
+* rbenv install 2.7.1
+* Install JVM 11.0
+* Install clojure + clojure-tools
+
+### Debian (Ubuntu 18.04+)
+
+* Install a Python 3.10 distribution with python3.10 in $PATH.
+* Run `bin/build debian-prereq`
+
+### OSX
+
+* Install macports
+* Run `bin/build macports-prereq`
+
+## Build
+
+```
+$ rbenv shell 2.7.1
+$ bin/build clean demo
+```

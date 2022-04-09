@@ -4,43 +4,17 @@ Introduction to [SWIG](http://www.swig.org/).
 
 # What is SWIG?
 
-Swig is a FFI binding generator.
+Swig is a C/C++ FFI binding generator.
 
 # Target Languages
 
-The examples in this repo support these target languages:
+The examples below target these languages:
 
 * Python
 * Ruby
 * TCL
 * Guile Scheme
 * Java (via Clojure)
-
-# HOW-TO
-
-## Setup
-
-* Install rbenv + ruby-build
-* rbenv install 2.7.1
-* Install JVM 11.0
-* Install clojure + clojure-tools
-
-### Debian (Ubuntu 18.04+)
-
-* Install a Python 3.10 distribution with python3.10 in $PATH.
-* Run `bin/build debian-prereq`
-
-### OSX
-
-* Install macports
-* Run `bin/build macports-prereq`
-
-## Build
-
-```
-$ rbenv shell 2.7.1
-$ bin/build clean demo
-```
 
 <%
 exit! if ENV['README_MD']
@@ -264,3 +238,29 @@ msg "}}} Workflow"
 cmd "#{make} all >/dev/null"
 msg 'DONE'
 %>
+
+# HOW-TO
+
+## Setup
+
+* Install rbenv + ruby-build
+* rbenv install 2.7.1
+* Install JVM 11.0
+* Install clojure + clojure-tools
+
+### Debian (Ubuntu 18.04+)
+
+* Install a Python 3.10 distribution with python3.10 in $PATH.
+* Run `bin/build debian-prereq`
+
+### OSX
+
+* Install macports
+* Run `bin/build macports-prereq`
+
+## Build
+
+```
+$ rbenv shell 2.7.1
+$ bin/build clean demo
+```
