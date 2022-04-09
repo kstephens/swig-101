@@ -2,7 +2,21 @@
 
 Introduction to [SWIG](http://www.swig.org/).
 
-# HOWTO
+# What is SWIG?
+
+Swig is a FFI binding generator.
+
+# Target Languages
+
+The examples in this repo support these target languages:
+
+* Python
+* Ruby
+* TCL
+* Guile Scheme
+* Java (via Clojure)
+
+# HOW-TO
 
 ## Setup
 
@@ -55,8 +69,18 @@ end
 
 def cmd cmd
   msg "cmd : #{cmd.inspect}"
-  system "#{cmd} >tmp/cmd.out 2>&1"
+  system "bin/run #{cmd} >tmp/cmd.out 2>&1"
   File.read("tmp/cmd.out")
+end
+
+def string_lines s
+  s.
+  split("\n", -1).
+  tap{|lines| lines.each{|line| line.sub!(/\s+$/, '')}}.
+  tap{|lines| lines.shift while lines[0].empty?}.
+  tap{|lines| lines.pop   while lines[-1].empty?}.
+  map.with_index(1) {|line, i| "%3d   %s" % [i, line] }.
+  join("\n") + "\n"
 end
 
 def wrap_line line, width = 78
@@ -66,22 +90,54 @@ def wrap_line line, width = 78
   words.each do | word |
     if line.size + word.size > width
       out += line + " \\\n  "
-      line = word
-    else
-      line += word + ' '
+      line = String.new
     end
+    line += word + ' '
     # pe(word: word, words: words)
   end
   out << line
 end
 
-make = `which gmake make 2>/dev/null`.split("\n").first
-make = 'bin/build'
+def run_workflow e
+  # cmd "#{make} clean-example EXAMPLE=#{e[:name]}"
+  cmd "#{make} clean"
+  out = cmd "#{make} build-example EXAMPLE=#{e[:name]}"
+  # pe(s: out)
+  out = out.
+  gsub('/opt/local/bin/gmake', 'make').
+  gsub(%r{^/.*/swig}, 'swig').
+  gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
+  gsub(%r{/opt/local/Library/Frameworks/Python.framework/Versions/[^/]+}, '$PYTHON_HOME').
+  gsub(%r{-isysroot/Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
+  gsub(%r{^/.*/python}, 'python').
+  gsub(%r{ *-I */opt/local/include[^ ]* *}, ' ').
+  gsub(%r{ *-L */opt/local/lib[^ ]* *}, ' ').
+  gsub(%r{#{ENV['PYTHON_HOME']}}, '$PYTHON_HOME').
+  gsub(%r{#{ENV['RUBY_HOME']}}, '$RUBY_HOME').
+  gsub(%r{#{ENV['GUILE_HOME']}}, '$GUILE_HOME').
+  gsub(%r{#{ENV['JAVA_HOME']}}, '$JAVA_HOME').
+  gsub(%r{#{ENV['HOME']}}, '$HOME').
+  gsub(%r{  +}, ' ')
+  lines = out.split("\n", 999999)
+  lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
+  lines.reject!{|l| l =~ /Document-method:/ } # ruby
+  # pe(lines: lines)
+  lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
+end
+
+def make
+  # make = `which gmake make 2>/dev/null`.split("\n").first
+  'bin/build'
+end
+
+#####################################
 
 msg "Start"
 
 examples = [ ]
 targets = nil
+
+#####################################
 
 cmd "#{make} all >/dev/null"
 %>
@@ -113,7 +169,7 @@ Ruby            | src/#{basename}-ruby     |
 Python          | src/#{basename}-python   |
 TCL             | src/#{basename}-tcl      |
 Guile           | src/#{basename}-guile    |
-Clojure         | src/#{basename}-clojure  | bin/run-clj src/#{basename}-clojure
+Clojure         | src/#{basename}-clojure  |
 END
 
   targets =
@@ -140,7 +196,9 @@ END
 ## <%= t[:type] %> -- <%= t[:file] %>
 
 ``` <%= t[:type].split(" ").first %>
-<%= File.read(t[:file]).sub(/\A\n+|\n+\Z/, "\n") %>
+<%=
+string_lines(File.read(t[:file]))
+%>
 ```
 
 <% if t[:cmd] %>
@@ -182,33 +240,12 @@ msg "}}} Output"
 
 <% msg "{{{ Workflow" %>
 
-* Compile native library
-* Generate SWIG wrappers for target language
-* Compile and link SWIG wrappers for target language with native library
-* Load SWIG wrappers into target language
+<%= File.read("doc/workflow.md") %>
 
 <%
 [ examples.first ].each do | e |
 %>
-<%=
-  msg "{{{ Workflow : #{e[:name]}"
-  pe(e: e)
-  
-  # cmd "#{make} clean-example EXAMPLE=#{e[:name]}"
-  cmd "#{make} clean"
-  out = cmd "#{make} build-example EXAMPLE=#{e[:name]}"
-  # pe(s: out)
-  out = out.
-  gsub('/opt/local/bin/gmake', 'make').
-  gsub(%r{^/.*/swig}, 'swig').
-  gsub(%r{ *-I */opt/local/include/* *}, ' -I ').
-  gsub(%r{ *-L */opt/local/lib/* *}, ' -L ').
-  gsub(%r{ +-I +}, ' ').
-  gsub(%r{ +-L +}, ' ')
-  lines = out.split("\n", 999999)
-  # pe(lines: lines)
-  lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
-%>
+<%= run_workflow e %>
 <%
   msg "}}} Workflow : #{e[:name]}"
 end

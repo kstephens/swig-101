@@ -81,15 +81,11 @@ SWIG_SO_PREFIX_python:=_
 
 ############################
 
-TCL_HOME:=$(abspath $(shell which tclsh)/../..)
 SWIG_CFLAGS_tcl:=-I$(TCL_HOME)/include
 SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
-GUILE_VERSION:=2.2
-GUILE_HOME:=$(abspath $(shell which guile)/../..)
-GUILE_EXE:=$(GUILE_HOME)/bin/guile
 SWIG_OPTS_guile=-scmstub
 SWIG_CFLAGS_guile:=$(shell guile-config compile) #
 SWIG_LDFLAGS_guile:=$(shell guile-config link) #
@@ -97,15 +93,9 @@ SWIG_SO_PREFIX_guile:=lib
 
 ############################
 
-# JAVA_VERSION=11.0.2
-JAVA_HOME:=$(abspath $(shell which java)/../..)
-JAVA_INCL:=$(JAVA_HOME)/include
-JAVA_LIB:=$(JAVA_HOME)/lib
-JAVA_EXE:=$(JAVA_HOME)/bin/java
-SWIG_CFLAGS_java:=-I$(JAVA_INCL) -I$(JAVA_INCL)/linux -I$(JAVA_INCL)/darwin
+SWIG_CFLAGS_java=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
 SWIG_SO_PREFIX_java:=lib
 SWIG_SO_SUFFIX_java:=.jnilib # OSX
-# debian prereq: openjdk-11-jdk-headless
 
 ############################
 
@@ -234,7 +224,7 @@ endif
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
 build-target-begin:
-	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n\`\`\`"
+	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper:\n\`\`\`"
 
 build-target-end:
 	@echo "\`\`\`\n"
@@ -245,6 +235,8 @@ target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).h
 	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ $<
 	@echo ''
 	wc -l $@
+	@echo ''
+	grep -si $(EXAMPLE_NAME) $@
 
 target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 	@mkdir -p $(dir $@)
@@ -263,21 +255,23 @@ target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX) : target
 
 #################################
 
+RUN="bin/run"
+
 demo:
 	$(MAKE) clean all
-	@set -x; time target/native/example1
-	@set -x; time src/example1-python
-	@set -x; time src/example1-ruby
-	@set -x; time src/example1-tcl
-	@set -x; time src/example1-guile
-	@set -x; time bin/run-clj src/example1-clojure
+	@set -x; $(RUN) target/native/example1
+	@set -x; $(RUN) src/example1-python
+	@set -x; $(RUN) src/example1-ruby
+	@set -x; $(RUN) src/example1-tcl
+	@set -x; $(RUN) src/example1-guile
+	@set -x; $(RUN) src/example1-clojure
 
-	@set -x; time target/native/example2
-	@set -x; time src/example2-python
-	@set -x; time src/example2-ruby
-	@set -x; time src/example2-tcl
-#	@set -x; time src/example2-guile
-	@set -x; time bin/run-clj src/example2-clojure
+	@set -x; $(RUN) target/native/example2
+	@set -x; $(RUN) src/example2-python
+	@set -x; $(RUN) src/example2-ruby
+	@set -x; $(RUN) src/example2-tcl
+#	@set -x; $(RUN) src/example2-guile
+	@set -x; $(RUN) src/example2-clojure
 
 #################################
 

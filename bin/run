@@ -1,14 +1,51 @@
 #!/usr/bin/env bash
 
-dir="$(/bin/pwd)"
-
-PATH="$dir/bin:$dir/../swig:$HOME/local/bin:$PATH"
 PATH="/opt/local/libexec/gnubin:$PATH" # macports
 
-export LD_LIBRARY_PATH="$dir/target/ruby:$LD_LIBRARY_PATH"
-export LD_RUN_PATH="$dir/target/ruby:$LD_RUN_PATH"
+cmd=("$@")
+dir="$(/bin/pwd)"
+
+prog-path() { # VAR prog
+  local var="$1"
+  prog_name="$2" prog_exe= prog_dir= prog_home= prog_inc= prog_lib=
+  shift 2
+  "$@"
+  : "${prog_exe:=$(which "$prog_name" || echo "$prog_name")}"
+  : "${prog_dir:=$(dirname "$prog_exe")}"
+  : "${prog_home:=$(cd "$prog_dir/.." && /bin/pwd)}"
+  : "${prog_inc:=$prog_home/include}"
+  : "${prog_lib:=$prog_home/lib}"
+  # set -x
+  export \
+    "${var}_HOME=$prog_home" "${var}_EXE=$prog_exe" \
+    "${var}_INC=$prog_inc" "${var}_LIB=$prog_lib"
+  export PATH="$prog_dir:$PATH"
+  # export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
+  # export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
+}
+
+PATH="$dir/bin:$dir/../swig:$HOME/local/bin:$PATH"
+
+# set -x
+prog-path PYTHON  python3.10
+prog-path RUBY    ruby        declare prog_exe="$(rbenv which ruby)"
+prog-path TCL     tclsh
+prog-path GUILE   guile
+prog-path JAVA    java
 
 export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
 export GUILE_AUTO_COMPILE=0
+export CLASSPATH="$dir/target/java:$CLASSPATH"
 
-exec "$@"
+case "${cmd[0]}"
+in
+*-clojure|*.clj)
+  javac target/java/*.java 2>/dev/null
+  export LD_LIBRARY_PATH="$dir/target/java:$LD_LIBRARY_PATH"
+  export LD_RUN_PATH="$dir/target/java:$LD_RUN_PATH"
+  CLASSPATH="$dir/target/java:$(clojure -Spath 2>/dev/null):$CLASSPATH"
+  cmd=(clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$dir/target/java" "${cmd[@]}")
+  ;;
+esac
+
+exec "${cmd[@]}"
