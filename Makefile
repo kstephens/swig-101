@@ -76,7 +76,6 @@ PYTHON_CONFIG:=$(shell which python$(PYTHON_VERSION)-config python$(PYTHON_MAJOR
 PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | head -1)
 SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
-SWIG_OPTS_python:=-py3
 SWIG_SO_PREFIX_python:=_
 SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_NAME).py
 
