@@ -87,7 +87,7 @@ SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
-SWIG_OPTS_guile=-scmstub
+SWIG_OPTS_guile=-guile
 SWIG_CFLAGS_guile:=$(shell guile-config compile) #
 SWIG_LDFLAGS_guile:=$(shell guile-config link) #
 SWIG_SO_PREFIX_guile:=lib
