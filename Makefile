@@ -78,6 +78,7 @@ SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarati
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
 SWIG_OPTS_python:=-py3
 SWIG_SO_PREFIX_python:=_
+SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_NAME).py
 
 ############################
 
@@ -96,6 +97,12 @@ SWIG_SO_PREFIX_guile:=lib
 SWIG_CFLAGS_java=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
 SWIG_SO_PREFIX_java:=lib
 SWIG_SO_SUFFIX_java:=.jnilib # OSX
+SWIG_GENERATED_FILES_java=target/$(SWIG_TARGET)/$(EXAMPLE_NAME)*.java
+
+############################
+
+SWIG_CFLAGS_xml:= #-I$(TCL_HOME)/include
+SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
@@ -234,9 +241,10 @@ target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper"
 	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ src/$(EXAMPLE_NAME).i
 	@echo ''
-	wc -l $@
+	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	@echo ''
-	grep -si $(EXAMPLE_NAME) $@
+	grep -si $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
+	-@$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
 target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
 	@mkdir -p $(dir $@)
