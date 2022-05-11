@@ -3,7 +3,7 @@
 ENV["LD_LIBRARY_PATH"] = 'target/ruby'
 $:.unshift 'target/ruby'
 
-require 'example2'
+require 'polynomial'
 include Example2
 
 p = Polynomial.new

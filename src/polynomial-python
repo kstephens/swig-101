@@ -5,7 +5,7 @@ import sys
 sys.path.append('target/python')
 
 # Import library bindings:
-from example2 import Polynomial, VectorDouble
+from polynomial import Polynomial, VectorDouble
 
 # Instantiate object:
 poly = Polynomial()

@@ -1,7 +1,7 @@
-%module example2
+%module polynomial
 %include "std_vector.i"
 %template(VectorDouble) std::vector<double>;
-%include "example2.h"
+%include "polynomial.h"
 %{
-#include "example2.h"
+#include "polynomial.h"
 %}

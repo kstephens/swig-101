@@ -1,5 +1,5 @@
 #include <iostream>
-#include "example2.h"
+#include "polynomial.h"
 
 int main(int argc, char **argv) {
   Polynomial p;

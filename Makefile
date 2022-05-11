@@ -107,7 +107,7 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 EXAMPLES = \
   example1.c \
-  example2.cc
+  polynomial.cc
 
 ############################
 
@@ -212,10 +212,10 @@ TARGET_DEPS:= \
 
 #############################
 
-ifeq "$(EXAMPLE_NAME)" "example2"
+ifeq "$(EXAMPLE_NAME)" "polynomial"
 ifeq "$(UNAME_S)" "Linux"
-# target/ruby/example2.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
-# target/ruby/example2.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
+# target/ruby/polynomial.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
+# target/ruby/polynomial.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
 #   rb_define_virtual_variable("SWIG_TRACKINGS_COUNT", swig_ruby_trackings_count, NULL);
 SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
 TARGET_DEPS:=$(filter-out ruby, $(TARGET_DEPS))
@@ -273,12 +273,12 @@ demo:
 	@echo ""; set -x; $(RUN) src/example1-guile
 	@echo ""; set -x; $(RUN) src/example1-clojure
 
-	@echo ""; set -x; $(RUN) target/native/example2
-	@echo ""; set -x; $(RUN) src/example2-python
-	@echo ""; set -x; $(RUN) src/example2-ruby
-	@echo ""; set -x; $(RUN) src/example2-tcl
-	@echo ""; set -x; $(RUN) src/example2-guile
-	@echo ""; set -x; $(RUN) src/example2-clojure
+	@echo ""; set -x; $(RUN) target/native/polynomial
+	@echo ""; set -x; $(RUN) src/polynomial-python
+	@echo ""; set -x; $(RUN) src/polynomial-ruby
+	@echo ""; set -x; $(RUN) src/polynomial-tcl
+	@echo ""; set -x; $(RUN) src/polynomial-guile
+	@echo ""; set -x; $(RUN) src/polynomial-clojure
 
 #################################
 

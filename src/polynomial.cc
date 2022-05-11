@@ -1,4 +1,4 @@
-#include "example2.h"
+#include "polynomial.h"
 
 double Polynomial::evaluate(double x) {
   double result = 0, xx = 1;

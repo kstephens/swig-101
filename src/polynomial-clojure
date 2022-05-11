@@ -1,10 +1,10 @@
 ;; -*- clojure -*-
 
 ;; Load Java bindings dynamic library:
-(clojure.lang.RT/loadLibrary "example2")
+(clojure.lang.RT/loadLibrary "polynomial")
 
 ;; Import Java namespace:
-(import 'example2)
+(import 'polynomial)
 
 ;; Instantiate object:
 (def p (Polynomial.))
