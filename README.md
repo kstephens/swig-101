@@ -534,46 +534,50 @@ $ src/example2-clojure
 4. Link native library and SWIG wrapper into dynamic library.
 5. Load dynamic library into target language.
 
-```
-+----------------+
-|  c/example1.i  +---+   1. swig -python c/example1.i \
-+----------------+   |           -o target/example1.c
-                     |
-+----------------+   |       +----------------------+
-|  c/example1.h  +---+------>|  target/example1.py  +--------+
-|----------------|           |----------------------|        |
-|  c/example1.c  |           |  target/example1.c   |        |
-+-+--------------+           +-+--------------------+        |
-  |                            |                             |
-  |  2. cc -c c/example.c      | 3. cc -c target/example1.c  |
-  v                            v                             |
-+----------------+           +----------------------+        |
-|  c/example1.о  |           |  target/example1.о   |        |
-+-+--------------+           +-+--------------------+        |
-  |                            |                             |
-  +----------------------------+                             |
-  |                                                          |
-  | 4. cc -dynamiclib -о target/_example1.so \               |
-  |      c/example1.о target/example1.о                      |
-  v                                                          |
-+----------------------+                                     |
-|  target/example1.sо  |                                     |
-+-+--------------------+                                     |
-  |                                                          |
-  +----------------------------------------------------------+
-  | 
-  | 5. python script.py
-  v                    
-+------------------------------+
-| script.py                    |
-|------------------------------|
-| import sys                   |
-| sys.path.append('target')    |
-| import example1              |
-| print(example1.f(2.0, 3.0))  |
-+------------------------------+
+************************************************************************
+* 
+*                           
+*                         
+* +----------------+
+* |  c/example1.i  +---+   1. swig -python c/example1.i \
+* +----------------+   |           -o target/example1.c
+*                      |
+* +----------------+   |       +----------------------+
+* |  c/example1.h  +---+------>|  target/example1.py  +--------+
+* |----------------|           |----------------------|        |
+* |  c/example1.c  |           |  target/example1.c   |        |
+* +-+--------------+           +-+--------------------+        |
+*   |                            |                             |
+*   |  2. cc -c c/example.c      | 3. cc -c target/example1.c  |
+*   v                            v                             |
+* +----------------+           +----------------------+        |
+* |  c/example1.о  |           |  target/example1.о   |        |
+* +-+--------------+           +-+--------------------+        |
+*   |                            |                             |
+*   +----------------------------+                             |
+*   |                                                          |
+*   | 4. cc -dynamiclib -о target/_example1.so \               |
+*   |      c/example1.о target/example1.о                      |
+*   v                                                          |
+* +----------------------+                                     |
+* |  target/example1.sо  |                                     |
+* +-+--------------------+                                     |
+*   |                                                          |
+*   +----------------------------------------------------------+
+*   | 
+*   | 5. python script.py
+*   v                    
+* +------------------------------+
+* | script.py                    |
+* |------------------------------|
+* | import sys                   |
+* | sys.path.append('target')    |
+* | import example1              |
+* | print(example1.f(2.0, 3.0))  |
+* +------------------------------+
+* 
+************************************************************************
 
-```
 
 
 
@@ -596,18 +600,22 @@ clang -g -Isrc -o target/native/example1 src/example1-native.c  \
 ``` 
 
 # Generate python SWIG wrapper 
-swig -addextern -I- -Isrc -py3 -python -o target/python/example1.c  \
-  src/example1.i 
+swig -addextern -I- -Isrc -python -o target/python/example1.c src/example1.i 
 
-wc -l target/python/example1.c 
-3573 target/python/example1.c 
+wc -l target/python/example1.c target/python/example1.py 
+3604 target/python/example1.c 
+64 target/python/example1.py 
+3668 total 
 
-grep -si example1 target/python/example1.c 
-@(target):= _example1.so 
-# define SWIG_init PyInit__example1 
-# define SWIG_init init_example1 
-#define SWIG_name "_example1" 
-#include "example1.h" 
+grep -siH example1 target/python/example1.c target/python/example1.py 
+target/python/example1.c: @(target):= _example1.so 
+target/python/example1.c:# define SWIG_init PyInit__example1 
+target/python/example1.c:# define SWIG_init init_example1 
+target/python/example1.c:#define SWIG_name "_example1" 
+target/python/example1.c:#include "example1.h" 
+target/python/example1.py: from . import _example1 
+target/python/example1.py: import _example1 
+target/python/example1.py: return _example1.cubic_poly(x, c0, c1, c2, c3) 
 
 # Compile python SWIG wrapper: 
 clang -g -Isrc -I$PYTHON_HOME/include/python3.10  \
@@ -631,16 +639,17 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -Isrc -ruby -o target/ruby/example1.c src/example1.i 
 
 wc -l target/ruby/example1.c 
-2215 target/ruby/example1.c 
+2219 target/ruby/example1.c 
 
-grep -si example1 target/ruby/example1.c 
-#define SWIG_init Init_example1 
-#define SWIG_name "Example1" 
-static VALUE mExample1; 
-#include "example1.h" 
-SWIGEXPORT void Init_example1(void) { 
-mExample1 = rb_define_module("Example1"); 
-rb_define_module_function(mExample1, "cubic_poly", _wrap_cubic_poly, -1); 
+grep -siH example1 target/ruby/example1.c 
+target/ruby/example1.c:#define SWIG_init Init_example1 
+target/ruby/example1.c:#define SWIG_name "Example1" 
+target/ruby/example1.c:static VALUE mExample1; 
+target/ruby/example1.c:#include "example1.h" 
+target/ruby/example1.c:SWIGEXPORT void Init_example1(void) { 
+target/ruby/example1.c: mExample1 = rb_define_module("Example1"); 
+target/ruby/example1.c: rb_define_module_function(mExample1, "cubic_poly",  \
+  _wrap_cubic_poly, -1); 
 
 # Compile ruby SWIG wrapper: 
 clang -g -Isrc -I$RUBY_HOME/include/ruby-2.7.0  \
@@ -660,13 +669,13 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 swig -addextern -I- -Isrc -tcl -o target/tcl/example1.c src/example1.i 
 
 wc -l target/tcl/example1.c 
-2121 target/tcl/example1.c 
+2124 target/tcl/example1.c 
 
-grep -si example1 target/tcl/example1.c 
-#define SWIG_init Example1_Init 
-#define SWIG_name "example1" 
-#include "example1.h" 
-SWIGEXPORT int Example1_SafeInit(Tcl_Interp *interp) { 
+grep -siH example1 target/tcl/example1.c 
+target/tcl/example1.c:#define SWIG_init Example1_Init 
+target/tcl/example1.c:#define SWIG_name "example1" 
+target/tcl/example1.c:#include "example1.h" 
+target/tcl/example1.c:SWIGEXPORT int Example1_SafeInit(Tcl_Interp *interp) { 
 
 # Compile tcl SWIG wrapper: 
 clang -g -Isrc -I/usr/include/tcl -c -o target/tcl/example1.o  \
@@ -682,14 +691,14 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate guile SWIG wrapper 
-swig -addextern -I- -Isrc -scmstub -guile -o target/guile/example1.c  \
+swig -addextern -I- -Isrc -guile -guile -o target/guile/example1.c  \
   src/example1.i 
 
 wc -l target/guile/example1.c 
-1583 target/guile/example1.c 
+1588 target/guile/example1.c 
 
-grep -si example1 target/guile/example1.c 
-#include "example1.h" 
+grep -siH example1 target/guile/example1.c 
+target/guile/example1.c:#include "example1.h" 
 
 # Compile guile SWIG wrapper: 
 clang -g -Isrc -D_THREAD_SAFE -c -o target/guile/example1.o  \
@@ -708,14 +717,20 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 # Generate java SWIG wrapper 
 swig -addextern -I- -Isrc -java -o target/java/example1.c src/example1.i 
 
-wc -l target/java/example1.c 
-243 target/java/example1.c 
+wc -l target/java/example1.c target/java/example1*.java 
+231 target/java/example1.c 
+15 target/java/example1.java 
+12 target/java/example1JNI.java 
+258 total 
 
-grep -si example1 target/java/example1.c 
-#include "example1.h" 
-SWIGEXPORT jdouble JNICALL Java_example1JNI_cubic_1poly(JNIEnv *jenv, jclass  \
-  jcls, jdouble jarg1, jdouble jarg2, jdouble jarg3, jdouble jarg4, jdouble  \
-  jarg5) { 
+grep -siH example1 target/java/example1.c target/java/example1*.java 
+target/java/example1.c:#include "example1.h" 
+target/java/example1.c:SWIGEXPORT jdouble JNICALL  \
+  Java_example1JNI_cubic_1poly(JNIEnv *jenv, jclass jcls, jdouble jarg1, jdouble  \
+  jarg2, jdouble jarg3, jdouble jarg4, jdouble jarg5) { 
+target/java/example1.java:public class example1 { 
+target/java/example1.java: return example1JNI.cubic_poly(x, c0, c1, c2, c3); 
+target/java/example1JNI.java:public class example1JNI { 
 
 # Compile java SWIG wrapper: 
 clang -g -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
@@ -750,18 +765,93 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o  \
 ``` 
 
 # Generate python SWIG wrapper 
-swig -addextern -I- -Isrc -py3 -c++ -python -o target/python/example2.cc  \
+swig -addextern -I- -Isrc -c++ -python -o target/python/example2.cc  \
   src/example2.i 
 
-wc -l target/python/example2.cc 
-8331 target/python/example2.cc 
+wc -l target/python/example2.cc target/python/example2.py 
+8362 target/python/example2.cc 
+240 target/python/example2.py 
+8602 total 
 
-grep -si example2 target/python/example2.cc 
-@(target):= _example2.so 
-# define SWIG_init PyInit__example2 
-# define SWIG_init init_example2 
-#define SWIG_name "_example2" 
-#include "example2.h" 
+grep -siH example2 target/python/example2.cc target/python/example2.py 
+target/python/example2.cc: @(target):= _example2.so 
+target/python/example2.cc:# define SWIG_init PyInit__example2 
+target/python/example2.cc:# define SWIG_init init_example2 
+target/python/example2.cc:#define SWIG_name "_example2" 
+target/python/example2.cc:#include "example2.h" 
+target/python/example2.py: from . import _example2 
+target/python/example2.py: import _example2 
+target/python/example2.py: __swig_destroy__ = _example2.delete_SwigPyIterator 
+target/python/example2.py: return _example2.SwigPyIterator_value(self) 
+target/python/example2.py: return _example2.SwigPyIterator_incr(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator_decr(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator_distance(self, x) 
+target/python/example2.py: return _example2.SwigPyIterator_equal(self, x) 
+target/python/example2.py: return _example2.SwigPyIterator_copy(self) 
+target/python/example2.py: return _example2.SwigPyIterator_next(self) 
+target/python/example2.py: return _example2.SwigPyIterator___next__(self) 
+target/python/example2.py: return _example2.SwigPyIterator_previous(self) 
+target/python/example2.py: return _example2.SwigPyIterator_advance(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator___eq__(self, x) 
+target/python/example2.py: return _example2.SwigPyIterator___ne__(self, x) 
+target/python/example2.py: return _example2.SwigPyIterator___iadd__(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator___isub__(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator___add__(self, n) 
+target/python/example2.py: return _example2.SwigPyIterator___sub__(self,  \
+  *args) 
+target/python/example2.py:# Register SwigPyIterator in _example2: 
+ \
+  target/python/example2.py:_example2.SwigPyIterator_swigregister(SwigPyIterator) 
+target/python/example2.py: return _example2.VectorDouble_iterator(self) 
+target/python/example2.py: return _example2.VectorDouble___nonzero__(self) 
+target/python/example2.py: return _example2.VectorDouble___bool__(self) 
+target/python/example2.py: return _example2.VectorDouble___len__(self) 
+target/python/example2.py: return _example2.VectorDouble___getslice__(self, i,  \
+  j) 
+target/python/example2.py: return _example2.VectorDouble___setslice__(self,  \
+  *args) 
+target/python/example2.py: return _example2.VectorDouble___delslice__(self, i,  \
+  j) 
+target/python/example2.py: return _example2.VectorDouble___delitem__(self,  \
+  *args) 
+target/python/example2.py: return _example2.VectorDouble___getitem__(self,  \
+  *args) 
+target/python/example2.py: return _example2.VectorDouble___setitem__(self,  \
+  *args) 
+target/python/example2.py: return _example2.VectorDouble_pop(self) 
+target/python/example2.py: return _example2.VectorDouble_append(self, x) 
+target/python/example2.py: return _example2.VectorDouble_empty(self) 
+target/python/example2.py: return _example2.VectorDouble_size(self) 
+target/python/example2.py: return _example2.VectorDouble_swap(self, v) 
+target/python/example2.py: return _example2.VectorDouble_begin(self) 
+target/python/example2.py: return _example2.VectorDouble_end(self) 
+target/python/example2.py: return _example2.VectorDouble_rbegin(self) 
+target/python/example2.py: return _example2.VectorDouble_rend(self) 
+target/python/example2.py: return _example2.VectorDouble_clear(self) 
+target/python/example2.py: return _example2.VectorDouble_get_allocator(self) 
+target/python/example2.py: return _example2.VectorDouble_pop_back(self) 
+target/python/example2.py: return _example2.VectorDouble_erase(self, *args) 
+target/python/example2.py: _example2.VectorDouble_swiginit(self,  \
+  _example2.new_VectorDouble(*args)) 
+target/python/example2.py: return _example2.VectorDouble_push_back(self, x) 
+target/python/example2.py: return _example2.VectorDouble_front(self) 
+target/python/example2.py: return _example2.VectorDouble_back(self) 
+target/python/example2.py: return _example2.VectorDouble_assign(self, n, x) 
+target/python/example2.py: return _example2.VectorDouble_resize(self, *args) 
+target/python/example2.py: return _example2.VectorDouble_insert(self, *args) 
+target/python/example2.py: return _example2.VectorDouble_reserve(self, n) 
+target/python/example2.py: return _example2.VectorDouble_capacity(self) 
+target/python/example2.py: __swig_destroy__ = _example2.delete_VectorDouble 
+target/python/example2.py:# Register VectorDouble in _example2: 
+target/python/example2.py:_example2.VectorDouble_swigregister(VectorDouble) 
+target/python/example2.py: coeffs = property(_example2.Polynomial_coeffs_get,  \
+  _example2.Polynomial_coeffs_set) 
+target/python/example2.py: return _example2.Polynomial_evaluate(self, x) 
+target/python/example2.py: _example2.Polynomial_swiginit(self,  \
+  _example2.new_Polynomial()) 
+target/python/example2.py: __swig_destroy__ = _example2.delete_Polynomial 
+target/python/example2.py:# Register Polynomial in _example2: 
+target/python/example2.py:_example2.Polynomial_swigregister(Polynomial) 
 
 # Compile python SWIG wrapper: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
@@ -786,25 +876,26 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 swig -addextern -I- -Isrc -c++ -ruby -o target/ruby/example2.cc src/example2.i 
 
 wc -l target/ruby/example2.cc 
-8486 target/ruby/example2.cc 
+8490 target/ruby/example2.cc 
 
-grep -si example2 target/ruby/example2.cc 
-#define SWIG_init Init_example2 
-#define SWIG_name "Example2" 
-static VALUE mExample2; 
-#include "example2.h" 
-SWIGEXPORT void Init_example2(void) { 
-mExample2 = rb_define_module("Example2"); 
-SwigClassGC_VALUE.klass = rb_define_class_under(mExample2, "GC_VALUE",  \
-  rb_cObject); 
-SwigClassConstIterator.klass = rb_define_class_under(mExample2,  \
-  "ConstIterator", rb_cObject); 
-SwigClassIterator.klass = rb_define_class_under(mExample2, "Iterator",  \
-  ((swig_class *) SWIGTYPE_p_swig__ConstIterator->clientdata)->klass); 
-SwigClassVectorDouble.klass = rb_define_class_under(mExample2, "VectorDouble",  \
-  rb_cObject); 
-SwigClassPolynomial.klass = rb_define_class_under(mExample2, "Polynomial",  \
-  rb_cObject); 
+grep -siH example2 target/ruby/example2.cc 
+target/ruby/example2.cc:#define SWIG_init Init_example2 
+target/ruby/example2.cc:#define SWIG_name "Example2" 
+target/ruby/example2.cc:static VALUE mExample2; 
+target/ruby/example2.cc:#include "example2.h" 
+target/ruby/example2.cc:SWIGEXPORT void Init_example2(void) { 
+target/ruby/example2.cc: mExample2 = rb_define_module("Example2"); 
+target/ruby/example2.cc: SwigClassGC_VALUE.klass =  \
+  rb_define_class_under(mExample2, "GC_VALUE", rb_cObject); 
+target/ruby/example2.cc: SwigClassConstIterator.klass =  \
+  rb_define_class_under(mExample2, "ConstIterator", rb_cObject); 
+target/ruby/example2.cc: SwigClassIterator.klass =  \
+  rb_define_class_under(mExample2, "Iterator", ((swig_class *)  \
+  SWIGTYPE_p_swig__ConstIterator->clientdata)->klass); 
+target/ruby/example2.cc: SwigClassVectorDouble.klass =  \
+  rb_define_class_under(mExample2, "VectorDouble", rb_cObject); 
+target/ruby/example2.cc: SwigClassPolynomial.klass =  \
+  rb_define_class_under(mExample2, "Polynomial", rb_cObject); 
 
 # Compile ruby SWIG wrapper: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
@@ -826,13 +917,13 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 swig -addextern -I- -Isrc -c++ -tcl -o target/tcl/example2.cc src/example2.i 
 
 wc -l target/tcl/example2.cc 
-2932 target/tcl/example2.cc 
+2936 target/tcl/example2.cc 
 
-grep -si example2 target/tcl/example2.cc 
-#define SWIG_init Example2_Init 
-#define SWIG_name "example2" 
-#include "example2.h" 
-SWIGEXPORT int Example2_SafeInit(Tcl_Interp *interp) { 
+grep -siH example2 target/tcl/example2.cc 
+target/tcl/example2.cc:#define SWIG_init Example2_Init 
+target/tcl/example2.cc:#define SWIG_name "example2" 
+target/tcl/example2.cc:#include "example2.h" 
+target/tcl/example2.cc:SWIGEXPORT int Example2_SafeInit(Tcl_Interp *interp) { 
 
 # Compile tcl SWIG wrapper: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
@@ -849,14 +940,14 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 # Generate guile SWIG wrapper 
-swig -addextern -I- -Isrc -scmstub -c++ -guile -o target/guile/example2.cc  \
+swig -addextern -I- -Isrc -guile -c++ -guile -o target/guile/example2.cc  \
   src/example2.i 
 
 wc -l target/guile/example2.cc 
-2245 target/guile/example2.cc 
+2250 target/guile/example2.cc 
 
-grep -si example2 target/guile/example2.cc 
-#include "example2.h" 
+grep -siH example2 target/guile/example2.cc 
+target/guile/example2.cc:#include "example2.h" 
 
 # Compile guile SWIG wrapper: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
@@ -875,51 +966,73 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 # Generate java SWIG wrapper 
 swig -addextern -I- -Isrc -c++ -java -o target/java/example2.cc src/example2.i 
 
-wc -l target/java/example2.cc 
-660 target/java/example2.cc 
+wc -l target/java/example2.cc target/java/example2*.java 
+648 target/java/example2.cc 
+11 target/java/example2.java 
+31 target/java/example2JNI.java 
+690 total 
 
-grep -si example2 target/java/example2.cc 
-#include "example2.h" 
-SWIGEXPORT jlong JNICALL Java_example2JNI_new_1VectorDouble_1_1SWIG_10(JNIEnv  \
-  *jenv, jclass jcls) { 
-SWIGEXPORT jlong JNICALL Java_example2JNI_new_1VectorDouble_1_1SWIG_11(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT jlong JNICALL Java_example2JNI_VectorDouble_1capacity(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT void JNICALL Java_example2JNI_VectorDouble_1reserve(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) { 
-SWIGEXPORT jboolean JNICALL Java_example2JNI_VectorDouble_1isEmpty(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT void JNICALL Java_example2JNI_VectorDouble_1clear(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT jlong JNICALL Java_example2JNI_new_1VectorDouble_1_1SWIG_12(JNIEnv  \
-  *jenv, jclass jcls, jint jarg1, jdouble jarg2) { 
-SWIGEXPORT jint JNICALL Java_example2JNI_VectorDouble_1doSize(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT void JNICALL Java_example2JNI_VectorDouble_1doAdd_1_1SWIG_10(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) { 
-SWIGEXPORT void JNICALL Java_example2JNI_VectorDouble_1doAdd_1_1SWIG_11(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) { 
-SWIGEXPORT jdouble JNICALL Java_example2JNI_VectorDouble_1doRemove(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) { 
-SWIGEXPORT jdouble JNICALL Java_example2JNI_VectorDouble_1doGet(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) { 
-SWIGEXPORT jdouble JNICALL Java_example2JNI_VectorDouble_1doSet(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) { 
-SWIGEXPORT void JNICALL Java_example2JNI_VectorDouble_1doRemoveRange(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) { 
-SWIGEXPORT void JNICALL Java_example2JNI_delete_1VectorDouble(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1) { 
-SWIGEXPORT void JNICALL Java_example2JNI_Polynomial_1coeffs_1set(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) { 
-SWIGEXPORT jlong JNICALL Java_example2JNI_Polynomial_1coeffs_1get(JNIEnv  \
-  *jenv, jclass jcls, jlong jarg1, jobject jarg1_) { 
-SWIGEXPORT jdouble JNICALL Java_example2JNI_Polynomial_1evaluate(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) { 
-SWIGEXPORT jlong JNICALL Java_example2JNI_new_1Polynomial(JNIEnv *jenv, jclass  \
-  jcls) { 
-SWIGEXPORT void JNICALL Java_example2JNI_delete_1Polynomial(JNIEnv *jenv,  \
-  jclass jcls, jlong jarg1) { 
+grep -siH example2 target/java/example2.cc target/java/example2*.java 
+target/java/example2.cc:#include "example2.h" 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_new_1VectorDouble_1_1SWIG_10(JNIEnv *jenv, jclass jcls) { 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_new_1VectorDouble_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_VectorDouble_1capacity(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_VectorDouble_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_, jlong jarg2) { 
+target/java/example2.cc:SWIGEXPORT jboolean JNICALL  \
+  Java_example2JNI_VectorDouble_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_VectorDouble_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_new_1VectorDouble_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint  \
+  jarg1, jdouble jarg2) { 
+target/java/example2.cc:SWIGEXPORT jint JNICALL  \
+  Java_example2JNI_VectorDouble_1doSize(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_VectorDouble_1doAdd_1_1SWIG_10(JNIEnv *jenv, jclass jcls,  \
+  jlong jarg1, jobject jarg1_, jdouble jarg2) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_VectorDouble_1doAdd_1_1SWIG_11(JNIEnv *jenv, jclass jcls,  \
+  jlong jarg1, jobject jarg1_, jint jarg2, jdouble jarg3) { 
+target/java/example2.cc:SWIGEXPORT jdouble JNICALL  \
+  Java_example2JNI_VectorDouble_1doRemove(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_, jint jarg2) { 
+target/java/example2.cc:SWIGEXPORT jdouble JNICALL  \
+  Java_example2JNI_VectorDouble_1doGet(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_, jint jarg2) { 
+target/java/example2.cc:SWIGEXPORT jdouble JNICALL  \
+  Java_example2JNI_VectorDouble_1doSet(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_, jint jarg2, jdouble jarg3) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_VectorDouble_1doRemoveRange(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_, jint jarg2, jint jarg3) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_delete_1VectorDouble(JNIEnv *jenv, jclass jcls, jlong jarg1)  \
+  { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_Polynomial_1coeffs_1set(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) { 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_Polynomial_1coeffs_1get(JNIEnv *jenv, jclass jcls, jlong  \
+  jarg1, jobject jarg1_) { 
+target/java/example2.cc:SWIGEXPORT jdouble JNICALL  \
+  Java_example2JNI_Polynomial_1evaluate(JNIEnv *jenv, jclass jcls, jlong jarg1,  \
+  jobject jarg1_, jdouble jarg2) { 
+target/java/example2.cc:SWIGEXPORT jlong JNICALL  \
+  Java_example2JNI_new_1Polynomial(JNIEnv *jenv, jclass jcls) { 
+target/java/example2.cc:SWIGEXPORT void JNICALL  \
+  Java_example2JNI_delete_1Polynomial(JNIEnv *jenv, jclass jcls, jlong jarg1) { 
+target/java/example2.java:public class example2 { 
+target/java/example2JNI.java:public class example2JNI { 
 
 # Compile java SWIG wrapper: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \

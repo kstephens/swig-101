@@ -242,7 +242,7 @@ target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	@echo ''
-	grep -si $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
+	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	-@$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
 target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
@@ -266,19 +266,19 @@ RUN="bin/run"
 
 demo:
 	$(MAKE) clean all
-	@set -x; $(RUN) target/native/example1
-	@set -x; $(RUN) src/example1-python
-	@set -x; $(RUN) src/example1-ruby
-	@set -x; $(RUN) src/example1-tcl
-	@set -x; $(RUN) src/example1-guile
-	@set -x; $(RUN) src/example1-clojure
+	@echo ""; set -x; $(RUN) target/native/example1
+	@echo ""; set -x; $(RUN) src/example1-python
+	@echo ""; set -x; $(RUN) src/example1-ruby
+	@echo ""; set -x; $(RUN) src/example1-tcl
+	@echo ""; set -x; $(RUN) src/example1-guile
+	@echo ""; set -x; $(RUN) src/example1-clojure
 
-	@set -x; $(RUN) target/native/example2
-	@set -x; $(RUN) src/example2-python
-	@set -x; $(RUN) src/example2-ruby
-	@set -x; $(RUN) src/example2-tcl
-	@set -x; $(RUN) src/example2-guile
-	@set -x; $(RUN) src/example2-clojure
+	@echo ""; set -x; $(RUN) target/native/example2
+	@echo ""; set -x; $(RUN) src/example2-python
+	@echo ""; set -x; $(RUN) src/example2-ruby
+	@echo ""; set -x; $(RUN) src/example2-tcl
+	@echo ""; set -x; $(RUN) src/example2-guile
+	@echo ""; set -x; $(RUN) src/example2-clojure
 
 #################################
 

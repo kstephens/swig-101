@@ -4,9 +4,105 @@ Introduction to [SWIG](http://www.swig.org/).
 
 # What is SWIG?
 
-Swig is a C/C++ FFI binding generator.
+SWIG is a foreign-function-interface (FFI) generator for native C/C++.
+SWIG vastly reduces the development cost of using native libraries within dynamic languages.
+
+# History
+
+* SWIG was [created](https://www.swig.org/history.html) in 1995 at Los Alamos National Laboratory.
+* Still under active development.
+
+# Benefits
+
+SWIG:
+
+* parses SWIG interface definition files.
+* SWIG interface defintions are a superset of C/C++.
+* many C/C++ header files can be used verbatim with minimal specification.
+* interface definitions can target multiple target languages with little additional effort.
+* genertated FFI code is statically-generated, reducing runtime costs.
+* FFI code can be dynamically loaded or statically linked.
+* FFI code is self-contained.
+* hinting for improved integration and representation.
+* template driven, user's can write generator for multiple purposes.
+
+# Native Code Support
+
+Comprehensive support:
+
+** C struct/unions
+** C pointers
+** C function signatures
+** C function calls
+** C++ classes
+** C++ methods: static, virtual and operator override
+** Pointers, References, `const` declarations. 
+** `in`, `out`, `in-out` parameter declarations.
+** Memory Management
 
 # Target Languages
+
+SWIG can generate FFI bindings for many languages from one set of interface files:
+
+* D
+* Go
+* Guile
+* Java
+* Javascript
+* Lua
+* Octave
+* Perl 5
+* PHP 7
+* Python
+* R (aka GNU S)
+* Ruby
+* Scilab
+* Tcl 8
+* XML (machine-readable metadata)
+
+# Alternatives
+
+## Native Language ABIs
+
+* Every native language's ABI is entirely different.
+* Some implementations of the same target language have different ABIs: e.g. JRuby and CRuby.
+* Some are only dynamic with associate performance costs.
+* Few languages have well-defined ABIs; Java JNI is a notable exception.
+* Each ABI requires intimate knownlege of internals ABIs and rules:
+** class and method definition
+** memory managment
+** best-practices
+
+## LibFFI
+
+[Libffi](https://github.com/libffi/libffi) can invoke native C functions dynamically from a low-level function signature.
+
+* libffi does not interpret native C/C++ headers.
+* C++ FFI is unsupported.
+* Must explicit specfify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
+* Does not provide any data type serialization functionality.  
+* Must have knowlege of CPU and compiler calling conventions.
+* Must manually layout struct and union values accordingly.
+
+# Case Study
+
+
+| Kind         |   Language     | files | lines |
+-------------+-------+--------------------------|
+| Native C/C++ Library | | |
+|  | C/C++ Header |   626 |  150508 |
+|  | C++          |   254 |   91226 |
+|  | TOTAL:     |   880 |  241734 |
+| SWIG Interface Files | | |
+| | SWIG         |     9  |    2667 |
+| Generated Python FFI Files | | |
+| | C++          |    1     34983 |
+| Generate Java FFI Files | | |
+| | C++          |   1   |  17987 |
+| | Java         |  55   |   6741 |
+| | TOTAL:       | 56    |  24728 |
+
+# Examples
 
 The examples below target these languages:
 
@@ -14,7 +110,7 @@ The examples below target these languages:
 * Ruby
 * TCL
 * Guile Scheme
-* Java (via Clojure)
+* Clojure via Java
 
 <%
 exit! if ENV['README_MD']

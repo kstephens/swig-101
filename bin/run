@@ -24,7 +24,15 @@ prog-path() { # VAR prog
   # export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
 }
 
-PATH="$dir/bin:$dir/../swig:$HOME/local/bin:$PATH"
+
+for swig_exe in "$dir/../swig/swig" "$(which swig)" 
+do
+  [[ -x "$swig_exe" ]] && export SWIG_EXE="$swig_exe" && break
+done
+PATH="$(dirname "$swig_exe"):$PATH"
+PATH="$dir/bin:$PATH"
+
+# (set -x; which swig); # exit
 
 # set -x
 prog-path PYTHON  python3.10
