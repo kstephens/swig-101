@@ -1,10 +1,10 @@
-# swig-101
+# SWIG-101
 
 Introduction to [SWIG](http://www.swig.org/).
 
 # What is SWIG?
 
-SWIG is a foreign-function-interface (FFI) generator for native C/C++.
+SWIG is a foreign-function-interface (FFI) generator for native C/C++ libraries.
 SWIG vastly reduces the development cost of using native libraries within dynamic languages.
 
 # History
@@ -16,48 +16,49 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 
 SWIG:
 
-* parses SWIG interface definition files.
+* Parses SWIG interface definition files.
 * SWIG interface defintions are a superset of C/C++.
-* many C/C++ header files can be used verbatim with minimal specification.
-* interface definitions can target multiple target languages with little additional effort.
-* genertated FFI code is statically-generated, reducing runtime costs.
+* Many C/C++ header files can be used verbatim with minimal specification.
+* Interface definitions can target multiple target languages with little additional effort.
+* Generated FFI code is statically-generated, reducing runtime costs.
 * FFI code can be dynamically loaded or statically linked.
 * FFI code is self-contained.
-* hinting for improved integration and representation.
-* template driven, user's can write generator for multiple purposes.
+* Hinting for improved integration and representation.
+* Template driven, user's can write generator for multiple purposes.
+* Use dynamic language to test C/C++ code.
 
 # Native Code Support
 
 Comprehensive support:
 
-** C struct/unions
-** C pointers
-** C function signatures
-** C function calls
-** C++ classes
-** C++ methods: static, virtual and operator override
-** Pointers, References, `const` declarations. 
-** `in`, `out`, `in-out` parameter declarations.
-** Memory Management
+* C struct and union
+* C/C++ Pointers, references, `const` declarations
+* C/C++ function signatures and calls
+* C++ classes
+* C++ methods: static, virtual and operator overrides
+* C++ templates
+* `in`, `out`, `in-out` parameters
+* C/C++ `#define` macros
+* Memory Management
 
 # Target Languages
 
-SWIG can generate FFI bindings for many languages from one set of interface files:
+SWIG can generate FFI bindings for multiple target languages from one set of interface files:
 
+* Python
+* Ruby
+* Java
+* Perl 5
+* Tcl 8
+* Lua
 * D
 * Go
-* Guile
-* Java
+* Guile Scheme
 * Javascript
-* Lua
 * Octave
-* Perl 5
 * PHP 7
-* Python
 * R (aka GNU S)
-* Ruby
 * Scilab
-* Tcl 8
 * XML (machine-readable metadata)
 
 # Alternatives
@@ -77,40 +78,37 @@ SWIG can generate FFI bindings for many languages from one set of interface file
 
 [Libffi](https://github.com/libffi/libffi) can invoke native C functions dynamically from a low-level function signature.
 
-* libffi does not interpret native C/C++ headers.
+* libffi does not interpret C/C++ headers.
 * C++ FFI is unsupported.
-* Must explicit specfify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
-* Does not provide any data type serialization functionality.  
-* Must have knowlege of CPU and compiler calling conventions.
+* Must specify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
+* Does not provide any data type serialization functionality.
+* Must have knowledge of CPU, Compiler and OS calling conventions.
 * Must manually layout struct and union values accordingly.
 
 # Case Study
 
-
-| Kind         |   Language     | files | lines |
--------------+-------+--------------------------|
-| Native C/C++ Library | | |
-|  | C/C++ Header |   626 |  150508 |
-|  | C++          |   254 |   91226 |
-|  | TOTAL:     |   880 |  241734 |
-| SWIG Interface Files | | |
-| | SWIG         |     9  |    2667 |
-| Generated Python FFI Files | | |
-| | C++          |    1     34983 |
-| Generate Java FFI Files | | |
-| | C++          |   1   |  17987 |
-| | Java         |  55   |   6741 |
-| | TOTAL:       | 56    |  24728 |
+Kind              |  Language     |  Files  |   Lines 
+------------------|:-------------:|--------:|----------:
+Native C/C++      |               |         |  
+                  | C/C++ Header  |      40 |    3505
+SWIG Interfaces   |               |         |
+                  | SWIG          |       9 |    2667
+Generated Python  |               |         |
+                  | Python        |       1 |    8922
+                  | C++           |       1 |   35235
+Generated Java    |               |         | 
+                  | Java          |      55 |    6741
+                  | C++           |       1 |   17987
 
 # Examples
 
-The examples below target these languages:
+The examples below target:
 
 * Python
 * Ruby
+* Clojure via Java
 * TCL
 * Guile Scheme
-* Clojure via Java
 
 <%
 exit! if ENV['README_MD']
@@ -230,31 +228,32 @@ msg "Examples"
   msg "{{{ Example : #{e[:name]}"
   pe(e: e)
 
-  targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).reject(&:empty?)}
-#{lang} Header          | src/#{basename}.h        | -
-#{lang} Library         | src/#{name}              | -
+  targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
+#{lang} Header          | src/#{basename}.h        | - |
+#{lang} Library         | src/#{name}              | - |
 #{lang} Main            | src/#{basename}-native.#{suffix} | target/native/#{basename}
-#{lang} SWIG Interface  | src/#{basename}.i        | -
-Ruby                    | src/#{basename}-ruby     | 
-Python                  | src/#{basename}-python   |
-TCL                     | src/#{basename}-tcl      |
-Guile                   | src/#{basename}-guile    |
-Clojure                 | src/#{basename}-clojure  |
+#{lang} SWIG Interface  | src/#{basename}.i        | - | #{lang}
+Python                  | src/#{basename}-python   |   |
+Ruby                    | src/#{basename}-ruby     |   |
+Clojure (Java)          | src/#{basename}-clojure  |   | Lisp
+Guile                   | src/#{basename}-guile    |   | Scheme
+TCL                     | src/#{basename}-tcl      |   |
 END
-
   targets =
     targets.
     map do |l|
-      t = [:type, :file, :cmd].zip(l).to_h
+      t = [:type, :file, :cmd, :lang].zip(l).to_h
       t[:name] ||= t[:file]
       if t[:cmd] == '-'
         t[:cmd] = nil
       else 
         t[:cmd] ||= t[:file]
       end
+      t[:lang] ||= t[:type].split(/\s+/).first
       t
     end
 
+  # PP.pp(targets: targets, $stderr)
   pe(targets: targets)
 %>
 
@@ -265,7 +264,7 @@ END
 %>
 ## <%= t[:type] %> : <%= t[:file] %>
 
-``` <%= t[:type].split(" ").first %>
+```<%= t[:lang] %>
 <%=
 string_lines(File.read(t[:file]))
 %>
@@ -294,6 +293,7 @@ targets.select{|t| t[:cmd]}.each do | t |
 ```
 $ <%= t[:cmd] %>
 <%= cmd t[:cmd] %>
+
 ```
 
 <%

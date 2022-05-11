@@ -7,7 +7,7 @@ UNAME_S:=$(shell uname -s)
 ############################
 
 SWIG_EXE?=$(shell which swig)
-SWIG_TARGETS:=python ruby tcl guile java
+SWIG_TARGETS:=python java ruby tcl guile
 SWIG_TARGET=UNDEFINED
 
 ############################
