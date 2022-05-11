@@ -63,16 +63,22 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Alternatives
 
+## Rewrite it in Language X
+
+* Coders love greenfields.
+* Waste of time.
+
 ## Native Language ABIs
 
 * Every native language's ABI is entirely different.
 * Some implementations of the same target language have different ABIs: e.g. JRuby and CRuby.
 * Some are only dynamic with associate performance costs.
 * Few languages have well-defined ABIs; Java JNI is a notable exception.
-* Each ABI requires intimate knownlege of internals ABIs and rules:
-** class and method definition
-** memory managment
-** best-practices
+* Each ABI requires intimate knownlege of ABIs
+ * rules
+ * best-practices
+ * manual data structure, function, class, method wrapping and registration
+ * manual memory managment
 
 ## LibFFI
 
@@ -105,8 +111,8 @@ Generated Java    |               |         |
 The examples below target:
 
 * Python
-* Ruby
 * Clojure via Java
+* Ruby
 * TCL
 * Guile Scheme
 
@@ -234,8 +240,8 @@ msg "Examples"
 #{lang} Main            | src/#{basename}-native.#{suffix} | target/native/#{basename}
 #{lang} SWIG Interface  | src/#{basename}.i        | - | #{lang}
 Python                  | src/#{basename}-python   |   |
-Ruby                    | src/#{basename}-ruby     |   |
 Clojure (Java)          | src/#{basename}-clojure  |   | Lisp
+Ruby                    | src/#{basename}-ruby     |   |
 Guile                   | src/#{basename}-guile    |   | Scheme
 TCL                     | src/#{basename}-tcl      |   |
 END

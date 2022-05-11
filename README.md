@@ -38,6 +38,7 @@ Comprehensive support:
 * C++ methods: static, virtual and operator overrides
 * C++ templates
 * `in`, `out`, `in-out` parameters
+* C/C++ `#define` macros
 * Memory Management
 
 # Target Languages
@@ -62,16 +63,22 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Alternatives
 
+## Rewrite it in Language X
+
+* Coders love greenfields.
+* Waste of time.
+
 ## Native Language ABIs
 
 * Every native language's ABI is entirely different.
 * Some implementations of the same target language have different ABIs: e.g. JRuby and CRuby.
 * Some are only dynamic with associate performance costs.
 * Few languages have well-defined ABIs; Java JNI is a notable exception.
-* Each ABI requires intimate knownlege of internals ABIs and rules:
-** class and method definition
-** memory managment
-** best-practices
+* Each ABI requires intimate knownlege of ABIs
+ * rules
+ * best-practices
+ * manual data structure, function, class, method wrapping and registration
+ * manual memory managment
 
 ## LibFFI
 
@@ -104,8 +111,8 @@ Generated Java    |               |         |
 The examples below target:
 
 * Python
-* Ruby
 * Clojure via Java
+* Ruby
 * TCL
 * Guile Scheme
 
@@ -119,8 +126,13 @@ The examples below target:
 ## C Header : src/example1.h
 
 ```C
-  1   #define POLYNOMIAL_LIBRARY_VERSION "1.2.3"
-  2   double cubic_poly(double x, double c0, double c1, double c2, double c3);
+  1   #define EXAMPLE1_VERSION "1.2.3"
+  2   /* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */
+  3   double cubic_poly(double x,
+  4                     double c0,
+  5                     double c1,
+  6                     double c2,
+  7                     double c3);
 
 ```
 
@@ -130,10 +142,13 @@ The examples below target:
 
 ```C
   1   #include "example1.h"
-  2   
-  3   double cubic_poly(double x, double c0, double c1, double c2, double c3) {
-  4     return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
-  5   }
+  2   double cubic_poly(double x,
+  3                     double c0,
+  4                     double c1,
+  5                     double c2,
+  6                     double c3) {
+  7     return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
+  8   }
 
 ```
 
@@ -146,9 +161,10 @@ The examples below target:
   2   #include "example1.h"
   3   
   4   int main(int argc, char **argv) {
-  5     printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
-  6     return 0;
-  7   }
+  5     printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);
+  6     printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
+  7     return 0;
+  8   }
 
 ```
 
@@ -157,6 +173,7 @@ The examples below target:
 
 ```
 $ target/native/example1
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 ```
@@ -180,12 +197,16 @@ $ target/native/example1
 ```Python
   1   #!/usr/bin/env python3.10
   2   
-  3   import sys
-  4   sys.path.append('target/python')
-  5   
-  6   import example1
-  7   
-  8   print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
+  3   # Setup DLL search path:
+  4   import sys
+  5   sys.path.append('target/python')
+  6   
+  7   # Import library bindings:
+  8   import example1
+  9   
+ 10   # Use imported module:
+ 11   print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)
+ 12   print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
 
 ```
 
@@ -194,6 +215,32 @@ $ target/native/example1
 
 ```
 $ src/example1-python
+EXAMPLE1_VERSION = 1.2.3
+129.0
+
+```
+
+
+## Clojure (Java) : src/example1-clojure
+
+```Lisp
+  1   ;; -*- clojure -*-
+  2   
+  3   (clojure.lang.RT/loadLibrary "example1")
+  4   
+  5   (import 'example1)
+  6   
+  7   (println (format "EXAMPLE1_VERSION = %s" (example1/EXAMPLE1_VERSION)))
+  8   (prn (example1/cubic_poly 2.0 3.0 5.0 7.0 11.0))
+
+```
+
+
+----
+
+```
+$ src/example1-clojure
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 ```
@@ -209,7 +256,8 @@ $ src/example1-python
   5   
   6   require 'example1'
   7   
-  8   puts Example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
+  8   puts "EXAMPLE1_VERSION = #{Example1::EXAMPLE1_VERSION}"
+  9   puts Example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
 
 ```
 
@@ -218,29 +266,7 @@ $ src/example1-python
 
 ```
 $ src/example1-ruby
-129.0
-
-```
-
-
-## Clojure (Java) : src/example1-clojure
-
-```Lisp
-  1   ;; -*- clojure -*-
-  2   
-  3   (clojure.lang.RT/loadLibrary "example1")
-  4   
-  5   (import 'example1)
-  6   
-  7   (prn (example1/cubic_poly 2.0 3.0 5.0 7.0 11.0))
-
-```
-
-
-----
-
-```
-$ src/example1-clojure
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 ```
@@ -254,8 +280,10 @@ $ src/example1-clojure
   3   
   4   (load-extension "target/guile/libexample1.so" "SWIG_init")
   5   
-  6   (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
+  6   (write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))
   7   (newline)
+  8   (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
+  9   (newline)
 
 ```
 
@@ -264,6 +292,7 @@ $ src/example1-clojure
 
 ```
 $ src/example1-guile
+(EXAMPLE1-VERSION = "1.2.3")
 129.0
 
 ```
@@ -276,7 +305,8 @@ $ src/example1-guile
   2   
   3   load target/tcl/example1.so Example1
   4   
-  5   puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
+  5   puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"
+  6   puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
 
 ```
 
@@ -285,6 +315,7 @@ $ src/example1-guile
 
 ```
 $ src/example1-tcl
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 ```
@@ -296,6 +327,7 @@ $ src/example1-tcl
 
 ```
 $ target/native/example1
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 
@@ -305,15 +337,7 @@ $ target/native/example1
 
 ```
 $ src/example1-python
-129.0
-
-
-```
-
-
-
-```
-$ src/example1-ruby
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 
@@ -323,6 +347,17 @@ $ src/example1-ruby
 
 ```
 $ src/example1-clojure
+EXAMPLE1_VERSION = 1.2.3
+129.0
+
+
+```
+
+
+
+```
+$ src/example1-ruby
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 
@@ -332,6 +367,7 @@ $ src/example1-clojure
 
 ```
 $ src/example1-guile
+(EXAMPLE1-VERSION = "1.2.3")
 129.0
 
 
@@ -341,6 +377,7 @@ $ src/example1-guile
 
 ```
 $ src/example1-tcl
+EXAMPLE1_VERSION = 1.2.3
 129.0
 
 
@@ -430,16 +467,20 @@ $ target/native/example2
 ```Python
   1   #!/usr/bin/env python3.10
   2   
-  3   import sys
-  4   sys.path.append('target/python')
-  5   
-  6   from example2 import Polynomial, VectorDouble
-  7   
-  8   poly = Polynomial()
-  9   poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
- 10   
- 11   print(list(poly.coeffs))
- 12   print(poly.evaluate(2.0))
+  3   # Setup DLL search path:
+  4   import sys
+  5   sys.path.append('target/python')
+  6   
+  7   # Import library bindings:
+  8   from example2 import Polynomial, VectorDouble
+  9   
+ 10   # Instantiate object:
+ 11   poly = Polynomial()
+ 12   poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
+ 13   
+ 14   # Invoke methods:
+ 15   print(list(poly.coeffs))
+ 16   print(poly.evaluate(2.0))
 
 ```
 
@@ -449,6 +490,38 @@ $ target/native/example2
 ```
 $ src/example2-python
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
+
+```
+
+
+## Clojure (Java) : src/example2-clojure
+
+```Lisp
+  1   ;; -*- clojure -*-
+  2   
+  3   ;; Load Java bindings dynamic library:
+  4   (clojure.lang.RT/loadLibrary "example2")
+  5   
+  6   ;; Import Java namespace:
+  7   (import 'example2)
+  8   
+  9   ;; Instantiate object:
+ 10   (def p (Polynomial.))
+ 11   (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
+ 12   
+ 13   ;; Invoke methods:
+ 14   (prn (.getCoeffs p))
+ 15   (prn (.evaluate p 2.0))
+
+```
+
+
+----
+
+```
+$ src/example2-clojure
+[2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
 
 ```
@@ -484,34 +557,6 @@ $ src/example2-ruby
 ```
 
 
-## Clojure (Java) : src/example2-clojure
-
-```Lisp
-  1   ;; -*- clojure -*-
-  2   
-  3   (clojure.lang.RT/loadLibrary "example2")
-  4   
-  5   (import 'example2)
-  6   
-  7   (def p (Polynomial.))
-  8   (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
-  9   
- 10   (prn (.getCoeffs p))
- 11   (prn (.evaluate p 2.0))
-
-```
-
-
-----
-
-```
-$ src/example2-clojure
-[2.0 3.0 5.0 7.0 11.0 -13.0]
--156.0
-
-```
-
-
 ## Guile : src/example2-guile
 
 ```Scheme
@@ -533,7 +578,7 @@ $ src/example2-clojure
 
 ```
 $ src/example2-guile
-#<swig-pointer std::vector< double > * 7fd4ded041b0>
+#<swig-pointer std::vector< double > * 7ff6b47040e0>
 -156.0
 
 ```
@@ -560,7 +605,7 @@ $ src/example2-guile
 
 ```
 $ src/example2-tcl
-_f06460438f7f0000_p_std__vectorT_double_t
+_10cbc0369e7f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -590,16 +635,6 @@ $ src/example2-python
 
 
 ```
-$ src/example2-ruby
-[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
--156.0
-
-
-```
-
-
-
-```
 $ src/example2-clojure
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
@@ -610,8 +645,18 @@ $ src/example2-clojure
 
 
 ```
+$ src/example2-ruby
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
+
+
+```
+
+
+
+```
 $ src/example2-guile
-#<swig-pointer std::vector< double > * 7ffc24d040e0>
+#<swig-pointer std::vector< double > * 7f904ad04080>
 -156.0
 
 
@@ -621,7 +666,7 @@ $ src/example2-guile
 
 ```
 $ src/example2-tcl
-_1041f085b67f0000_p_std__vectorT_double_t
+_d0e3c057907f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -741,38 +786,6 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 
-## Build ruby SWIG wrapper 
-``` 
-
-# Generate ruby SWIG wrapper 
-swig -addextern -I- -Isrc -ruby -o target/ruby/example1.c src/example1.i 
-
-wc -l target/ruby/example1.c 
-2257 target/ruby/example1.c 
-
-grep -siH example1 target/ruby/example1.c 
-target/ruby/example1.c:#define SWIG_init Init_example1 
-target/ruby/example1.c:#define SWIG_name "Example1" 
-target/ruby/example1.c:static VALUE mExample1; 
-target/ruby/example1.c:#include "example1.h" 
-target/ruby/example1.c:SWIGEXPORT void Init_example1(void) { 
-target/ruby/example1.c: mExample1 = rb_define_module("Example1"); 
-target/ruby/example1.c: rb_define_const(mExample1, "EXAMPLE1_VERSION",  \
-  SWIG_FromCharPtr("1.2.3")); 
-target/ruby/example1.c: rb_define_module_function(mExample1, "cubic_poly",  \
-  _wrap_cubic_poly, -1); 
-
-# Compile ruby SWIG wrapper: 
-clang -g -Isrc -I$RUBY_HOME/include/ruby-2.7.0  \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o target/ruby/example1.o  \
-  target/ruby/example1.c 
-
-# Link ruby SWIG wrapper dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/ruby/example1.bundle target/native/example1.o target/ruby/example1.o 
-``` 
-
-
 ## Build java SWIG wrapper 
 ``` 
 
@@ -810,6 +823,38 @@ clang -g -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
 # Link java SWIG wrapper dynamic library: 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/java/libexample1.jnilib target/native/example1.o target/java/example1.o 
+``` 
+
+
+## Build ruby SWIG wrapper 
+``` 
+
+# Generate ruby SWIG wrapper 
+swig -addextern -I- -Isrc -ruby -o target/ruby/example1.c src/example1.i 
+
+wc -l target/ruby/example1.c 
+2257 target/ruby/example1.c 
+
+grep -siH example1 target/ruby/example1.c 
+target/ruby/example1.c:#define SWIG_init Init_example1 
+target/ruby/example1.c:#define SWIG_name "Example1" 
+target/ruby/example1.c:static VALUE mExample1; 
+target/ruby/example1.c:#include "example1.h" 
+target/ruby/example1.c:SWIGEXPORT void Init_example1(void) { 
+target/ruby/example1.c: mExample1 = rb_define_module("Example1"); 
+target/ruby/example1.c: rb_define_const(mExample1, "EXAMPLE1_VERSION",  \
+  SWIG_FromCharPtr("1.2.3")); 
+target/ruby/example1.c: rb_define_module_function(mExample1, "cubic_poly",  \
+  _wrap_cubic_poly, -1); 
+
+# Compile ruby SWIG wrapper: 
+clang -g -Isrc -I$RUBY_HOME/include/ruby-2.7.0  \
+  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o target/ruby/example1.o  \
+  target/ruby/example1.c 
+
+# Link ruby SWIG wrapper dynamic library: 
+clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby/example1.bundle target/native/example1.o target/ruby/example1.o 
 ``` 
 
 
@@ -998,47 +1043,6 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 
-## Build ruby SWIG wrapper 
-``` 
-
-# Generate ruby SWIG wrapper 
-swig -addextern -I- -Isrc -c++ -ruby -o target/ruby/example2.cc src/example2.i 
-
-wc -l target/ruby/example2.cc 
-8490 target/ruby/example2.cc 
-
-grep -siH example2 target/ruby/example2.cc 
-target/ruby/example2.cc:#define SWIG_init Init_example2 
-target/ruby/example2.cc:#define SWIG_name "Example2" 
-target/ruby/example2.cc:static VALUE mExample2; 
-target/ruby/example2.cc:#include "example2.h" 
-target/ruby/example2.cc:SWIGEXPORT void Init_example2(void) { 
-target/ruby/example2.cc: mExample2 = rb_define_module("Example2"); 
-target/ruby/example2.cc: SwigClassGC_VALUE.klass =  \
-  rb_define_class_under(mExample2, "GC_VALUE", rb_cObject); 
-target/ruby/example2.cc: SwigClassConstIterator.klass =  \
-  rb_define_class_under(mExample2, "ConstIterator", rb_cObject); 
-target/ruby/example2.cc: SwigClassIterator.klass =  \
-  rb_define_class_under(mExample2, "Iterator", ((swig_class *)  \
-  SWIGTYPE_p_swig__ConstIterator->clientdata)->klass); 
-target/ruby/example2.cc: SwigClassVectorDouble.klass =  \
-  rb_define_class_under(mExample2, "VectorDouble", rb_cObject); 
-target/ruby/example2.cc: SwigClassPolynomial.klass =  \
-  rb_define_class_under(mExample2, "Polynomial", rb_cObject); 
-
-# Compile ruby SWIG wrapper: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$RUBY_HOME/include/ruby-2.7.0  \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o target/ruby/example2.o  \
-  target/ruby/example2.cc 
-
-# Link ruby SWIG wrapper dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/ruby/example2.bundle  \
-  target/native/example2.o target/ruby/example2.o 
-``` 
-
-
 ## Build java SWIG wrapper 
 ``` 
 
@@ -1122,6 +1126,47 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
   -Wl,-undefined,dynamic_lookup -o target/java/libexample2.jnilib  \
   target/native/example2.o target/java/example2.o 
+``` 
+
+
+## Build ruby SWIG wrapper 
+``` 
+
+# Generate ruby SWIG wrapper 
+swig -addextern -I- -Isrc -c++ -ruby -o target/ruby/example2.cc src/example2.i 
+
+wc -l target/ruby/example2.cc 
+8490 target/ruby/example2.cc 
+
+grep -siH example2 target/ruby/example2.cc 
+target/ruby/example2.cc:#define SWIG_init Init_example2 
+target/ruby/example2.cc:#define SWIG_name "Example2" 
+target/ruby/example2.cc:static VALUE mExample2; 
+target/ruby/example2.cc:#include "example2.h" 
+target/ruby/example2.cc:SWIGEXPORT void Init_example2(void) { 
+target/ruby/example2.cc: mExample2 = rb_define_module("Example2"); 
+target/ruby/example2.cc: SwigClassGC_VALUE.klass =  \
+  rb_define_class_under(mExample2, "GC_VALUE", rb_cObject); 
+target/ruby/example2.cc: SwigClassConstIterator.klass =  \
+  rb_define_class_under(mExample2, "ConstIterator", rb_cObject); 
+target/ruby/example2.cc: SwigClassIterator.klass =  \
+  rb_define_class_under(mExample2, "Iterator", ((swig_class *)  \
+  SWIGTYPE_p_swig__ConstIterator->clientdata)->klass); 
+target/ruby/example2.cc: SwigClassVectorDouble.klass =  \
+  rb_define_class_under(mExample2, "VectorDouble", rb_cObject); 
+target/ruby/example2.cc: SwigClassPolynomial.klass =  \
+  rb_define_class_under(mExample2, "Polynomial", rb_cObject); 
+
+# Compile ruby SWIG wrapper: 
+clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
+  -I$RUBY_HOME/include/ruby-2.7.0  \
+  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o target/ruby/example2.o  \
+  target/ruby/example2.cc 
+
+# Link ruby SWIG wrapper dynamic library: 
+clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
+  -Wl,-undefined,dynamic_lookup -o target/ruby/example2.bundle  \
+  target/native/example2.o target/ruby/example2.o 
 ``` 
 
 
