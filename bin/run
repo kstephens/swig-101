@@ -25,11 +25,12 @@ prog-path() { # VAR prog
 }
 
 
-for swig_exe in "$dir/../swig/swig" "$(which swig)" 
+for swig_exe in "$SWIG_EXE" "$dir/../swig/swig" "$HOME/local/bin/swig" "$(which swig)" CANNOT-FIND-SWIG
 do
-  [[ -x "$swig_exe" ]] && export SWIG_EXE="$swig_exe" && break
+  [[ -x "$swig_exe" ]] && break
 done
-PATH="$(dirname "$swig_exe"):$PATH"
+export SWIG_EXE="${swig_exe:?}"
+PATH="$(dirname "${swig_exe}"):$PATH"
 PATH="$dir/bin:$PATH"
 
 # (set -x; which swig); # exit
