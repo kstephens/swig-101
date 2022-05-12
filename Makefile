@@ -252,8 +252,10 @@ build-target-end:
 
 $(TARGET_SWIG) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)echo "\n# Generate $(SWIG_TARGET) bindings"
+	$(SILENT)echo "\n# Generate $(SWIG_TARGET) bindings:"
 	$(SWIG_EXE) $(SWIG_OPTS) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
+	$(SILENT)echo "\n# Code statistics:"
+	wc -l src/$(EXAMPLE_NAME).h src/$(EXAMPLE_NAME).i
 	$(SILENT)echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 #	$(SILENT)echo ''
@@ -296,11 +298,12 @@ debian-prereq:
 
 #################################
 
-README.md : doc/README.md.erb doc/*.* src/*.* Makefile
-	$(MAKE) clean all >/dev/null
+README.md : tmp/README.md 
+	mv tmp/$@ $@
+tmp/README.md: doc/README.md.erb doc/*.* src/*.* Makefile
+	$(MAKE) clean >/dev/null
 	mkdir -p tmp
-	erb $< > tmp/$@
-	[ -z "$$MARKDEEP" ] && mv tmp/$@ $@
+	erb $< > $@
 
 #################################
 
@@ -309,5 +312,5 @@ clean:
 	rm -rf target/*
 
 clean-example:
-	rm -rfv target/*/$(EXAMPLE_NAME)*
+	$(SILENT)rm -rf target/*/*$(EXAMPLE_NAME)*
 

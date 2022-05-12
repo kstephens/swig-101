@@ -26,7 +26,12 @@ end
 def cmd cmd
   msg "cmd : #{cmd.inspect}"
   system "bin/run #{cmd} >tmp/cmd.out 2>&1"
+  # puts File.read("tmp/cmd.out")
   File.read("tmp/cmd.out")
+end
+
+def remove_shebang s
+  s.gsub(%r{(^#!.*$)|(!#)|(^.+ -\*- [a-z]+ -\*-.*$)}, '')
 end
 
 def lines_to_string lines
@@ -39,8 +44,8 @@ end
 
 def trim_empty_lines!(lines)
   lines.each{|line| line.sub!(/\s+$/, '')}
-  lines.shift while lines[ 0].empty?
-  lines.pop   while lines[-1].empty?
+  lines.shift while lines[ 0] && lines[ 0].empty?
+  lines.pop   while lines[-1] && lines[-1].empty?
   lines
 end
 
@@ -48,8 +53,9 @@ def line_numbers! lines
   lines.map!.with_index(1) {|line, i| "%3d   %s" % [i, line] }
 end
 
-def string_lines s
+def code_lines s
   lines = string_to_lines(s)
+  lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
   line_numbers!(lines)
   lines_to_string(lines)
@@ -70,8 +76,7 @@ def wrap_line line, width = 78
 end
 
 def run_workflow e
-  cmd "#{make} clean"
-  out = cmd "#{make} build-example EXAMPLE=#{e[:name]}"
+  out = cmd "#{make} clean-example build-example EXAMPLE=#{e[:name]}"
   out = out.
   gsub('/opt/local/bin/gmake', 'make').
   gsub(%r{^/.*/swig}, 'swig').
@@ -101,6 +106,8 @@ end
 
 msg "Start"
 
+cmd "#{make} clean"
+
 example_names = %w(polynomial.cc example1.c)
 
 $examples = [ ]
@@ -121,6 +128,11 @@ example_names.each do | name |
 
   msg "{{{ Example : #{e[:name]}"
   pe(e: e)
+
+  msg "  {{{ Workflow : #{e[:name]}"
+  e[:workflow_output] = run_workflow(e)
+  msg e[:workflow_output]
+  msg "  }}} Workflow : #{e[:name]}"
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
 #{lang} Header          | src/#{basename}.h        | - |
@@ -144,9 +156,16 @@ END
         t[:cmd] ||= t[:file]
       end
       t[:lang] ||= t[:type].split(/\s+/).first
+      t[:code]       = code_lines(File.read(t[:file]))
+      t[:cmd_output] = t[:cmd] && lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd]))))
+      msg t[:cmd_output]
       t
     end
+  pe(e: e)
   # PP.pp(targets: targets, $stderr)
-  pe(targets: targets)
+  # pe(targets: targets)
+  msg "}}} Example : #{e[:name]}"
 end
+
+msg 'DONE'
 

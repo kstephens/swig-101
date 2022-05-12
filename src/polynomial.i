@@ -4,7 +4,7 @@
 // Include std::vector<T> support:
 %include "std_vector.i"
 
-// Template instantation:
+// Template instantiation:
 %template(VectorDouble) std::vector<double>;
 
 // Include C++ declarations as SWIG interface definitions:

@@ -117,67 +117,41 @@ The examples below target:
 * TCL
 * Guile Scheme
 
-<%
-msg "Examples"
-
-%>
-
-<%
-  $examples.each do | e |
-    targets = e[:targets]
-%>
+<% $examples.each do | e |
+    targets = e[:targets] %>
 
 # <%= e[:basename].capitalize %>
 
-<% targets.each do | t |
-  msg "{{{ Example : #{e[:name]} : Program : #{t[:name]}"
-%>
+<% targets.each do | t | %>
 ## <%= t[:type] %> : <%= t[:file] %>
 
 ```<%= t[:lang] %>
-<%=
-string_lines(File.read(t[:file]))
-%>
+<%= t[:code] %>
 ```
 
 <% if t[:cmd] %>
-----
-
 ```
 $ <%= t[:cmd] %>
-<%= lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd])))) %>
+<%= t[:cmd_output] %>
 ```
-<% end %>
 <%
-  msg "}}} Example : #{e[:name]} : Program : #{t[:name]}"
-end
+    end # if
+  end # targets
 %>
 
 ## Output
-<%
-msg "{{{ Output"
-targets.select{|t| t[:cmd]}.each do | t |
-  msg "#{e[:name]} : #{t[:name]} : Output : {{{"
-%>
+<% targets.select{|t| t[:cmd]}.each do | t | %>
 
 ```
 $ <%= t[:cmd] %>
-<%= lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd])))) %>
+<%= t[:cmd_output] %>
+
 ```
 
-<%
-  msg "}}} Example : #{e[:name]} : Output : #{t[:name]}"
-end # targets
-%>
-<%
-  msg "}}} Example : #{e[:name]}"
-end # $examples
-msg "}}} Output"
-%>
+<%   end # targets %>
+<% end # $examples %>
 
 # Workflow
-
-<% msg "{{{ Workflow" %>
 
 <%=
 workflow = File.read("doc/workflow.txt")
@@ -191,16 +165,8 @@ end
 %>
 
 <% $examples.each do | e | %>
-<%= run_workflow e %>
-<%
-  msg "}}} Workflow : #{e[:name]}"
-end
-%>
-<%
-msg "}}} Workflow"
-cmd "#{make} all >/dev/null"
-msg 'DONE'
-%>
+<%= e[:workflow_output] %>
+<% end %>
 
 # Links
 
