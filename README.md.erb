@@ -14,22 +14,23 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 
 # Benefits
 
-SWIG:
-
 * Parses SWIG interface definition files.
 * SWIG interface defintions are a superset of C/C++.
-* Many C/C++ header files can be used verbatim with minimal specification.
-* Interface definitions can target multiple target languages with little additional effort.
-* Generated FFI code is statically-generated, reducing runtime costs.
-* FFI code can be dynamically loaded or statically linked.
-* FFI code is self-contained.
+* Many C/C++ header files can be used verbatim.
+* Can target multiple languages with little effort.
+* Generated bindings are statically-generated, reducing runtime costs.
+* Bindings s can be dynamically loaded or statically linked.
+* Binding code is self-contained.
 * Hinting for improved integration and representation.
 * Template driven, user's can write generator for multiple purposes.
+
+# Applications
+
 * Use dynamic language to test C/C++ code.
+* Reduce adoption costs.
+* Integration with other tools.
 
-# Native Code Support
-
-Comprehensive support:
+# Comprehensive Native Code Support
 
 * C struct and union
 * C/C++ Pointers, references, `const` declarations
@@ -68,13 +69,13 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 * Coders love greenfields.
 * Waste of time.
 
-## Native Language ABIs
+## Native Language APIs
 
-* Every native language's ABI is entirely different.
-* Some implementations of the same target language have different ABIs: e.g. JRuby and CRuby.
-* Some are only dynamic with associate performance costs.
-* Few languages have well-defined ABIs; Java JNI is a notable exception.
-* Each ABI requires intimate knownlege of ABIs
+* Every target language's API is entirely different.
+* Some implementations of the same target language are differnt: e.g. JRuby and CRuby.
+* Some are dynamic with associated performance costs.
+* Few languages have well-defined APIs.  (JNI is a notable exception)
+* Requires intimate knowledge
  * rules
  * best-practices
  * manual data structure, function, class, method wrapping and registration
@@ -82,12 +83,11 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 ## LibFFI
 
-[Libffi](https://github.com/libffi/libffi) can invoke native C functions dynamically from a low-level function signature.
-
-* libffi does not interpret C/C++ headers.
-* C++ FFI is unsupported.
+* Very low-level.
+* Does not interpret C/C++ headers.
+* Does not support C++.
 * Must specify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
-* Does not provide any data type serialization functionality.
+* Does not provide any data structure functionality.
 * Must have knowledge of CPU, Compiler and OS calling conventions.
 * Must manually layout struct and union values accordingly.
 
@@ -340,6 +340,13 @@ msg "}}} Workflow"
 cmd "#{make} all >/dev/null"
 msg 'DONE'
 %>
+
+# Links
+
+* https://www.swig.org/
+* https://github.com/swig/swig
+* https://github.com/kstephens/swig-101
+* https://github.com/libffi/libffi
 
 # HOW-TO
 

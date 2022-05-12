@@ -11,6 +11,6 @@
 (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
 
 ;; Invoke methods:
-(println (format "POLYNOMIAL_VERSION = %s" (polynomial_swig/POLYNOMIAL_VERSION)))
+(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
 (prn (.getCoeffs p))
 (prn (.evaluate p 2.0))

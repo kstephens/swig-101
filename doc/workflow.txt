@@ -1,49 +1,50 @@
-1. Generate SWIG bindings from interface file for target language.
-2. Compile SWIG bindings.
-3. Link native library and SWIG bindings into a dynamic library.
-4. Load dynamic library into target language.
+1. Create interface files. (once)
+2. Generate bindings from interface files. (many)
+3. Compile bindings.
+4. Link bindings and native library into a dynamic library.
+5. Load dynamic library.
 
 ************************************************************************
 *
 *    +---------------------------+
-* +--+          mylib.h          |
+* +--+           foo.h           |
 * |  +---------------------------+
 * |  | double f(double, double); |
 * |  +------------------+--------+
 * |                  
 * |  +---------------------------+ 
-* |  |          mylib.i          | 
+* |  |            foo.i          | 
 * |  +---------------------------+ 
-* |  | %module mylib_swig        | 
-* |  | %include "mylib.h"        |
+* |  | %module foo_swig          | 
+* |  | %include "foo.h"          |
 * |  +-+-------------------------+ 
-* +----+  1. swig -python mylib.i   \
-*      v       -o bld/mylib_swig.c
-*    +---------------------+
-* +--+  bld/mylib_swig.py  |
-* |  |  bld/mylib_swig.c   |
-* |  +-+-------------------+
-* |    |  2. cc -c bld/mylib_swig.c
+* +----+  2. swig -python foo.i    \
+*      v       -o bld/foo_swig.c
+*    +-------------------+
+* +--+  bld/foo_swig.py  |
+* |  |  bld/foo_swig.c   |
+* |  +-+-----------------+
+* |    |  3. cc -c bld/foo_swig.c
 * |    v                       
-* |  +---------------------+  
-* |  |  bld/mylib_swig.о   |  
-* |  +-+-------------------+  
-* |    |  3. cc -dynamiclib           \   
-* |    |       -о bld/_mylib_swig.so  \   
-* |    |       bld/mylib_swig.о       \
-* |    v       -l mylib 
-* |  +---------------------+ 
-* |  |  bld/mylib_swig.sо  | 
-* |  +-+-------------------+ 
-* +----+  4. python script.py
+* |  +-------------------+  
+* |  |  bld/foo_swig.о   |  
+* |  +-+-----------------+  
+* |    |  4. cc -dynamiclib         \   
+* |    |       -о bld/_foo_swig.so  \   
+* |    |       bld/foo_swig.о       \
+* |    v       -l foo 
+* |  +-------------------+ 
+* |  |  bld/foo_swig.sо  | 
+* |  +-+-----------------+ 
+* +----+  5. python script.py
 *      v
-*    +-----------------------------+
-*    |         scripy.py           |
-*    +-----------------------------+
-*    | import sys                  |
-*    | sys.path.append('bld')      |
-*    | import mylib_swig as mylib  |
-*    | print(mylib.f(2.0, 3.0))    |
-*    +-----------------------------+
+*    +--------------------------+
+*    |        scripy.py         |
+*    +--------------------------+
+*    | import sys               |
+*    | sys.path.append('bld')   |
+*    | import foo_swig as foo   |
+*    | print(foo.f(2.0, 3.0))   |
+*    +--------------------------+
 *
 ************************************************************************

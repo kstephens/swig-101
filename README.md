@@ -14,22 +14,23 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 
 # Benefits
 
-SWIG:
-
 * Parses SWIG interface definition files.
 * SWIG interface defintions are a superset of C/C++.
-* Many C/C++ header files can be used verbatim with minimal specification.
-* Interface definitions can target multiple target languages with little additional effort.
-* Generated FFI code is statically-generated, reducing runtime costs.
-* FFI code can be dynamically loaded or statically linked.
-* FFI code is self-contained.
+* Many C/C++ header files can be used verbatim.
+* Can target multiple languages with little effort.
+* Generated bindings are statically-generated, reducing runtime costs.
+* Bindings s can be dynamically loaded or statically linked.
+* Binding code is self-contained.
 * Hinting for improved integration and representation.
 * Template driven, user's can write generator for multiple purposes.
+
+# Applications
+
 * Use dynamic language to test C/C++ code.
+* Reduce adoption costs.
+* Integration with other tools.
 
-# Native Code Support
-
-Comprehensive support:
+# Comprehensive Native Code Support
 
 * C struct and union
 * C/C++ Pointers, references, `const` declarations
@@ -68,13 +69,13 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 * Coders love greenfields.
 * Waste of time.
 
-## Native Language ABIs
+## Native Language APIs
 
-* Every native language's ABI is entirely different.
-* Some implementations of the same target language have different ABIs: e.g. JRuby and CRuby.
-* Some are only dynamic with associate performance costs.
-* Few languages have well-defined ABIs; Java JNI is a notable exception.
-* Each ABI requires intimate knownlege of ABIs
+* Every target language's API is entirely different.
+* Some implementations of the same target language are differnt: e.g. JRuby and CRuby.
+* Some are dynamic with associated performance costs.
+* Few languages have well-defined APIs.  (JNI is a notable exception)
+* Requires intimate knowledge
  * rules
  * best-practices
  * manual data structure, function, class, method wrapping and registration
@@ -82,12 +83,11 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 ## LibFFI
 
-[Libffi](https://github.com/libffi/libffi) can invoke native C functions dynamically from a low-level function signature.
-
-* libffi does not interpret C/C++ headers.
-* C++ FFI is unsupported.
+* Very low-level.
+* Does not interpret C/C++ headers.
+* Does not support C++.
 * Must specify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
-* Does not provide any data type serialization functionality.
+* Does not provide any data structure functionality.
 * Must have knowledge of CPU, Compiler and OS calling conventions.
 * Must manually layout struct and union values accordingly.
 
@@ -247,7 +247,7 @@ POLYNOMIAL_VERSION = 2.3.5
  11   (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
  12   
  13   ;; Invoke methods:
- 14   (println (format "POLYNOMIAL_VERSION = %s" (polynomial_swig/POLYNOMIAL_VERSION)))
+ 14   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
  15   (prn (.getCoeffs p))
  16   (prn (.evaluate p 2.0))
 
@@ -258,7 +258,7 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial-clojure
-POLYNOMIAL_VERSION = 2.3.5
+{:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
 
@@ -320,7 +320,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fc097c08200>
+#<swig-pointer std::vector< double > * 7ffb305041e0>
 -156.0
 
 ```
@@ -349,7 +349,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_40dc405a9a7f0000_p_std__vectorT_double_t
+_604a5039957f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -381,7 +381,7 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial-clojure
-POLYNOMIAL_VERSION = 2.3.5
+{:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
 
@@ -404,7 +404,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fab3ce040f0>
+#<swig-pointer std::vector< double > * 7fdca35040f0>
 -156.0
 
 
@@ -415,7 +415,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_306ae084cf7f0000_p_std__vectorT_double_t
+_406850f59c7f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -695,53 +695,54 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 
-1. Generate SWIG bindings from interface file for target language.
-2. Compile SWIG bindings.
-3. Link native library and SWIG bindings into a dynamic library.
-4. Load dynamic library into target language.
+1. Create interface files. (once)
+2. Generate bindings from interface files. (many)
+3. Compile bindings.
+4. Link bindings and native library into a dynamic library.
+5. Load dynamic library.
 
 ```
 *
    +---------------------------+
-+--+          mylib.h          |
++--+           foo.h           |
 |  +---------------------------+
 |  | double f(double, double); |
 |  +------------------+--------+
 |                  
 |  +---------------------------+ 
-|  |          mylib.i          | 
+|  |            foo.i          | 
 |  +---------------------------+ 
-|  | %module mylib_swig        | 
-|  | %include "mylib.h"        |
+|  | %module foo_swig          | 
+|  | %include "foo.h"          |
 |  +-+-------------------------+ 
-+----+  1. swig -python mylib.i   \
-     v       -o bld/mylib_swig.c
-   +---------------------+
-+--+  bld/mylib_swig.py  |
-|  |  bld/mylib_swig.c   |
-|  +-+-------------------+
-|    |  2. cc -c bld/mylib_swig.c
++----+  2. swig -python foo.i    \
+     v       -o bld/foo_swig.c
+   +-------------------+
++--+  bld/foo_swig.py  |
+|  |  bld/foo_swig.c   |
+|  +-+-----------------+
+|    |  3. cc -c bld/foo_swig.c
 |    v                       
-|  +---------------------+  
-|  |  bld/mylib_swig.о   |  
-|  +-+-------------------+  
-|    |  3. cc -dynamiclib           \   
-|    |       -о bld/_mylib_swig.so  \   
-|    |       bld/mylib_swig.о       \
-|    v       -l mylib 
-|  +---------------------+ 
-|  |  bld/mylib_swig.sо  | 
-|  +-+-------------------+ 
-+----+  4. python script.py
+|  +-------------------+  
+|  |  bld/foo_swig.о   |  
+|  +-+-----------------+  
+|    |  4. cc -dynamiclib         \   
+|    |       -о bld/_foo_swig.so  \   
+|    |       bld/foo_swig.о       \
+|    v       -l foo 
+|  +-------------------+ 
+|  |  bld/foo_swig.sо  | 
+|  +-+-----------------+ 
++----+  5. python script.py
      v
-   +-----------------------------+
-   |         scripy.py           |
-   +-----------------------------+
-   | import sys                  |
-   | sys.path.append('bld')      |
-   | import mylib_swig as mylib  |
-   | print(mylib.f(2.0, 3.0))    |
-   +-----------------------------+
+   +--------------------------+
+   |        scripy.py         |
+   +--------------------------+
+   | import sys               |
+   | sys.path.append('bld')   |
+   | import foo_swig as foo   |
+   | print(foo.f(2.0, 3.0))   |
+   +--------------------------+
 *
 ```
 
@@ -1655,6 +1656,13 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 
 
 
+
+# Links
+
+* https://www.swig.org/
+* https://github.com/swig/swig
+* https://github.com/kstephens/swig-101
+* https://github.com/libffi/libffi
 
 # HOW-TO
 
