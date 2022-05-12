@@ -127,11 +127,11 @@ example_names.each do | name |
 #{lang} Library         | src/#{name}              | - |
 #{lang} Main            | src/#{basename}-native.#{suffix} | target/native/#{basename}
 #{lang} SWIG Interface  | src/#{basename}.i        | - | #{lang}
-Python                  | src/#{basename}-python   |   |
-Clojure (Java)          | src/#{basename}-clojure  |   | Lisp
-Ruby                    | src/#{basename}-ruby     |   |
-Guile                   | src/#{basename}-guile    |   | Scheme
-TCL                     | src/#{basename}-tcl      |   |
+Python                  | src/#{basename}.py       |   |
+Clojure (Java)          | src/#{basename}.clj      |   | Lisp
+Ruby                    | src/#{basename}.rb       |   |
+Guile                   | src/#{basename}.scm      |   | Scheme
+TCL                     | src/#{basename}.tcl      |   |
 END
   e[:targets] =
     targets.

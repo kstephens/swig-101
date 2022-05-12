@@ -3,11 +3,13 @@
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 UNAME_S:=$(shell uname -s)
+SILENT=@
 
 ############################
 
 SWIG_EXE?=$(shell which swig)
-SWIG_TARGETS:=python java ruby tcl guile
+SWIG_TARGETS=python clojure ruby tcl guile
+TARGET_SUFFIXES=py clj rb tcl scm
 SWIG_TARGET=UNDEFINED
 
 ############################
@@ -15,7 +17,7 @@ SWIG_TARGET=UNDEFINED
 SWIG_SO_PREFIX_DEFAULT=
 SWIG_SO_SUFFIX_DEFAULT=.so
 
-SWIG_SO_SUFFIX_ruby:=.so # Linux
+SWIG_SO_SUFFIX_ruby=.so # Linux
 
 ifeq "$(UNAME_S)" "CYGWIN_NT-10.0"
 # https://cygwin.com/cygwin-ug-net/dll.html
@@ -66,6 +68,8 @@ CXXFLAGS += -Isrc
 
 ############################
 
+SUFFIX_ruby=rb
+SWIG_OPTS_ruby=-ruby
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
 
 ############################
@@ -74,6 +78,9 @@ PYTHON_VERSION=3.10
 PYTHON_MAJOR_VERSION=3
 PYTHON_CONFIG:=$(shell which python$(PYTHON_VERSION)-config python$(PYTHON_MAJOR_VERSION)-config python-config 2>/dev/null | head -1)
 PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | head -1)
+
+SUFFIX_python=py
+SWIG_OPTS_python=-python
 SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
 SWIG_SO_PREFIX_python:=_
@@ -81,11 +88,14 @@ SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG).py
 
 ############################
 
+SUFFIX_tcl=tcl
+SWIG_OPTS_tcl=-tcl
 SWIG_CFLAGS_tcl:=-I$(TCL_HOME)/include
 SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
+SUFFIX_guile=scm
 SWIG_OPTS_guile=-guile
 SWIG_CFLAGS_guile:=$(shell guile-config compile) #
 SWIG_LDFLAGS_guile:=$(shell guile-config link) #
@@ -93,11 +103,13 @@ SWIG_SO_PREFIX_guile:=lib
 
 ############################
 
-# SWIG_OPTS_java=-package $(EXAMPLE_NAME)
-SWIG_CFLAGS_java=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
-SWIG_SO_PREFIX_java:=lib
-SWIG_SO_SUFFIX_java:=.jnilib # OSX
-SWIG_GENERATED_FILES_java=target/$(SWIG_TARGET)/$(EXAMPLE_NAME)*.java
+SUFFIX_clojure=clj
+SWIG_OPTS_clojure=-java
+# SWIG_OPTS_clojure=-package $(EXAMPLE_NAME)
+SWIG_CFLAGS_clojure=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
+SWIG_SO_PREFIX_clojure=lib
+SWIG_SO_SUFFIX_clojure=.jnilib # OSX
+SWIG_GENERATED_FILES_clojure=target/$(SWIG_TARGET)/$(EXAMPLE_NAME)*.java
 
 ############################
 
@@ -113,7 +125,7 @@ EXAMPLES = polynomial.cc example1.c
 all: early build-examples
 
 early:
-	@mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
+	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
 #################################
 
@@ -160,16 +172,16 @@ CFLAGS_SUFFIX.cc+= -std=c++17
 endif
 
 build-examples:
-	@echo "\n# Examples \n"
-	@for e in $(EXAMPLES) ;\
+	$(SILENT)echo "\n# Examples \n"
+	$(SILENT)set -e; for e in $(EXAMPLES) ;\
 	do \
-	  $(MAKE) --no-print-directory build-example EXAMPLE=$$e ;\
+	  $(MAKE) build-example EXAMPLE=$$e ;\
 	done
 
 build-example: early build-example-begin build-native build-targets build-example-end
 
 build-example-begin:
-	@echo "\n# Build $(EXAMPLE) \n"
+	$(SILENT)echo "\n# Build $(EXAMPLE) \n"
 
 build-example-end:
 
@@ -182,27 +194,27 @@ NATIVE_DEPS = \
 build-native: early build-native-begin $(NATIVE_DEPS) build-native-end
 
 build-native-begin:
-	@echo "\n## Build $(EXAMPLE) Native Code\n\`\`\`"
+	$(SILENT)echo "\n## Build $(EXAMPLE) Native Code\n\`\`\`"
 
 build-native-end:
-	@echo "\`\`\`\n"
+	$(SILENT)echo "\`\`\`\n"
 
 target/native/$(EXAMPLE_NAME).o : src/$(EXAMPLE)
-	@echo "\n# Compile native library:"
+	$(SILENT)echo "\n# Compile native library:"
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE))
-	@mkdir -p $(dir $@)
-	@echo "\n# Compile and link native program:"
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)echo "\n# Compile and link native program:"
 	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE_NAME).o
 
 #################################
 
 build-targets : Makefile
-	@set -e ;\
+	$(SILENT)set -e ;\
 	for t in $(SWIG_TARGETS) ;\
 	do \
-	  $(MAKE) --no-print-directory build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
+	  $(MAKE) build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
 	done
 
 TARGET_SWIG=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)$(EXAMPLE_SUFFIX)
@@ -233,35 +245,30 @@ endif
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
 build-target-begin:
-	@echo "\n## Build $(SWIG_TARGET) bindings\n\`\`\`"
+	$(SILENT)echo "\n## Build $(SWIG_TARGET) bindings\n\`\`\`"
 
 build-target-end:
-	@echo "\`\`\`\n"
+	$(SILENT)echo "\`\`\`\n"
 
 $(TARGET_SWIG) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
-	@mkdir -p $(dir $@)
-	@echo "\n# Generate $(SWIG_TARGET) bindings"
-	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
-	@echo ''
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)echo "\n# Generate $(SWIG_TARGET) bindings"
+	$(SWIG_EXE) $(SWIG_OPTS) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
+	$(SILENT)echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
-#	@echo ''
+#	$(SILENT)echo ''
 #	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
-	-@$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
+	-$(SILENT)$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
 $(TARGET_SWIG_O) : $(TARGET_SWIG)
-	@mkdir -p $(dir $@)
-	@echo "\n# Compile $(SWIG_TARGET) bindings:"
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)echo "\n# Compile $(SWIG_TARGET) bindings:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
-	@mkdir -p $(dir $@)
-	@echo "\n# Link $(SWIG_TARGET) dynamic library:"
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)echo "\n# Link $(SWIG_TARGET) dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
-
-#################################
-
-%.md : all %.md.erb src/* Makefile
-	erb -T 2 $@.erb | sed -E -e 's@$(HOME)@$$HOME@g' > $@
 
 #################################
 
@@ -269,13 +276,13 @@ RUN="bin/run"
 
 demo: clean all demo-run
 demo-run:
-	@set -e ;\
+	$(SILENT)set -e ;\
 	for example in $(basename $(EXAMPLES)) ;\
 	do \
 	   (set -x; $(RUN) target/native/$$example) ;\
-	   for target in $(subst java,clojure,$(SWIG_TARGETS)) ;\
+	   for suffix in $(TARGET_SUFFIXES) ;\
 	   do \
-	     (set -x; $(RUN) src/$$example-$$target) ;\
+	     (set -x; $(RUN) src/$$example.$$suffix) ;\
 	   done \
 	done
 
@@ -289,7 +296,8 @@ debian-prereq:
 
 #################################
 
-README.md : README.md.erb doc/README.md.erb.rb clean
+README.md : README.md.erb doc/README.md.erb.rb src/*.* Makefile
+	$(MAKE) clean all >/dev/null
 	mkdir -p tmp
 	erb $< > tmp/$@
 	[ -z "$$MARKDEEP" ] && mv tmp/$@ $@

@@ -16,11 +16,10 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 
 # Benefits
 
-* Parses SWIG interface definition files.
 * SWIG interface defintions are a superset of C/C++.
-* Many C/C++ header files can be used verbatim.
+* Many C/C++ header files are also SWIG interface definition files.
 * Can target multiple languages with little effort.
-* Generated bindings are statically-generated, reducing runtime costs.
+* Generated binding code is generated, compiled and linked.
 * Bindings can be dynamically loaded or statically linked.
 * Generated code is self-contained.
 * Hinting for improved integration and representation.
@@ -122,8 +121,6 @@ The examples below target:
 
 
 
-
-
 # Polynomial
 
 
@@ -167,9 +164,10 @@ The examples below target:
   4   int main(int argc, char **argv) {
   5     Polynomial p;
   6     p.coeffs = { 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 };
-  7     std::cout << p.evaluate(2.0) << std::endl;
-  8     return 0;
-  9   }
+  7     std::cout << "POLYNOMIAL_VERSION = " << POLYNOMIAL_VERSION << std::endl;
+  8     std::cout << p.evaluate(2.0) << std::endl;
+  9     return 0;
+ 10   }
 ```
 
 
@@ -177,6 +175,7 @@ The examples below target:
 
 ```
 $ target/native/polynomial
+POLYNOMIAL_VERSION = 2.3.5
 -156
 ```
 
@@ -204,7 +203,7 @@ $ target/native/polynomial
 
 
 
-## Python : src/polynomial-python
+## Python : src/polynomial.py
 
 ```Python
   1   #!/usr/bin/env python3.10
@@ -230,14 +229,14 @@ $ target/native/polynomial
 ----
 
 ```
-$ src/polynomial-python
+$ src/polynomial.py
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
 
 
-## Clojure (Java) : src/polynomial-clojure
+## Clojure (Java) : src/polynomial.clj
 
 ```Lisp
   1   ;; -*- clojure -*-
@@ -262,14 +261,14 @@ POLYNOMIAL_VERSION = 2.3.5
 ----
 
 ```
-$ src/polynomial-clojure
+$ src/polynomial.clj
 {:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
 ```
 
 
-## Ruby : src/polynomial-ruby
+## Ruby : src/polynomial.rb
 
 ```Ruby
   1   #!/usr/bin/env ruby
@@ -292,14 +291,14 @@ $ src/polynomial-clojure
 ----
 
 ```
-$ src/polynomial-ruby
+$ src/polynomial.rb
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
 
 
-## Guile : src/polynomial-guile
+## Guile : src/polynomial.scm
 
 ```Scheme
   1   #!/usr/bin/env guile
@@ -319,14 +318,14 @@ POLYNOMIAL_VERSION = 2.3.5
 ----
 
 ```
-$ src/polynomial-guile
+$ src/polynomial.scm
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fd087c07910>
+#<swig-pointer std::vector< double > * 7ff2325041d0>
 -156.0
 ```
 
 
-## TCL : src/polynomial-tcl
+## TCL : src/polynomial.tcl
 
 ```TCL
   1   #!/usr/bin/env tclsh
@@ -346,9 +345,9 @@ $ src/polynomial-guile
 ----
 
 ```
-$ src/polynomial-tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION = 2.3.5
-_f04190a3dc7f0000_p_std__vectorT_double_t
+_20489050c57f0000_p_std__vectorT_double_t
 -156.0
 ```
 
@@ -359,58 +358,53 @@ _f04190a3dc7f0000_p_std__vectorT_double_t
 
 ```
 $ target/native/polynomial
+POLYNOMIAL_VERSION = 2.3.5
 -156
-
 ```
 
 
 
 ```
-$ src/polynomial-python
+$ src/polynomial.py
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
 
 ```
-$ src/polynomial-clojure
+$ src/polynomial.clj
 {:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
-
 ```
 
 
 
 ```
-$ src/polynomial-ruby
+$ src/polynomial.rb
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
 
 ```
-$ src/polynomial-guile
+$ src/polynomial.scm
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fd3c6504080>
+#<swig-pointer std::vector< double > * 7fc635c081f0>
 -156.0
-
 ```
 
 
 
 ```
-$ src/polynomial-tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION = 2.3.5
-_f0aa403ff57f0000_p_std__vectorT_double_t
+_3067d0d8c67f0000_p_std__vectorT_double_t
 -156.0
-
 ```
 
 
@@ -483,7 +477,7 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 
-## Python : src/example1-python
+## Python : src/example1.py
 
 ```Python
   1   #!/usr/bin/env python3.10
@@ -504,13 +498,13 @@ EXAMPLE1_VERSION = 1.2.3
 ----
 
 ```
-$ src/example1-python
+$ src/example1.py
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 
-## Clojure (Java) : src/example1-clojure
+## Clojure (Java) : src/example1.clj
 
 ```Lisp
   1   ;; -*- clojure -*-
@@ -527,13 +521,13 @@ EXAMPLE1_VERSION = 1.2.3
 ----
 
 ```
-$ src/example1-clojure
+$ src/example1.clj
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 
-## Ruby : src/example1-ruby
+## Ruby : src/example1.rb
 
 ```Ruby
   1   #!/usr/bin/env ruby
@@ -552,13 +546,13 @@ EXAMPLE1_VERSION = 1.2.3
 ----
 
 ```
-$ src/example1-ruby
+$ src/example1.rb
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 
-## Guile : src/example1-guile
+## Guile : src/example1.scm
 
 ```Scheme
   1   #!/usr/bin/env guile
@@ -576,13 +570,13 @@ EXAMPLE1_VERSION = 1.2.3
 ----
 
 ```
-$ src/example1-guile
+$ src/example1.scm
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
 ```
 
 
-## TCL : src/example1-tcl
+## TCL : src/example1.tcl
 
 ```TCL
   1   #!/usr/bin/env tclsh
@@ -597,7 +591,7 @@ $ src/example1-guile
 ----
 
 ```
-$ src/example1-tcl
+$ src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
@@ -611,52 +605,46 @@ EXAMPLE1_VERSION = 1.2.3
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
 
 ```
-$ src/example1-python
+$ src/example1.py
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
 
 ```
-$ src/example1-clojure
+$ src/example1.clj
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
 
 ```
-$ src/example1-ruby
+$ src/example1.rb
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
 
 ```
-$ src/example1-guile
+$ src/example1.scm
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
-
 ```
 
 
 
 ```
-$ src/example1-tcl
+$ src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -738,7 +726,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o  \
 ``` 
 
 # Generate python bindings 
-swig -addextern -I- -Isrc -c++ -python -outdir target/python/ -o  \
+swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o  \
   target/python/polynomial_swig.cc src/polynomial.i 
 
 wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py 
@@ -762,29 +750,29 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 
-## Build java bindings 
+## Build clojure bindings 
 ``` 
 
-# Generate java bindings 
-swig -addextern -I- -Isrc -c++ -java -outdir target/java/ -o  \
-  target/java/polynomial_swig.cc src/polynomial.i 
+# Generate clojure bindings 
+swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o  \
+  target/clojure/polynomial_swig.cc src/polynomial.i 
 
-wc -l target/java/polynomial_swig.cc target/java/polynomial*.java 
-660 target/java/polynomial_swig.cc 
-11 target/java/polynomial_swig.java 
-12 target/java/polynomial_swigConstants.java 
-32 target/java/polynomial_swigJNI.java 
+wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java 
+660 target/clojure/polynomial_swig.cc 
+11 target/clojure/polynomial_swig.java 
+12 target/clojure/polynomial_swigConstants.java 
+32 target/clojure/polynomial_swigJNI.java 
 715 total 
 
-# Compile java bindings: 
+# Compile clojure bindings: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
   -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -I$JAVA_HOME/include/darwin -c  \
-  -o target/java/polynomial_swig.cc.o target/java/polynomial_swig.cc 
+  -o target/clojure/polynomial_swig.cc.o target/clojure/polynomial_swig.cc 
 
-# Link java dynamic library: 
+# Link clojure dynamic library: 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/java//libpolynomial_swig.jnilib  \
-  target/native/polynomial.o target/java/polynomial_swig.cc.o 
+  -Wl,-undefined,dynamic_lookup -o target/clojure//libpolynomial_swig.jnilib  \
+  target/native/polynomial.o target/clojure/polynomial_swig.cc.o 
 ``` 
 
 
@@ -792,7 +780,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 # Generate ruby bindings 
-swig -addextern -I- -Isrc -c++ -ruby -outdir target/ruby/ -o  \
+swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o  \
   target/ruby/polynomial_swig.cc src/polynomial.i 
 
 wc -l target/ruby/polynomial_swig.cc 
@@ -815,7 +803,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 # Generate tcl bindings 
-swig -addextern -I- -Isrc -c++ -tcl -outdir target/tcl/ -o  \
+swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o  \
   target/tcl/polynomial_swig.cc src/polynomial.i 
 
 wc -l target/tcl/polynomial_swig.cc 
@@ -837,7 +825,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 # Generate guile bindings 
-swig -addextern -I- -Isrc -guile -c++ -guile -outdir target/guile/ -o  \
+swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o  \
   target/guile/polynomial_swig.cc src/polynomial.i 
 
 wc -l target/guile/polynomial_swig.cc 
@@ -900,29 +888,29 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 
-## Build java bindings 
+## Build clojure bindings 
 ``` 
 
-# Generate java bindings 
-swig -addextern -I- -Isrc -java -outdir target/java/ -o  \
-  target/java/example1_swig.c src/example1.i 
+# Generate clojure bindings 
+swig -addextern -I- -Isrc -java -outdir target/clojure/ -o  \
+  target/clojure/example1_swig.c src/example1.i 
 
-wc -l target/java/example1_swig.c target/java/example1*.java 
-243 target/java/example1_swig.c 
-15 target/java/example1_swig.java 
-12 target/java/example1_swigConstants.java 
-13 target/java/example1_swigJNI.java 
+wc -l target/clojure/example1_swig.c target/clojure/example1*.java 
+243 target/clojure/example1_swig.c 
+15 target/clojure/example1_swig.java 
+12 target/clojure/example1_swigConstants.java 
+13 target/clojure/example1_swigJNI.java 
 283 total 
 
-# Compile java bindings: 
+# Compile clojure bindings: 
 clang -g -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
-  -I$JAVA_HOME/include/darwin -c -o target/java/example1_swig.c.o  \
-  target/java/example1_swig.c 
+  -I$JAVA_HOME/include/darwin -c -o target/clojure/example1_swig.c.o  \
+  target/clojure/example1_swig.c 
 
-# Link java dynamic library: 
+# Link clojure dynamic library: 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/java//libexample1_swig.jnilib target/native/example1.o  \
-  target/java/example1_swig.c.o 
+  target/clojure//libexample1_swig.jnilib target/native/example1.o  \
+  target/clojure/example1_swig.c.o 
 ``` 
 
 
@@ -973,7 +961,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ``` 
 
 # Generate guile bindings 
-swig -addextern -I- -Isrc -guile -guile -outdir target/guile/ -o  \
+swig -addextern -I- -Isrc -guile -outdir target/guile/ -o  \
   target/guile/example1_swig.c src/example1.i 
 
 wc -l target/guile/example1_swig.c 
