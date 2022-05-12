@@ -44,6 +44,7 @@ prog-path JAVA    java
 export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
 export GUILE_AUTO_COMPILE=0
 export CLASSPATH="$dir/target/java:$CLASSPATH"
+export PYTHON_LIB="$dir/target/python:$PYTHON_LIB"
 
 case "${cmd[0]}"
 in

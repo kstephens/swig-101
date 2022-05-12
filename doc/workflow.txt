@@ -1,39 +1,37 @@
 1. Generate SWIG wrapper from interface file for target language.
 2. Compile native library.
 3. Compile SWIG wrapper.
-4. Link native library and SWIG wrapper into dynamic library.
+4. Link native library and SWIG wrapper into a dynamic library.
 5. Load dynamic library into target language.
 
 ************************************************************************
-* 
-*                           
 *                         
-* +----------------+
-* |  c/example1.i  +---+   1. swig -python c/example1.i \
-* +----------------+   |           -o target/example1.c
-*                      |
-* +----------------+   |       +----------------------+
-* |  c/example1.h  +---+------>|  target/example1.py  +--------+
-* |----------------|           |----------------------|        |
-* |  c/example1.c  |           |  target/example1.c   |        |
-* +-+--------------+           +-+--------------------+        |
-*   |                            |                             |
-*   |  2. cc -c c/example.c      | 3. cc -c target/example1.c  |
-*   v                            v                             |
-* +----------------+           +----------------------+        |
-* |  c/example1.о  |           |  target/example1.о   |        |
-* +-+--------------+           +-+--------------------+        |
-*   |                            |                             |
-*   +----------------------------+                             |
-*   |                                                          |
-*   | 4. cc -dynamiclib -о target/_example1.so \               |
-*   |      c/example1.о target/example1.о                      |
-*   v                                                          |
-* +----------------------+                                     |
-* |  target/example1.sо  |                                     |
-* +-+--------------------+                                     |
-*   |                                                          |
-*   +----------------------------------------------------------+
+* +-------------+
+* |  c/mylib.i  +---+   1. swig -python c/mylib.i \
+* +-------------+   |           -o swig/mylib_swig.c
+*                   |
+* +-------------+   |       +----------------------+
+* |  c/mylib.h  +---+------>|  swig/mylib_swig.py  +--------+
+* |-------------|           |----------------------|        |
+* |  c/mylib.c  |           |  swig/mylib_swig.c   |        |
+* +-+-----------+           +-+--------------------+        |
+*   |                         |                             |
+*   |  2. cc -c c/mylib.c     | 3. cc -c swig/mylib_swig.c  |
+*   v                         v                             |
+* +-------------+           +----------------------+        |
+* |  c/mylib.о  |           |  swig/mylib_swig.о   |        |
+* +-+-----------+           +-+--------------------+        |
+*   |                            |                          |
+*   +----------------------------+                          |
+*   |                                                       |
+*   | 4. cc -dynamiclib -о swig/_mylib_swig.so \            |
+*   |      c/mylib.о swig/mylib_swig.о                      |
+*   v                                                       |
+* +----------------------+                                  |
+* |  swig/mylib_swig.sо  |                                  |
+* +-+--------------------+                                  |
+*   |                                                       |
+*   +-------------------------------------------------------+
 *   | 
 *   | 5. python script.py
 *   v                    
@@ -41,9 +39,9 @@
 * | script.py                    |
 * |------------------------------|
 * | import sys                   |
-* | sys.path.append('target')    |
-* | import example1              |
-* | print(example1.f(2.0, 3.0))  |
+* | sys.path.append('python')    |
+* | import mylib_swig as mylib   |
+* | print(mylib.f(2.0, 3.0))     |
 * +------------------------------+
 * 
 ************************************************************************

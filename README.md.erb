@@ -218,7 +218,7 @@ cmd "#{make} all >/dev/null"
 <%
 msg "Examples"
 
-%w(example1.c example2.cc).each do | name |
+%w(polynomial.cc example1.c).each do | name |
   src       = "src/#{name}"
   basename  = name.sub(/\.([^.]+)$/, '')
   suffix    = $1
