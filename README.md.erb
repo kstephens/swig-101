@@ -165,7 +165,6 @@ targets.select{|t| t[:cmd]}.each do | t |
 ```
 $ <%= t[:cmd] %>
 <%= lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd])))) %>
-
 ```
 
 <%

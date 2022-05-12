@@ -16,11 +16,10 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 
 # Benefits
 
-* Parses SWIG interface definition files.
 * SWIG interface defintions are a superset of C/C++.
-* Many C/C++ header files can be used verbatim.
+* Many C/C++ header files are also SWIG interface definition files.
 * Can target multiple languages with little effort.
-* Generated bindings are statically-generated, reducing runtime costs.
+* Generated binding code is generated, compiled and linked.
 * Bindings can be dynamically loaded or statically linked.
 * Generated code is self-contained.
 * Hinting for improved integration and representation.
@@ -321,7 +320,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fd087c07910>
+#<swig-pointer std::vector< double > * 7fba477040e0>
 -156.0
 ```
 
@@ -348,7 +347,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_f04190a3dc7f0000_p_std__vectorT_double_t
+_8040e027907f0000_p_std__vectorT_double_t
 -156.0
 ```
 
@@ -360,7 +359,6 @@ _f04190a3dc7f0000_p_std__vectorT_double_t
 ```
 $ target/native/polynomial
 -156
-
 ```
 
 
@@ -370,7 +368,6 @@ $ src/polynomial-python
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
@@ -380,7 +377,6 @@ $ src/polynomial-clojure
 {:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
-
 ```
 
 
@@ -390,7 +386,6 @@ $ src/polynomial-ruby
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
@@ -398,9 +393,8 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fd3c6504080>
+#<swig-pointer std::vector< double > * 7fd4d7c040f0>
 -156.0
-
 ```
 
 
@@ -408,9 +402,8 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_f0aa403ff57f0000_p_std__vectorT_double_t
+_5061e00fa67f0000_p_std__vectorT_double_t
 -156.0
-
 ```
 
 
@@ -611,7 +604,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -620,7 +612,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-python
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -629,7 +620,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-clojure
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -638,7 +628,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-ruby
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -647,7 +636,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-guile
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
-
 ```
 
 
@@ -656,7 +644,6 @@ $ src/example1-guile
 $ src/example1-tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
