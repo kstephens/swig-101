@@ -95,16 +95,12 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 Kind              |  Language     |  Files  |   Lines 
 ------------------|:-------------:|--------:|----------:
-Native C/C++      |               |         |  
-                  | C/C++ Header  |      40 |    3505
-SWIG Interfaces   |               |         |
-                  | SWIG          |       9 |    2667
-Generated Python  |               |         |
-                  | Python        |       1 |    8922
-                  | C++           |       1 |   35235
-Generated Java    |               |         | 
-                  | Java          |      55 |    6741
-                  | C++           |       1 |   17987
+Native C/C++      | C/C++ Header  |      40 |    3505
+SWIG Interfaces   | SWIG          |       9 |    2667
+Generated Python  | Python        |       1 |    8922
+"                 | C++           |       1 |   35235
+Generated Java    | Java          |      55 |    6741
+"                 | C++           |       1 |   17987
 
 # Examples
 
