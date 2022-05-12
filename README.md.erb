@@ -10,7 +10,7 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # History
 
 * SWIG was [created](https://www.swig.org/history.html) in 1995 at Los Alamos National Laboratory.
-* Still under active development.
+* Under active development.
 
 # Benefits
 
@@ -19,15 +19,16 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 * Many C/C++ header files can be used verbatim.
 * Can target multiple languages with little effort.
 * Generated bindings are statically-generated, reducing runtime costs.
-* Bindings s can be dynamically loaded or statically linked.
-* Binding code is self-contained.
+* Bindings can be dynamically loaded or statically linked.
+* Generated code is self-contained.
 * Hinting for improved integration and representation.
-* Template driven, user's can write generator for multiple purposes.
+* Template-driven: users can create specialized generators.
+* Consistency between target languages.
 
 # Applications
 
 * Use dynamic language to test C/C++ code.
-* Reduce adoption costs.
+* Improve library adoption.
 * Integration with other tools.
 
 # Comprehensive Native Code Support
@@ -66,40 +67,43 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 ## Rewrite it in Language X
 
-* Coders love greenfields.
-* Waste of time.
+* Does not leverage existing work.
+* Does not target multiple languages.
+* Increased cost of ownership.
+* Adoption barriers.
 
 ## Native Language APIs
 
-* Every target language's API is entirely different.
-* Some implementations of the same target language are differnt: e.g. JRuby and CRuby.
+* Every target language extension API is completely different.
+* Some implementations of the same target language are different: e.g. JRuby and CRuby.
 * Some are dynamic with associated performance costs.
 * Few languages have well-defined APIs.  (JNI is a notable exception)
-* Requires intimate knowledge
- * rules
- * best-practices
- * manual data structure, function, class, method wrapping and registration
- * manual memory managment
+* Requires intimate knowledge:
+  * rules
+  * best-practices
+  * manually wrapping data structure, function, class, method and associated runtime.
+  * manual memory managment
 
 ## LibFFI
 
+* Only supports dynamic function calls.
 * Very low-level.
 * Does not interpret C/C++ headers.
 * Does not support C++.
-* Must specify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
+* Requires specifing function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
 * Does not provide any data structure functionality.
-* Must have knowledge of CPU, compiler and OS calling conventions.
-* Must manually layout struct and union values accordingly.
+* Requires knowledge of CPU, compiler and OS calling conventions.
+* Requires manual layout struct and union values accordingly.
 
 # Case Study
 
 Kind              |  Language     |  Files  |   Lines 
 ------------------|:-------------:|--------:|----------:
-Native C/C++      | C/C++ Header  |      40 |    3505
+Native Library    | C/C++ Header  |      40 |    3505
 SWIG Interfaces   | SWIG          |       9 |    2667
-Generated Python  | Python        |       1 |    8922
+Python Bindings   | Python        |       1 |    8922
 "                 | C++           |       1 |   35235
-Generated Java    | Java          |      55 |    6741
+Java Bindings     | Java          |      55 |    6741
 "                 | C++           |       1 |   17987
 
 # Examples
@@ -113,6 +117,8 @@ The examples below target:
 * Guile Scheme
 
 <%
+#####################################
+
 exit! if ENV['README_MD']
 ENV['README_MD'] = '1'
 
@@ -142,14 +148,30 @@ def cmd cmd
   File.read("tmp/cmd.out")
 end
 
+def lines_to_string lines
+  lines.join("\n") + "\n"
+end
+
+def string_to_lines s
+  s.split("\n", -1)
+end
+
+def trim_empty_lines!(lines)
+  lines.each{|line| line.sub!(/\s+$/, '')}
+  lines.shift while lines[ 0].empty?
+  lines.pop   while lines[-1].empty?
+  lines
+end
+
+def line_numbers! lines
+  lines.map!.with_index(1) {|line, i| "%3d   %s" % [i, line] }
+end
+
 def string_lines s
-  s.
-  split("\n", -1).
-  tap{|lines| lines.each{|line| line.sub!(/\s+$/, '')}}.
-  tap{|lines| lines.shift while lines[0].empty?}.
-  tap{|lines| lines.pop   while lines[-1].empty?}.
-  map.with_index(1) {|line, i| "%3d   %s" % [i, line] }.
-  join("\n") + "\n"
+  lines = string_to_lines(s)
+  trim_empty_lines!(lines)
+  line_numbers!(lines)
+  lines_to_string(lines)
 end
 
 def wrap_line line, width = 78
@@ -190,12 +212,10 @@ def run_workflow e
   lines = out.split("\n", 999999)
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
-  # pe(lines: lines)
   lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
 end
 
 def make
-  # make = `which gmake make 2>/dev/null`.split("\n").first
   'bin/build'
 end
 
@@ -254,7 +274,6 @@ END
       t[:lang] ||= t[:type].split(/\s+/).first
       t
     end
-
   # PP.pp(targets: targets, $stderr)
   pe(targets: targets)
 %>
@@ -277,7 +296,7 @@ string_lines(File.read(t[:file]))
 
 ```
 $ <%= t[:cmd] %>
-<%= cmd t[:cmd] %>
+<%= lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd])))) %>
 ```
 <% end %>
 <%
@@ -294,7 +313,7 @@ targets.select{|t| t[:cmd]}.each do | t |
 
 ```
 $ <%= t[:cmd] %>
-<%= cmd t[:cmd] %>
+<%= lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd])))) %>
 
 ```
 

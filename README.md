@@ -10,7 +10,7 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # History
 
 * SWIG was [created](https://www.swig.org/history.html) in 1995 at Los Alamos National Laboratory.
-* Still under active development.
+* Under active development.
 
 # Benefits
 
@@ -19,15 +19,16 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 * Many C/C++ header files can be used verbatim.
 * Can target multiple languages with little effort.
 * Generated bindings are statically-generated, reducing runtime costs.
-* Bindings s can be dynamically loaded or statically linked.
-* Binding code is self-contained.
+* Bindings can be dynamically loaded or statically linked.
+* Generated code is self-contained.
 * Hinting for improved integration and representation.
-* Template driven, user's can write generator for multiple purposes.
+* Template-driven: users can create specialized generators.
+* Consistency between target languages.
 
 # Applications
 
 * Use dynamic language to test C/C++ code.
-* Reduce adoption costs.
+* Improve library adoption.
 * Integration with other tools.
 
 # Comprehensive Native Code Support
@@ -66,40 +67,43 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 ## Rewrite it in Language X
 
-* Coders love greenfields.
-* Waste of time.
+* Does not leverage existing work.
+* Does not target multiple languages.
+* Increased cost of ownership.
+* Adoption barriers.
 
 ## Native Language APIs
 
-* Every target language's API is entirely different.
-* Some implementations of the same target language are differnt: e.g. JRuby and CRuby.
+* Every target language extension API is completely different.
+* Some implementations of the same target language are different: e.g. JRuby and CRuby.
 * Some are dynamic with associated performance costs.
 * Few languages have well-defined APIs.  (JNI is a notable exception)
-* Requires intimate knowledge
- * rules
- * best-practices
- * manual data structure, function, class, method wrapping and registration
- * manual memory managment
+* Requires intimate knowledge:
+  * rules
+  * best-practices
+  * manually wrapping data structure, function, class, method and associated runtime.
+  * manual memory managment
 
 ## LibFFI
 
+* Only supports dynamic function calls.
 * Very low-level.
 * Does not interpret C/C++ headers.
 * Does not support C++.
-* Must specify function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
+* Requires specifing function signatures at [runtime](http://www.chiark.greenend.org.uk/doc/libffi-dev/html/Simple-Example.html).
 * Does not provide any data structure functionality.
-* Must have knowledge of CPU, Compiler and OS calling conventions.
-* Must manually layout struct and union values accordingly.
+* Requires knowledge of CPU, compiler and OS calling conventions.
+* Requires manual layout struct and union values accordingly.
 
 # Case Study
 
 Kind              |  Language     |  Files  |   Lines 
 ------------------|:-------------:|--------:|----------:
-Native C/C++      | C/C++ Header  |      40 |    3505
+Native Library    | C/C++ Header  |      40 |    3505
 SWIG Interfaces   | SWIG          |       9 |    2667
-Generated Python  | Python        |       1 |    8922
+Python Bindings   | Python        |       1 |    8922
 "                 | C++           |       1 |   35235
-Generated Java    | Java          |      55 |    6741
+Java Bindings     | Java          |      55 |    6741
 "                 | C++           |       1 |   17987
 
 # Examples
@@ -180,13 +184,22 @@ $ target/native/polynomial
 ## CC SWIG Interface : src/polynomial.i
 
 ```CC
-  1   %module polynomial_swig
-  2   %include "std_vector.i"
-  3   %template(VectorDouble) std::vector<double>;
-  4   %include "polynomial.h"
-  5   %{
-  6   #include "polynomial.h"
-  7   %}
+  1   // Name of generated bindings:
+  2   %module polynomial_swig
+  3   
+  4   // Include std::vector<T> support:
+  5   %include "std_vector.i"
+  6   
+  7   // Template instantation:
+  8   %template(VectorDouble) std::vector<double>;
+  9   
+ 10   // Include C++ declarations as SWIG interface definitions:
+ 11   %include "polynomial.h"
+ 12   
+ 13   // Additional code in generated bindings:
+ 14   %{
+ 15   #include "polynomial.h"
+ 16   %}
 
 ```
 
@@ -316,7 +329,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fef1ce040e0>
+#<swig-pointer std::vector< double > * 7f88b5604080>
 -156.0
 
 ```
@@ -345,7 +358,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_c081702ede7f0000_p_std__vectorT_double_t
+_0043c0fd9c7f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -400,7 +413,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fa0f9407130>
+#<swig-pointer std::vector< double > * 7ff358c07130>
 -156.0
 
 
@@ -411,7 +424,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_f040c08bb07f0000_p_std__vectorT_double_t
+_305ff0e1ed7f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -698,7 +711,6 @@ EXAMPLE1_VERSION = 1.2.3
 5. Load dynamic library.
 
 ```
-*
    +---------------------------+
 +--+           foo.h           |
 |  +---------------------------+
@@ -739,7 +751,7 @@ EXAMPLE1_VERSION = 1.2.3
    | import foo_swig as foo   |
    | print(foo.f(2.0, 3.0))   |
    +--------------------------+
-*
+
 ```
 
 
