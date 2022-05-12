@@ -119,8 +119,6 @@ The examples below target:
 
 
 
-
-
 # Polynomial
 
 
@@ -135,7 +133,6 @@ The examples below target:
   6     double evaluate(double x);
   7   };
 ```
-
 
 
 ## C++ Library : src/polynomial.cc
@@ -154,7 +151,6 @@ The examples below target:
 ```
 
 
-
 ## C++ Main : src/polynomial-native.cc
 
 ```C++
@@ -171,14 +167,11 @@ The examples below target:
 ```
 
 
-----
-
 ```
 $ target/native/polynomial
 POLYNOMIAL_VERSION 2.3.5
 -156
 ```
-
 
 ## C++ SWIG Interface : src/polynomial.i
 
@@ -189,7 +182,7 @@ POLYNOMIAL_VERSION 2.3.5
   4   // Include std::vector<T> support:
   5   %include "std_vector.i"
   6   
-  7   // Template instantation:
+  7   // Template instantiation:
   8   %template(VectorDouble) std::vector<double>;
   9   
  10   // Include C++ declarations as SWIG interface definitions:
@@ -202,31 +195,26 @@ POLYNOMIAL_VERSION 2.3.5
 ```
 
 
-
 ## Python : src/polynomial.py
 
 ```Python
-  1   #!/usr/bin/env python3.10
-  2   
-  3   # Setup DLL search path:
-  4   import sys
-  5   sys.path.append('target/python')
-  6   
-  7   # Import library bindings:
-  8   from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
-  9   
- 10   # Instantiate object:
- 11   poly = Polynomial()
- 12   poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
- 13   
- 14   # Invoke methods:
- 15   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
- 16   print(list(poly.coeffs))
- 17   print(poly.evaluate(2.0))
+  1   # Setup DLL search path:
+  2   import sys
+  3   sys.path.append('target/python')
+  4   
+  5   # Import library bindings:
+  6   from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
+  7   
+  8   # Instantiate object:
+  9   poly = Polynomial()
+ 10   poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
+ 11   
+ 12   # Invoke methods:
+ 13   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
+ 14   print(list(poly.coeffs))
+ 15   print(poly.evaluate(2.0))
 ```
 
-
-----
 
 ```
 $ src/polynomial.py
@@ -235,30 +223,25 @@ $ src/polynomial.py
 -156.0
 ```
 
-
 ## Clojure (Java) : src/polynomial.clj
 
 ```Lisp
-  1   ;; -*- clojure -*-
-  2   
-  3   ;; Load Java bindings dynamic library:
-  4   (clojure.lang.RT/loadLibrary "polynomial_swig")
-  5   
-  6   ;; Import Java namespace:
-  7   (import 'polynomial_swig)
-  8   
-  9   ;; Instantiate object:
- 10   (def p (Polynomial.))
- 11   (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
- 12   
- 13   ;; Invoke methods:
- 14   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
- 15   (prn (.getCoeffs p))
- 16   (prn (.evaluate p 2.0))
+  1   ;; Load Java bindings dynamic library:
+  2   (clojure.lang.RT/loadLibrary "polynomial_swig")
+  3   
+  4   ;; Import Java namespace:
+  5   (import 'polynomial_swig)
+  6   
+  7   ;; Instantiate object:
+  8   (def p (Polynomial.))
+  9   (.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
+ 10   
+ 11   ;; Invoke methods:
+ 12   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
+ 13   (prn (.getCoeffs p))
+ 14   (prn (.evaluate p 2.0))
 ```
 
-
-----
 
 ```
 $ src/polynomial.clj
@@ -267,28 +250,23 @@ $ src/polynomial.clj
 -156.0
 ```
 
-
 ## Ruby : src/polynomial.rb
 
 ```Ruby
-  1   #!/usr/bin/env ruby
-  2   
-  3   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
-  4   $:.unshift 'target/ruby'
-  5   
-  6   require 'polynomial_swig'
-  7   include Polynomial_swig
-  8   
-  9   p = Polynomial.new
- 10   p.coeffs = VectorDouble.new([2.0, 3.0, 5.0, 7.0, 11.0, -13.0])
- 11   
- 12   pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
- 13   pp p.coeffs.to_a
- 14   pp p.evaluate(2.0)
+  1   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
+  2   $:.unshift 'target/ruby'
+  3   
+  4   require 'polynomial_swig'
+  5   include Polynomial_swig
+  6   
+  7   p = Polynomial.new
+  8   p.coeffs = VectorDouble.new([2.0, 3.0, 5.0, 7.0, 11.0, -13.0])
+  9   
+ 10   pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
+ 11   pp p.coeffs.to_a
+ 12   pp p.evaluate(2.0)
 ```
 
-
-----
 
 ```
 $ src/polynomial.rb
@@ -297,60 +275,48 @@ $ src/polynomial.rb
 -156.0
 ```
 
-
 ## Guile : src/polynomial.scm
 
 ```Scheme
-  1   #!/usr/bin/env guile
-  2   !#
-  3   
-  4   (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")
+  1   (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")
+  2   
+  3   (define p (new-Polynomial))
+  4   (Polynomial-coeffs-set p (new-VectorDouble '(2.0 3.0 5.0 7.0 11.0 -13.0)))
   5   
-  6   (define p (new-Polynomial))
-  7   (Polynomial-coeffs-set p (new-VectorDouble '(2.0 3.0 5.0 7.0 11.0 -13.0)))
-  8   
-  9   (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
- 10   (write (Polynomial-coeffs-get p)) (newline)
- 11   (write (Polynomial-evaluate p 2.0)) (newline)
+  6   (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
+  7   (write (Polynomial-coeffs-get p)) (newline)
+  8   (write (Polynomial-evaluate p 2.0)) (newline)
 ```
 
-
-----
 
 ```
 $ src/polynomial.scm
 (POLYNOMIAL-VERSION "2.3.5")
-#<swig-pointer std::vector< double > * 7fbdc4e040e0>
+#<swig-pointer std::vector< double > * 7fd946408230>
 -156.0
 ```
-
 
 ## TCL : src/polynomial.tcl
 
 ```TCL
-  1   #!/usr/bin/env tclsh
+  1   load target/tcl/polynomial_swig.so Polynomial_swig
   2   
-  3   load target/tcl/polynomial_swig.so Polynomial_swig
-  4   
-  5   Polynomial poly
-  6   VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
-  7   poly configure -coeffs c
-  8   
-  9   puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
- 10   puts [poly cget -coeffs]
- 11   puts [poly evaluate 2.0]
+  3   Polynomial poly
+  4   VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
+  5   poly configure -coeffs c
+  6   
+  7   puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
+  8   puts [poly cget -coeffs]
+  9   puts [poly evaluate 2.0]
 ```
 
-
-----
 
 ```
 $ src/polynomial.tcl
 POLYNOMIAL_VERSION 2.3.5
-_104b5032e67f0000_p_std__vectorT_double_t
+_f084401fbe7f0000_p_std__vectorT_double_t
 -156.0
 ```
-
 
 
 ## Output
@@ -360,6 +326,7 @@ _104b5032e67f0000_p_std__vectorT_double_t
 $ target/native/polynomial
 POLYNOMIAL_VERSION 2.3.5
 -156
+
 ```
 
 
@@ -369,6 +336,7 @@ $ src/polynomial.py
 {'POLYNOMIAL_VERSION': '2.3.5'}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
+
 ```
 
 
@@ -378,6 +346,7 @@ $ src/polynomial.clj
 {:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
+
 ```
 
 
@@ -387,6 +356,7 @@ $ src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"2.3.5"}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
+
 ```
 
 
@@ -394,8 +364,9 @@ $ src/polynomial.rb
 ```
 $ src/polynomial.scm
 (POLYNOMIAL-VERSION "2.3.5")
-#<swig-pointer std::vector< double > * 7faa32d040e0>
+#<swig-pointer std::vector< double > * 7fd946408230>
 -156.0
+
 ```
 
 
@@ -403,10 +374,10 @@ $ src/polynomial.scm
 ```
 $ src/polynomial.tcl
 POLYNOMIAL_VERSION 2.3.5
-_906b702cf57f0000_p_std__vectorT_double_t
+_f084401fbe7f0000_p_std__vectorT_double_t
 -156.0
-```
 
+```
 
 
 
@@ -426,7 +397,6 @@ _906b702cf57f0000_p_std__vectorT_double_t
 ```
 
 
-
 ## C Library : src/example1.c
 
 ```C
@@ -439,7 +409,6 @@ _906b702cf57f0000_p_std__vectorT_double_t
   7     return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
   8   }
 ```
-
 
 
 ## C Main : src/example1-native.c
@@ -456,14 +425,11 @@ _906b702cf57f0000_p_std__vectorT_double_t
 ```
 
 
-----
-
 ```
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
-
 
 ## C SWIG Interface : src/example1.i
 
@@ -476,26 +442,21 @@ EXAMPLE1_VERSION = 1.2.3
 ```
 
 
-
 ## Python : src/example1.py
 
 ```Python
-  1   #!/usr/bin/env python3.10
-  2   
-  3   # Setup DLL search path:
-  4   import sys
-  5   sys.path.append('target/python')
-  6   
-  7   # Import library bindings:
-  8   import example1_swig as example1
-  9   
- 10   # Use imported module:
- 11   print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)
- 12   print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
+  1   # Setup DLL search path:
+  2   import sys
+  3   sys.path.append('target/python')
+  4   
+  5   # Import library bindings:
+  6   import example1_swig as example1
+  7   
+  8   # Use imported module:
+  9   print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)
+ 10   print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
 ```
 
-
-----
 
 ```
 $ src/example1.py
@@ -503,22 +464,17 @@ EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
-
 ## Clojure (Java) : src/example1.clj
 
 ```Lisp
-  1   ;; -*- clojure -*-
+  1   (clojure.lang.RT/loadLibrary "example1_swig")
   2   
-  3   (clojure.lang.RT/loadLibrary "example1_swig")
+  3   (import 'example1_swig)
   4   
-  5   (import 'example1_swig)
-  6   
-  7   (println (format "EXAMPLE1_VERSION = %s" (example1_swig/EXAMPLE1_VERSION)))
-  8   (prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))
+  5   (println (format "EXAMPLE1_VERSION = %s" (example1_swig/EXAMPLE1_VERSION)))
+  6   (prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))
 ```
 
-
-----
 
 ```
 $ src/example1.clj
@@ -526,24 +482,19 @@ EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
-
 ## Ruby : src/example1.rb
 
 ```Ruby
-  1   #!/usr/bin/env ruby
-  2   
-  3   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
-  4   $:.unshift 'target/ruby'
-  5   
-  6   require 'example1_swig'
-  7   include Example1_swig
-  8   
-  9   puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"
- 10   puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
+  1   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
+  2   $:.unshift 'target/ruby'
+  3   
+  4   require 'example1_swig'
+  5   include Example1_swig
+  6   
+  7   puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"
+  8   puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
 ```
 
-
-----
 
 ```
 $ src/example1.rb
@@ -551,23 +502,17 @@ EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
-
 ## Guile : src/example1.scm
 
 ```Scheme
-  1   #!/usr/bin/env guile
-  2   !#
-  3   
-  4   (load-extension "target/guile/libexample1_swig.so" "SWIG_init")
-  5   
-  6   (write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))
-  7   (newline)
-  8   (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
-  9   (newline)
+  1   (load-extension "target/guile/libexample1_swig.so" "SWIG_init")
+  2   
+  3   (write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))
+  4   (newline)
+  5   (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
+  6   (newline)
 ```
 
-
-----
 
 ```
 $ src/example1.scm
@@ -575,27 +520,21 @@ $ src/example1.scm
 129.0
 ```
 
-
 ## TCL : src/example1.tcl
 
 ```TCL
-  1   #!/usr/bin/env tclsh
+  1   load target/tcl/example1_swig.so Example1_swig
   2   
-  3   load target/tcl/example1_swig.so Example1_swig
-  4   
-  5   puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"
-  6   puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
+  3   puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"
+  4   puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
 ```
 
-
-----
 
 ```
 $ src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
-
 
 
 ## Output
@@ -605,6 +544,7 @@ EXAMPLE1_VERSION = 1.2.3
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
+
 ```
 
 
@@ -613,6 +553,7 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1.py
 EXAMPLE1_VERSION = 1.2.3
 129.0
+
 ```
 
 
@@ -621,6 +562,7 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1.clj
 EXAMPLE1_VERSION = 1.2.3
 129.0
+
 ```
 
 
@@ -629,6 +571,7 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1.rb
 EXAMPLE1_VERSION = 1.2.3
 129.0
+
 ```
 
 
@@ -637,6 +580,7 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1.scm
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
+
 ```
 
 
@@ -645,14 +589,11 @@ $ src/example1.scm
 $ src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
+
 ```
 
 
-
-
 # Workflow
-
-
 
 1. Create interface files. (once)
 2. Generate bindings from interface files. (many)
@@ -725,9 +666,15 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o  \
 ## Build python bindings 
 ``` 
 
-# Generate python bindings 
+# Generate python bindings: 
 swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o  \
   target/python/polynomial_swig.cc src/polynomial.i 
+
+# Code statistics: 
+wc -l src/polynomial.h src/polynomial.i 
+8 src/polynomial.h 
+16 src/polynomial.i 
+24 total 
 
 wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py 
 8408 target/python/polynomial_swig.cc 
@@ -753,9 +700,15 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ## Build clojure bindings 
 ``` 
 
-# Generate clojure bindings 
+# Generate clojure bindings: 
 swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o  \
   target/clojure/polynomial_swig.cc src/polynomial.i 
+
+# Code statistics: 
+wc -l src/polynomial.h src/polynomial.i 
+8 src/polynomial.h 
+16 src/polynomial.i 
+24 total 
 
 wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java 
 660 target/clojure/polynomial_swig.cc 
@@ -779,9 +732,15 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ## Build ruby bindings 
 ``` 
 
-# Generate ruby bindings 
+# Generate ruby bindings: 
 swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o  \
   target/ruby/polynomial_swig.cc src/polynomial.i 
+
+# Code statistics: 
+wc -l src/polynomial.h src/polynomial.i 
+8 src/polynomial.h 
+16 src/polynomial.i 
+24 total 
 
 wc -l target/ruby/polynomial_swig.cc 
 8528 target/ruby/polynomial_swig.cc 
@@ -802,9 +761,15 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ## Build tcl bindings 
 ``` 
 
-# Generate tcl bindings 
+# Generate tcl bindings: 
 swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o  \
   target/tcl/polynomial_swig.cc src/polynomial.i 
+
+# Code statistics: 
+wc -l src/polynomial.h src/polynomial.i 
+8 src/polynomial.h 
+16 src/polynomial.i 
+24 total 
 
 wc -l target/tcl/polynomial_swig.cc 
 2951 target/tcl/polynomial_swig.cc 
@@ -824,9 +789,15 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ## Build guile bindings 
 ``` 
 
-# Generate guile bindings 
+# Generate guile bindings: 
 swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o  \
   target/guile/polynomial_swig.cc src/polynomial.i 
+
+# Code statistics: 
+wc -l src/polynomial.h src/polynomial.i 
+8 src/polynomial.h 
+16 src/polynomial.i 
+24 total 
 
 wc -l target/guile/polynomial_swig.cc 
 2267 target/guile/polynomial_swig.cc 
@@ -863,9 +834,15 @@ clang -g -Isrc -o target/native/example1 src/example1-native.c  \
 ## Build python bindings 
 ``` 
 
-# Generate python bindings 
+# Generate python bindings: 
 swig -addextern -I- -Isrc -python -outdir target/python/ -o  \
   target/python/example1_swig.c src/example1.i 
+
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
 
 wc -l target/python/example1_swig.c target/python/example1_swig.py 
 3650 target/python/example1_swig.c 
@@ -891,9 +868,15 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ## Build clojure bindings 
 ``` 
 
-# Generate clojure bindings 
+# Generate clojure bindings: 
 swig -addextern -I- -Isrc -java -outdir target/clojure/ -o  \
   target/clojure/example1_swig.c src/example1.i 
+
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
 
 wc -l target/clojure/example1_swig.c target/clojure/example1*.java 
 243 target/clojure/example1_swig.c 
@@ -917,9 +900,15 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ## Build ruby bindings 
 ``` 
 
-# Generate ruby bindings 
+# Generate ruby bindings: 
 swig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o  \
   target/ruby/example1_swig.c src/example1.i 
+
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
 
 wc -l target/ruby/example1_swig.c 
 2257 target/ruby/example1_swig.c 
@@ -939,9 +928,15 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ## Build tcl bindings 
 ``` 
 
-# Generate tcl bindings 
+# Generate tcl bindings: 
 swig -addextern -I- -Isrc -tcl -outdir target/tcl/ -o  \
   target/tcl/example1_swig.c src/example1.i 
+
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
 
 wc -l target/tcl/example1_swig.c 
 2149 target/tcl/example1_swig.c 
@@ -960,9 +955,15 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 ## Build guile bindings 
 ``` 
 
-# Generate guile bindings 
+# Generate guile bindings: 
 swig -addextern -I- -Isrc -guile -outdir target/guile/ -o  \
   target/guile/example1_swig.c src/example1.i 
+
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
 
 wc -l target/guile/example1_swig.c 
 1605 target/guile/example1_swig.c 
@@ -976,7 +977,6 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
   target/guile//libexample1_swig.so target/native/example1.o  \
   target/guile/example1_swig.c.o -lguile-2.2 -lgc 
 ``` 
-
 
 
 
