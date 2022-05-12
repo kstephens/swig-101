@@ -296,7 +296,7 @@ debian-prereq:
 
 #################################
 
-README.md : README.md.erb doc/README.md.erb.rb src/*.* Makefile
+README.md : doc/README.md.erb doc/*.* src/*.* Makefile
 	$(MAKE) clean all >/dev/null
 	mkdir -p tmp
 	erb $< > tmp/$@
