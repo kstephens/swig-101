@@ -289,14 +289,15 @@ debian-prereq:
 
 #################################
 
-README.md : README.md.erb clean
-	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
-	erb $< > $@.tmp
-	mv $@.tmp $@
+README.md : README.md.erb doc/README.md.erb.rb clean
+	mkdir -p tmp
+	erb $< > tmp/$@
+	[ -z "$$MARKDEEP" ] && mv tmp/$@ $@
 
 #################################
 
 clean:
+	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
 	rm -rf target/*
 
 clean-example:

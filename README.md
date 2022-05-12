@@ -1,3 +1,5 @@
+
+
 # SWIG-101
 
 Introduction to [SWIG](http://www.swig.org/).
@@ -120,12 +122,14 @@ The examples below target:
 
 
 
+
+
 # Polynomial
 
 
-## CC Header : src/polynomial.h
+## C++ Header : src/polynomial.h
 
-```CC
+```C++
   1   #include <vector>
   2   #define POLYNOMIAL_VERSION "2.3.5"
   3   class Polynomial {
@@ -138,9 +142,9 @@ The examples below target:
 
 
 
-## CC Library : src/polynomial.cc
+## C++ Library : src/polynomial.cc
 
-```CC
+```C++
   1   #include "polynomial.h"
   2   
   3   double Polynomial::evaluate(double x) {
@@ -156,9 +160,9 @@ The examples below target:
 
 
 
-## CC Main : src/polynomial-native.cc
+## C++ Main : src/polynomial-native.cc
 
-```CC
+```C++
   1   #include <iostream>
   2   #include "polynomial.h"
   3   
@@ -181,9 +185,9 @@ $ target/native/polynomial
 ```
 
 
-## CC SWIG Interface : src/polynomial.i
+## C++ SWIG Interface : src/polynomial.i
 
-```CC
+```C++
   1   // Name of generated bindings:
   2   %module polynomial_swig
   3   
@@ -196,7 +200,7 @@ $ target/native/polynomial
  10   // Include C++ declarations as SWIG interface definitions:
  11   %include "polynomial.h"
  12   
- 13   // Additional code in generated bindings:
+ 13   // Prepend C++ code in generated bindings:
  14   %{
  15   #include "polynomial.h"
  16   %}
@@ -329,7 +333,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7f88b5604080>
+#<swig-pointer std::vector< double > * 7fc6ac408220>
 -156.0
 
 ```
@@ -358,7 +362,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_0043c0fd9c7f0000_p_std__vectorT_double_t
+_a0b64017d37f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -413,7 +417,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7ff358c07130>
+#<swig-pointer std::vector< double > * 7fb859c040e0>
 -156.0
 
 
@@ -424,7 +428,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_305ff0e1ed7f0000_p_std__vectorT_double_t
+_1079f0c9817f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -1037,6 +1041,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 * https://github.com/swig/swig
 * https://github.com/kstephens/swig-101
 * https://github.com/libffi/libffi
+* https://www.chiark.greenend.org.uk/doc/libffi-dev/html/
 
 # HOW-TO
 
@@ -1046,6 +1051,14 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 * rbenv install 2.7.1
 * Install JVM 11.0
 * Install clojure + clojure-tools
+* Build swig from source:
+
+```
+$ cd ..
+$ git clone https://github.com/swig/swig.git
+$ cd swig
+$ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
+```
 
 ### Debian (Ubuntu 18.04+)
 

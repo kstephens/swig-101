@@ -10,7 +10,7 @@
 // Include C++ declarations as SWIG interface definitions:
 %include "polynomial.h"
 
-// Additional code in generated bindings:
+// Prepend C++ code in generated bindings:
 %{
 #include "polynomial.h"
 %}
