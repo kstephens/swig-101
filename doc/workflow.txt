@@ -1,47 +1,54 @@
 1. Generate SWIG wrapper from interface file for target language.
-2. Compile native library.
-3. Compile SWIG wrapper.
-4. Link native library and SWIG wrapper into a dynamic library.
-5. Load dynamic library into target language.
+2. Compile SWIG wrapper.
+3. Link native library and SWIG wrapper into a dynamic library.
+4. Load dynamic library into target language.
 
 ************************************************************************
-*                         
-* +-------------+
-* |  c/mylib.i  +---+   1. swig -python c/mylib.i \
-* +-------------+   |           -o swig/mylib_swig.c
-*                   |
-* +-------------+   |       +----------------------+
-* |  c/mylib.h  +---+------>|  swig/mylib_swig.py  +--------+
-* |-------------|           |----------------------|        |
-* |  c/mylib.c  |           |  swig/mylib_swig.c   |        |
-* +-+-----------+           +-+--------------------+        |
-*   |                         |                             |
-*   |  2. cc -c c/mylib.c     | 3. cc -c swig/mylib_swig.c  |
-*   v                         v                             |
-* +-------------+           +----------------------+        |
-* |  c/mylib.о  |           |  swig/mylib_swig.о   |        |
-* +-+-----------+           +-+--------------------+        |
-*   |                            |                          |
-*   +----------------------------+                          |
-*   |                                                       |
-*   | 4. cc -dynamiclib -о swig/_mylib_swig.so \            |
-*   |      c/mylib.о swig/mylib_swig.о                      |
-*   v                                                       |
-* +----------------------+                                  |
-* |  swig/mylib_swig.sо  |                                  |
-* +-+--------------------+                                  |
-*   |                                                       |
-*   +-------------------------------------------------------+
-*   | 
-*   | 5. python script.py
-*   v                    
+*
+* +---------------------------+
+* |        c/mylib.h          |
+* +---------------------------+
+* | double f(double, double); |
+* +------------------+--------+
+*                    |
+* +-------------+    |
+* |  c/mylib.i  |    |
+* +-+-----------+    |
+*   |                |
+*   +----------------+
+*   |  1. swig -python c/mylib.i \
+*   |       -o swig/mylib_swig.c
+*   v                
+* +----------------------+
+* |  swig/mylib_swig.py  +--------------+
+* |  swig/mylib_swig.c   |              |
+* +-+--------------------+              |
+*   |                                   |
+*   | 2. cc -c swig/mylib_swig.c        |
+*   v                                   |
+* +----------------------+              |
+* |  swig/mylib_swig.о   |              |
+* +-+--------------------+              |
+*   |                                   |
+*   | 3. cc -dynamiclib \               |
+*   |      -о swig/_mylib_swig.so \     |
+*   |      swig/mylib_swig.о -l mylib   |
+*   v                                   |
+* +----------------------+              |
+* |  swig/mylib_swig.sо  |              |
+* +-+--------------------+              |
+*   |                                   |
+*   +-----------------------------------+
+*   |
+*   | 4. python script.py
+*   v
 * +------------------------------+
-* | script.py                    |
-* |------------------------------|
+* |       scripy.py              |
+* +------------------------------+
 * | import sys                   |
 * | sys.path.append('swig')      |
 * | import mylib_swig as mylib   |
 * | print(mylib.f(2.0, 3.0))     |
 * +------------------------------+
-* 
+*
 ************************************************************************
