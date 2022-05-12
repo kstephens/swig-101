@@ -77,7 +77,7 @@ PYTHON_EXE:=$(shell which python$(PYTHON_MAJOR_VERSION) python 2>/dev/null | hea
 SWIG_CFLAGS_python:=$(shell $(PYTHON_CONFIG) --cflags) -Wno-deprecated-declarations
 SWIG_LDFLAGS_python:=$(shell $(PYTHON_CONFIG) --ldflags)
 SWIG_SO_PREFIX_python:=_
-SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_NAME).py
+SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG).py
 
 ############################
 
@@ -93,6 +93,7 @@ SWIG_SO_PREFIX_guile:=lib
 
 ############################
 
+# SWIG_OPTS_java=-package $(EXAMPLE_NAME)
 SWIG_CFLAGS_java=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
 SWIG_SO_PREFIX_java:=lib
 SWIG_SO_SUFFIX_java:=.jnilib # OSX
@@ -120,6 +121,7 @@ early:
 
 EXAMPLE_NAME:=$(basename $(EXAMPLE))
 EXAMPLE_SUFFIX:=$(suffix $(EXAMPLE))
+EXAMPLE_SWIG:=$(EXAMPLE_NAME)_swig
 
 ############################
 
@@ -205,10 +207,13 @@ build-targets : Makefile
 	  $(MAKE) --no-print-directory build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
 	done
 
+TARGET_SWIG=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)$(EXAMPLE_SUFFIX)
+TARGET_SWIG_O=$(TARGET_SWIG).o
+TARGET_SWIG_SO=$(dir $(TARGET_SWIG_O))/$(SWIG_SO_PREFIX)$(EXAMPLE_SWIG)$(SWIG_SO_SUFFIX)
 TARGET_DEPS:= \
-	target/$(SWIG_TARGET)/$(EXAMPLE) \
-	target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o \
-	target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX)
+	$(TARGET_SWIG) \
+	$(TARGET_SWIG_O) \
+	$(TARGET_SWIG_SO)
 
 #############################
 
@@ -235,22 +240,22 @@ build-target-begin:
 build-target-end:
 	@echo "\`\`\`\n"
 
-target/$(SWIG_TARGET)/$(EXAMPLE) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
+$(TARGET_SWIG) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
 	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper"
-	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -o $@ src/$(EXAMPLE_NAME).i
+	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
 	@echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	@echo ''
 	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	-@$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
-target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o : target/$(SWIG_TARGET)/$(EXAMPLE)
+$(TARGET_SWIG_O) : $(TARGET_SWIG)
 	@mkdir -p $(dir $@)
 	@echo "\n# Compile $(SWIG_TARGET) SWIG wrapper:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 
-target/$(SWIG_TARGET)/$(SWIG_SO_PREFIX)$(EXAMPLE_NAME)$(SWIG_SO_SUFFIX) : target/$(SWIG_TARGET)/$(EXAMPLE_NAME).o
+$(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	@mkdir -p $(dir $@)
 	@echo "\n# Link $(SWIG_TARGET) SWIG wrapper dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
