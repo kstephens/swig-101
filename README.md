@@ -164,7 +164,7 @@ The examples below target:
   4   int main(int argc, char **argv) {
   5     Polynomial p;
   6     p.coeffs = { 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 };
-  7     std::cout << "POLYNOMIAL_VERSION = " << POLYNOMIAL_VERSION << std::endl;
+  7     std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << std::endl;
   8     std::cout << p.evaluate(2.0) << std::endl;
   9     return 0;
  10   }
@@ -175,7 +175,7 @@ The examples below target:
 
 ```
 $ target/native/polynomial
-POLYNOMIAL_VERSION = 2.3.5
+POLYNOMIAL_VERSION 2.3.5
 -156
 ```
 
@@ -220,7 +220,7 @@ POLYNOMIAL_VERSION = 2.3.5
  12   poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
  13   
  14   # Invoke methods:
- 15   print("POLYNOMIAL_VERSION = " + POLYNOMIAL_VERSION)
+ 15   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
  16   print(list(poly.coeffs))
  17   print(poly.evaluate(2.0))
 ```
@@ -230,7 +230,7 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial.py
-POLYNOMIAL_VERSION = 2.3.5
+{'POLYNOMIAL_VERSION': '2.3.5'}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
@@ -282,7 +282,7 @@ $ src/polynomial.clj
   9   p = Polynomial.new
  10   p.coeffs = VectorDouble.new([2.0, 3.0, 5.0, 7.0, 11.0, -13.0])
  11   
- 12   puts "POLYNOMIAL_VERSION = #{POLYNOMIAL_VERSION}"
+ 12   pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
  13   pp p.coeffs.to_a
  14   pp p.evaluate(2.0)
 ```
@@ -292,7 +292,7 @@ $ src/polynomial.clj
 
 ```
 $ src/polynomial.rb
-POLYNOMIAL_VERSION = 2.3.5
+{:POLYNOMIAL_VERSION=>"2.3.5"}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
@@ -309,7 +309,7 @@ POLYNOMIAL_VERSION = 2.3.5
   6   (define p (new-Polynomial))
   7   (Polynomial-coeffs-set p (new-VectorDouble '(2.0 3.0 5.0 7.0 11.0 -13.0)))
   8   
-  9   (write `(POLYNOMIAL-VERSION = ,(POLYNOMIAL-VERSION))) (newline)
+  9   (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
  10   (write (Polynomial-coeffs-get p)) (newline)
  11   (write (Polynomial-evaluate p 2.0)) (newline)
 ```
@@ -319,8 +319,8 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial.scm
-(POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fba477040e0>
+(POLYNOMIAL-VERSION "2.3.5")
+#<swig-pointer std::vector< double > * 7fad62004080>
 -156.0
 ```
 
@@ -336,7 +336,7 @@ $ src/polynomial.scm
   6   VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
   7   poly configure -coeffs c
   8   
-  9   puts "POLYNOMIAL_VERSION = ${POLYNOMIAL_VERSION}"
+  9   puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
  10   puts [poly cget -coeffs]
  11   puts [poly evaluate 2.0]
 ```
@@ -346,8 +346,8 @@ $ src/polynomial.scm
 
 ```
 $ src/polynomial.tcl
-POLYNOMIAL_VERSION = 2.3.5
-_8040e027907f0000_p_std__vectorT_double_t
+POLYNOMIAL_VERSION 2.3.5
+_b04360fab07f0000_p_std__vectorT_double_t
 -156.0
 ```
 
@@ -358,7 +358,7 @@ _8040e027907f0000_p_std__vectorT_double_t
 
 ```
 $ target/native/polynomial
-POLYNOMIAL_VERSION = 2.3.5
+POLYNOMIAL_VERSION 2.3.5
 -156
 ```
 
@@ -366,7 +366,7 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial.py
-POLYNOMIAL_VERSION = 2.3.5
+{'POLYNOMIAL_VERSION': '2.3.5'}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
@@ -384,7 +384,7 @@ $ src/polynomial.clj
 
 ```
 $ src/polynomial.rb
-POLYNOMIAL_VERSION = 2.3.5
+{:POLYNOMIAL_VERSION=>"2.3.5"}
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 ```
@@ -393,8 +393,8 @@ POLYNOMIAL_VERSION = 2.3.5
 
 ```
 $ src/polynomial.scm
-(POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fd4d7c040f0>
+(POLYNOMIAL-VERSION "2.3.5")
+#<swig-pointer std::vector< double > * 7ffe77408250>
 -156.0
 ```
 
@@ -402,8 +402,8 @@ $ src/polynomial.scm
 
 ```
 $ src/polynomial.tcl
-POLYNOMIAL_VERSION = 2.3.5
-_5061e00fa67f0000_p_std__vectorT_double_t
+POLYNOMIAL_VERSION 2.3.5
+_a074d010fe7f0000_p_std__vectorT_double_t
 -156.0
 ```
 

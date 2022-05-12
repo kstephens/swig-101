@@ -12,7 +12,7 @@ poly = Polynomial()
 poly.coeffs = VectorDouble([ 2.0, 3.0, 5.0, 7.0, 11.0, -13.0 ])
 
 # Invoke methods:
-print("POLYNOMIAL_VERSION = " + POLYNOMIAL_VERSION)
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
 print(list(poly.coeffs))
 print(poly.evaluate(2.0))
 
