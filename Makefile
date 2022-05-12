@@ -233,29 +233,29 @@ endif
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
 build-target-begin:
-	@echo "\n## Build $(SWIG_TARGET) SWIG wrapper\n\`\`\`"
+	@echo "\n## Build $(SWIG_TARGET) bindings\n\`\`\`"
 
 build-target-end:
 	@echo "\`\`\`\n"
 
 $(TARGET_SWIG) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
 	@mkdir -p $(dir $@)
-	@echo "\n# Generate $(SWIG_TARGET) SWIG wrapper"
+	@echo "\n# Generate $(SWIG_TARGET) bindings"
 	$(SWIG_EXE) $(SWIG_OPTS) -$(SWIG_TARGET) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
 	@echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
-	@echo ''
-	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
+#	@echo ''
+#	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	-@$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
 $(TARGET_SWIG_O) : $(TARGET_SWIG)
 	@mkdir -p $(dir $@)
-	@echo "\n# Compile $(SWIG_TARGET) SWIG wrapper:"
+	@echo "\n# Compile $(SWIG_TARGET) bindings:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	@mkdir -p $(dir $@)
-	@echo "\n# Link $(SWIG_TARGET) SWIG wrapper dynamic library:"
+	@echo "\n# Link $(SWIG_TARGET) dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
 
 #################################
