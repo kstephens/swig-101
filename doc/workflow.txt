@@ -1,51 +1,49 @@
-1. Generate SWIG wrapper from interface file for target language.
-2. Compile SWIG wrapper.
-3. Link native library and SWIG wrapper into a dynamic library.
+1. Generate SWIG bindings from interface file for target language.
+2. Compile SWIG bindings.
+3. Link native library and SWIG bindings into a dynamic library.
 4. Load dynamic library into target language.
 
 ************************************************************************
 *
 *    +---------------------------+
-* +--+        c/mylib.h          |
+* +--+          mylib.h          |
 * |  +---------------------------+
 * |  | double f(double, double); |
 * |  +------------------+--------+
 * |                  
-* |  +-------------+ 
-* |  |  c/mylib.i  | 
-* |  +-+-----------+ 
-* |    | 
-* +----+  1. swig -python c/mylib.i \
-*      |       -o swig/mylib_swig.c
-*      v                
-*    +----------------------+
-* +--+  swig/mylib_swig.py  |
-* |  |  swig/mylib_swig.c   |
-* |  +-+--------------------+
-* |    |                     
-* |    |  2. cc -c swig/mylib_swig.c
+* |  +---------------------------+ 
+* |  |          mylib.i          | 
+* |  +---------------------------+ 
+* |  | %module mylib_swig        | 
+* |  | %include "mylib.h"        |
+* |  +-+-------------------------+ 
+* +----+  1. swig -python mylib.i   \
+*      v       -o bld/mylib_swig.c
+*    +---------------------+
+* +--+  bld/mylib_swig.py  |
+* |  |  bld/mylib_swig.c   |
+* |  +-+-------------------+
+* |    |  2. cc -c bld/mylib_swig.c
 * |    v                       
-* |  +----------------------+  
-* |  |  swig/mylib_swig.о   |  
-* |  +-+--------------------+  
-* |    |  3. cc -dynamiclib \   
-* |    |       -о swig/_mylib_swig.so \   
-* |    v       swig/mylib_swig.о -l mylib 
-* |    v                       
-* |  +----------------------+ 
-* |  |  swig/mylib_swig.sо  | 
-* |  +-+--------------------+ 
-* |    |                      
+* |  +---------------------+  
+* |  |  bld/mylib_swig.о   |  
+* |  +-+-------------------+  
+* |    |  3. cc -dynamiclib           \   
+* |    |       -о bld/_mylib_swig.so  \   
+* |    |       bld/mylib_swig.о       \
+* |    v       -l mylib 
+* |  +---------------------+ 
+* |  |  bld/mylib_swig.sо  | 
+* |  +-+-------------------+ 
 * +----+  4. python script.py
-*      |
 *      v
-*    +------------------------------+
-*    |         scripy.py            |
-*    +------------------------------+
-*    | import sys                   |
-*    | sys.path.append('swig')      |
-*    | import mylib_swig as mylib   |
-*    | print(mylib.f(2.0, 3.0))     |
-*    +------------------------------+
+*    +-----------------------------+
+*    |         scripy.py           |
+*    +-----------------------------+
+*    | import sys                  |
+*    | sys.path.append('bld')      |
+*    | import mylib_swig as mylib  |
+*    | print(mylib.f(2.0, 3.0))    |
+*    +-----------------------------+
 *
 ************************************************************************

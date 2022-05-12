@@ -320,7 +320,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fdbf17040e0>
+#<swig-pointer std::vector< double > * 7fc097c08200>
 -156.0
 
 ```
@@ -349,7 +349,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_a0bcc0a2c77f0000_p_std__vectorT_double_t
+_40dc405a9a7f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -404,7 +404,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fc7f6407f10>
+#<swig-pointer std::vector< double > * 7fab3ce040f0>
 -156.0
 
 
@@ -415,7 +415,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_c04160f9a47f0000_p_std__vectorT_double_t
+_306ae084cf7f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -695,51 +695,54 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 
-1. Generate SWIG wrapper from interface file for target language.
-2. Compile native library.
-3. Compile SWIG wrapper.
-4. Link native library and SWIG wrapper into a dynamic library.
-5. Load dynamic library into target language.
+1. Generate SWIG bindings from interface file for target language.
+2. Compile SWIG bindings.
+3. Link native library and SWIG bindings into a dynamic library.
+4. Load dynamic library into target language.
 
 ```
-+-------------+
-|  c/mylib.i  +---+   1. swig -python c/mylib.i \
-+-------------+   |           -o swig/mylib_swig.c
-                  |
-+-------------+   |       +----------------------+
-|  c/mylib.h  +---+------>|  swig/mylib_swig.py  +--------+
-|-------------|           |----------------------|        |
-|  c/mylib.c  |           |  swig/mylib_swig.c   |        |
-+-+-----------+           +-+--------------------+        |
-  |                         |                             |
-  |  2. cc -c c/mylib.c     | 3. cc -c swig/mylib_swig.c  |
-  v                         v                             |
-+-------------+           +----------------------+        |
-|  c/mylib.о  |           |  swig/mylib_swig.о   |        |
-+-+-----------+           +-+--------------------+        |
-  |                            |                          |
-  +----------------------------+                          |
-  |                                                       |
-  | 4. cc -dynamiclib -о swig/_mylib_swig.so \            |
-  |      c/mylib.о swig/mylib_swig.о                      |
-  v                                                       |
-+----------------------+                                  |
-|  swig/mylib_swig.sо  |                                  |
-+-+--------------------+                                  |
-  |                                                       |
-  +-------------------------------------------------------+
-  | 
-  | 5. python script.py
-  v                    
-+------------------------------+
-| script.py                    |
-|------------------------------|
-| import sys                   |
-| sys.path.append('swig')      |
-| import mylib_swig as mylib   |
-| print(mylib.f(2.0, 3.0))     |
-+------------------------------+
-
+*
+   +---------------------------+
++--+          mylib.h          |
+|  +---------------------------+
+|  | double f(double, double); |
+|  +------------------+--------+
+|                  
+|  +---------------------------+ 
+|  |          mylib.i          | 
+|  +---------------------------+ 
+|  | %module mylib_swig        | 
+|  | %include "mylib.h"        |
+|  +-+-------------------------+ 
++----+  1. swig -python mylib.i   \
+     v       -o bld/mylib_swig.c
+   +---------------------+
++--+  bld/mylib_swig.py  |
+|  |  bld/mylib_swig.c   |
+|  +-+-------------------+
+|    |  2. cc -c bld/mylib_swig.c
+|    v                       
+|  +---------------------+  
+|  |  bld/mylib_swig.о   |  
+|  +-+-------------------+  
+|    |  3. cc -dynamiclib           \   
+|    |       -о bld/_mylib_swig.so  \   
+|    |       bld/mylib_swig.о       \
+|    v       -l mylib 
+|  +---------------------+ 
+|  |  bld/mylib_swig.sо  | 
+|  +-+-------------------+ 
++----+  4. python script.py
+     v
+   +-----------------------------+
+   |         scripy.py           |
+   +-----------------------------+
+   | import sys                  |
+   | sys.path.append('bld')      |
+   | import mylib_swig as mylib  |
+   | print(mylib.f(2.0, 3.0))    |
+   +-----------------------------+
+*
 ```
 
 
