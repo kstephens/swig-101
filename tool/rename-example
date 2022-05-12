@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -x
+
+old=example2
+new=polynomial
+
+run=echo
+run=
+
+find . -name "$old*" -type f |
+  sort |
+  while read f
+  do
+    $run echo git mv "$f" "${f//$old/$new}"
+  done
+
+find * -type f |
+  sort |
+  egrep -v 'tmp/|README.md|tool/' |
+  xargs grep -li "$old" |
+  xargs $run sed -E -i.bak \
+        -e "s@$old@$new@g" \
+        -e "s@${old^^}@${new^^}@g" \
+        -e "s@${old^}@${new^}@g"
