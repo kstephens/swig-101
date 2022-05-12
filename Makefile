@@ -106,9 +106,7 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
-EXAMPLES = \
-  example1.c \
-  polynomial.cc
+EXAMPLES = polynomial.cc example1.c
 
 ############################
 
