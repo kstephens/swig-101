@@ -30,7 +30,7 @@ def cmd cmd
 end
 
 def lines_to_string lines
-  lines.join("\n") + "\n"
+  lines.join("\n")
 end
 
 def string_to_lines s

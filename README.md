@@ -137,7 +137,6 @@ The examples below target:
   5     std::vector<double> coeffs;
   6     double evaluate(double x);
   7   };
-
 ```
 
 
@@ -155,7 +154,6 @@ The examples below target:
   8     }
   9     return result;
  10   }
-
 ```
 
 
@@ -172,7 +170,6 @@ The examples below target:
   7     std::cout << p.evaluate(2.0) << std::endl;
   8     return 0;
   9   }
-
 ```
 
 
@@ -181,7 +178,6 @@ The examples below target:
 ```
 $ target/native/polynomial
 -156
-
 ```
 
 
@@ -204,7 +200,6 @@ $ target/native/polynomial
  14   %{
  15   #include "polynomial.h"
  16   %}
-
 ```
 
 
@@ -229,7 +224,6 @@ $ target/native/polynomial
  15   print("POLYNOMIAL_VERSION = " + POLYNOMIAL_VERSION)
  16   print(list(poly.coeffs))
  17   print(poly.evaluate(2.0))
-
 ```
 
 
@@ -240,7 +234,6 @@ $ src/polynomial-python
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
@@ -263,7 +256,6 @@ POLYNOMIAL_VERSION = 2.3.5
  14   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
  15   (prn (.getCoeffs p))
  16   (prn (.evaluate p 2.0))
-
 ```
 
 
@@ -274,7 +266,6 @@ $ src/polynomial-clojure
 {:POLYNOMIAL_VERSION "2.3.5"}
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
-
 ```
 
 
@@ -295,7 +286,6 @@ $ src/polynomial-clojure
  12   puts "POLYNOMIAL_VERSION = #{POLYNOMIAL_VERSION}"
  13   pp p.coeffs.to_a
  14   pp p.evaluate(2.0)
-
 ```
 
 
@@ -306,7 +296,6 @@ $ src/polynomial-ruby
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 ```
 
 
@@ -324,7 +313,6 @@ POLYNOMIAL_VERSION = 2.3.5
   9   (write `(POLYNOMIAL-VERSION = ,(POLYNOMIAL-VERSION))) (newline)
  10   (write (Polynomial-coeffs-get p)) (newline)
  11   (write (Polynomial-evaluate p 2.0)) (newline)
-
 ```
 
 
@@ -333,9 +321,8 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fc6ac408220>
+#<swig-pointer std::vector< double > * 7fd087c07910>
 -156.0
-
 ```
 
 
@@ -353,7 +340,6 @@ $ src/polynomial-guile
   9   puts "POLYNOMIAL_VERSION = ${POLYNOMIAL_VERSION}"
  10   puts [poly cget -coeffs]
  11   puts [poly evaluate 2.0]
-
 ```
 
 
@@ -362,9 +348,8 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_a0b64017d37f0000_p_std__vectorT_double_t
+_f04190a3dc7f0000_p_std__vectorT_double_t
 -156.0
-
 ```
 
 
@@ -376,7 +361,6 @@ _a0b64017d37f0000_p_std__vectorT_double_t
 $ target/native/polynomial
 -156
 
-
 ```
 
 
@@ -386,7 +370,6 @@ $ src/polynomial-python
 POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
-
 
 ```
 
@@ -398,7 +381,6 @@ $ src/polynomial-clojure
 [2.0 3.0 5.0 7.0 11.0 -13.0]
 -156.0
 
-
 ```
 
 
@@ -409,7 +391,6 @@ POLYNOMIAL_VERSION = 2.3.5
 [2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
 -156.0
 
-
 ```
 
 
@@ -417,9 +398,8 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fb859c040e0>
+#<swig-pointer std::vector< double > * 7fd3c6504080>
 -156.0
-
 
 ```
 
@@ -428,9 +408,8 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_1079f0c9817f0000_p_std__vectorT_double_t
+_f0aa403ff57f0000_p_std__vectorT_double_t
 -156.0
-
 
 ```
 
@@ -450,7 +429,6 @@ _1079f0c9817f0000_p_std__vectorT_double_t
   5                     double c1,
   6                     double c2,
   7                     double c3);
-
 ```
 
 
@@ -466,7 +444,6 @@ _1079f0c9817f0000_p_std__vectorT_double_t
   6                     double c3) {
   7     return c0 + c1 * x + c2 * x*x + c3 * x*x*x;
   8   }
-
 ```
 
 
@@ -482,7 +459,6 @@ _1079f0c9817f0000_p_std__vectorT_double_t
   6     printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));
   7     return 0;
   8   }
-
 ```
 
 
@@ -492,7 +468,6 @@ _1079f0c9817f0000_p_std__vectorT_double_t
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -504,7 +479,6 @@ EXAMPLE1_VERSION = 1.2.3
   3   %{
   4   #include "example1.h"
   5   %}
-
 ```
 
 
@@ -524,7 +498,6 @@ EXAMPLE1_VERSION = 1.2.3
  10   # Use imported module:
  11   print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)
  12   print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))
-
 ```
 
 
@@ -534,7 +507,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-python
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -549,7 +521,6 @@ EXAMPLE1_VERSION = 1.2.3
   6   
   7   (println (format "EXAMPLE1_VERSION = %s" (example1_swig/EXAMPLE1_VERSION)))
   8   (prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))
-
 ```
 
 
@@ -559,7 +530,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-clojure
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -576,7 +546,6 @@ EXAMPLE1_VERSION = 1.2.3
   8   
   9   puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"
  10   puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)
-
 ```
 
 
@@ -586,7 +555,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-ruby
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -602,7 +570,6 @@ EXAMPLE1_VERSION = 1.2.3
   7   (newline)
   8   (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))
   9   (newline)
-
 ```
 
 
@@ -612,7 +579,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-guile
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
-
 ```
 
 
@@ -625,7 +591,6 @@ $ src/example1-guile
   4   
   5   puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"
   6   puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]
-
 ```
 
 
@@ -635,7 +600,6 @@ $ src/example1-guile
 $ src/example1-tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 
@@ -648,7 +612,6 @@ $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
 
-
 ```
 
 
@@ -657,7 +620,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-python
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 
 ```
 
@@ -668,7 +630,6 @@ $ src/example1-clojure
 EXAMPLE1_VERSION = 1.2.3
 129.0
 
-
 ```
 
 
@@ -677,7 +638,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ src/example1-ruby
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 
 ```
 
@@ -688,7 +648,6 @@ $ src/example1-guile
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
 
-
 ```
 
 
@@ -697,7 +656,6 @@ $ src/example1-guile
 $ src/example1-tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 
 ```
 
