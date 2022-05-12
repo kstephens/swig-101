@@ -202,8 +202,8 @@ $ target/native/polynomial
   1   #!/usr/bin/env python3.10
   2   
   3   # Setup DLL search path:
-  4   #import sys
-  5   #sys.path.append('target/python')
+  4   import sys
+  5   sys.path.append('target/python')
   6   
   7   # Import library bindings:
   8   from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
@@ -224,10 +224,9 @@ $ target/native/polynomial
 
 ```
 $ src/polynomial-python
-Traceback (most recent call last):
-  File "/Users/kstephens/src/dev/swig-101/src/polynomial-python", line 8, in <module>
-    from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
-ModuleNotFoundError: No module named 'polynomial_swig'
+POLYNOMIAL_VERSION = 2.3.5
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
 
 ```
 
@@ -321,7 +320,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7f83214040c0>
+#<swig-pointer std::vector< double > * 7fdbf17040e0>
 -156.0
 
 ```
@@ -350,7 +349,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_904270cd8d7f0000_p_std__vectorT_double_t
+_a0bcc0a2c77f0000_p_std__vectorT_double_t
 -156.0
 
 ```
@@ -371,10 +370,9 @@ $ target/native/polynomial
 
 ```
 $ src/polynomial-python
-Traceback (most recent call last):
-  File "/Users/kstephens/src/dev/swig-101/src/polynomial-python", line 8, in <module>
-    from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
-ModuleNotFoundError: No module named 'polynomial_swig'
+POLYNOMIAL_VERSION = 2.3.5
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+-156.0
 
 
 ```
@@ -406,7 +404,7 @@ POLYNOMIAL_VERSION = 2.3.5
 ```
 $ src/polynomial-guile
 (POLYNOMIAL-VERSION = "2.3.5")
-#<swig-pointer std::vector< double > * 7fc5df604080>
+#<swig-pointer std::vector< double > * 7fc7f6407f10>
 -156.0
 
 
@@ -417,7 +415,7 @@ $ src/polynomial-guile
 ```
 $ src/polynomial-tcl
 POLYNOMIAL_VERSION = 2.3.5
-_c0415074b27f0000_p_std__vectorT_double_t
+_c04160f9a47f0000_p_std__vectorT_double_t
 -156.0
 
 
@@ -703,48 +701,46 @@ EXAMPLE1_VERSION = 1.2.3
 4. Link native library and SWIG wrapper into a dynamic library.
 5. Load dynamic library into target language.
 
-************************************************************************
-*                         
-* +-------------+
-* |  c/mylib.i  +---+   1. swig -python c/mylib.i \
-* +-------------+   |           -o swig/mylib_swig.c
-*                   |
-* +-------------+   |       +----------------------+
-* |  c/mylib.h  +---+------>|  swig/mylib_swig.py  +--------+
-* |-------------|           |----------------------|        |
-* |  c/mylib.c  |           |  swig/mylib_swig.c   |        |
-* +-+-----------+           +-+--------------------+        |
-*   |                         |                             |
-*   |  2. cc -c c/mylib.c     | 3. cc -c swig/mylib_swig.c  |
-*   v                         v                             |
-* +-------------+           +----------------------+        |
-* |  c/mylib.о  |           |  swig/mylib_swig.о   |        |
-* +-+-----------+           +-+--------------------+        |
-*   |                            |                          |
-*   +----------------------------+                          |
-*   |                                                       |
-*   | 4. cc -dynamiclib -о swig/_mylib_swig.so \            |
-*   |      c/mylib.о swig/mylib_swig.о                      |
-*   v                                                       |
-* +----------------------+                                  |
-* |  swig/mylib_swig.sо  |                                  |
-* +-+--------------------+                                  |
-*   |                                                       |
-*   +-------------------------------------------------------+
-*   | 
-*   | 5. python script.py
-*   v                    
-* +------------------------------+
-* | script.py                    |
-* |------------------------------|
-* | import sys                   |
-* | sys.path.append('python')    |
-* | import mylib_swig as mylib   |
-* | print(mylib.f(2.0, 3.0))     |
-* +------------------------------+
-* 
-************************************************************************
+```
++-------------+
+|  c/mylib.i  +---+   1. swig -python c/mylib.i \
++-------------+   |           -o swig/mylib_swig.c
+                  |
++-------------+   |       +----------------------+
+|  c/mylib.h  +---+------>|  swig/mylib_swig.py  +--------+
+|-------------|           |----------------------|        |
+|  c/mylib.c  |           |  swig/mylib_swig.c   |        |
++-+-----------+           +-+--------------------+        |
+  |                         |                             |
+  |  2. cc -c c/mylib.c     | 3. cc -c swig/mylib_swig.c  |
+  v                         v                             |
++-------------+           +----------------------+        |
+|  c/mylib.о  |           |  swig/mylib_swig.о   |        |
++-+-----------+           +-+--------------------+        |
+  |                            |                          |
+  +----------------------------+                          |
+  |                                                       |
+  | 4. cc -dynamiclib -о swig/_mylib_swig.so \            |
+  |      c/mylib.о swig/mylib_swig.о                      |
+  v                                                       |
++----------------------+                                  |
+|  swig/mylib_swig.sо  |                                  |
++-+--------------------+                                  |
+  |                                                       |
+  +-------------------------------------------------------+
+  | 
+  | 5. python script.py
+  v                    
++------------------------------+
+| script.py                    |
+|------------------------------|
+| import sys                   |
+| sys.path.append('swig')      |
+| import mylib_swig as mylib   |
+| print(mylib.f(2.0, 3.0))     |
++------------------------------+
 
+```
 
 
 

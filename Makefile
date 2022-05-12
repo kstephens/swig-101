@@ -290,7 +290,7 @@ debian-prereq:
 #################################
 
 README.md : README.md.erb clean
-	rm -f ~/.cache/guile/**/swig-101/**/example*-guile.go
+	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
 	erb $< > $@.tmp
 	mv $@.tmp $@
 

@@ -39,7 +39,7 @@
 * | script.py                    |
 * |------------------------------|
 * | import sys                   |
-* | sys.path.append('python')    |
+* | sys.path.append('swig')      |
 * | import mylib_swig as mylib   |
 * | print(mylib.f(2.0, 3.0))     |
 * +------------------------------+
