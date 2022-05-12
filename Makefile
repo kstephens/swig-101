@@ -269,21 +269,17 @@ $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 
 RUN="bin/run"
 
-demo:
-	$(MAKE) clean all
-	@echo ""; set -x; $(RUN) target/native/example1
-	@echo ""; set -x; $(RUN) src/example1-python
-	@echo ""; set -x; $(RUN) src/example1-ruby
-	@echo ""; set -x; $(RUN) src/example1-tcl
-	@echo ""; set -x; $(RUN) src/example1-guile
-	@echo ""; set -x; $(RUN) src/example1-clojure
-
-	@echo ""; set -x; $(RUN) target/native/polynomial
-	@echo ""; set -x; $(RUN) src/polynomial-python
-	@echo ""; set -x; $(RUN) src/polynomial-ruby
-	@echo ""; set -x; $(RUN) src/polynomial-tcl
-	@echo ""; set -x; $(RUN) src/polynomial-guile
-	@echo ""; set -x; $(RUN) src/polynomial-clojure
+demo: clean all demo-run
+demo-run:
+	@set -e ;\
+	for example in $(basename $(EXAMPLES)) ;\
+	do \
+	   (set -x; $(RUN) target/native/$$example) ;\
+	   for target in $(subst java,clojure,$(SWIG_TARGETS)) ;\
+	   do \
+	     (set -x; $(RUN) src/$$example-$$target) ;\
+	   done \
+	done
 
 #################################
 
