@@ -1,7 +1,7 @@
-#####################################
 
-exit! if ENV['README_MD']
-ENV['README_MD'] = '1'
+# Prevent accidental Makefile recursion:
+exit! if ENV['_SWIG_101_README_MD']
+ENV['_SWIG_101_README_MD'] = '1'
 
 require 'pp'
 
@@ -21,10 +21,9 @@ def pe_ x
   $stderr.flush
   x
 end
+
 def pe x
-  if $verbose or $pe
-    pe_ x
-  end
+  pe_ x if $verbose or $pe
   x
 end
 
@@ -69,16 +68,14 @@ def code_lines s
   lines_to_string(lines)
 end
 
-def wrap_line line, width = 78
-  words = line.strip.split(/\s+/)
-  out = String.new
-  line = String.new
-  words.each do | word |
+def wrap_line str, width = 78, newline =  " \\\n  "
+  out, line = String.new, String.new
+  str.strip.split(/\s+/).each do | word |
     if line.size + word.size > width
-      out += line + " \\\n  "
-      line = String.new
+      out << line << newline
+      line.clear
     end
-    line += word + ' '
+    line << word << ' '
   end
   out << line
 end
