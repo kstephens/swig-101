@@ -6,11 +6,13 @@
 ;; Import Java namespace:
 (import 'polynomial_swig)
 
+;; #define constants:
+(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
+
 ;; Instantiate object:
 (def p (Polynomial.))
-(.setCoeffs p (VectorDouble. [2.0 3.0 5.0 7.0 11.0 -13.0]))
+(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
 
 ;; Invoke methods:
-(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
 (prn (.getCoeffs p))
-(prn (.evaluate p 2.0))
+(prn (.evaluate p 1.2))

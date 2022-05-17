@@ -1,8 +1,7 @@
 #!/usr/bin/env python3.10
 
 # Setup DLL search path:
-import sys
-sys.path.append('target/python')
+import sys ; sys.path.append('target/python')
 
 # Import library bindings:
 import example1_swig as example1

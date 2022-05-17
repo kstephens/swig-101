@@ -2,11 +2,12 @@
 
 load target/tcl/polynomial_swig.so Polynomial_swig
 
+puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
+
 Polynomial poly
-VectorDouble c { 2.0 3.0 5.0 7.0 11.0 -13.0 }
+VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }
 poly configure -coeffs c
 
-puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
 puts [poly cget -coeffs]
-puts [poly evaluate 2.0]
+puts [poly evaluate 1.2]
 

@@ -8,6 +8,7 @@ require 'pp'
 $verbose = false
 $pe  = $verbose # || true
 $msg = $verbose # || true
+$context = nil
 
 def msg *args
   if $msg
@@ -15,23 +16,30 @@ def msg *args
   end
 end
 
+def pe_ x
+  PP.pp(x, $stderr)
+  $stderr.flush
+  x
+end
 def pe x
   if $verbose or $pe
-    PP.pp(x, $stderr)
-    $stderr.flush
+    pe_ x
   end
   x
 end
 
 def cmd cmd
   msg "cmd : #{cmd.inspect}"
-  system "bin/run #{cmd} >tmp/cmd.out 2>&1"
+  system "#{cmd} >tmp/cmd.out 2>&1"
+  ok = $?.success?
   # puts File.read("tmp/cmd.out")
-  File.read("tmp/cmd.out")
+  out = File.read("tmp/cmd.out")
+  raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless ok
+  out
 end
 
 def remove_shebang s
-  s.gsub(%r{(^#!.*$)|(!#)|(^.+ -\*- [a-z]+ -\*-.*$)}, '')
+  s.gsub(%r{(^#!.*$)|(!#)|(^.+ -\*- [a-z]+ -\*-.*$)|(^#pragma +once.*$)}, '')
 end
 
 def lines_to_string lines
@@ -76,7 +84,7 @@ def wrap_line line, width = 78
 end
 
 def run_workflow e
-  out = cmd "#{make} clean-example build-example EXAMPLE=#{e[:name]}"
+  out = cmd "bin/build clean-example build-example EXAMPLE=#{e[:name]}"
   out = out.
   gsub('/opt/local/bin/gmake', 'make').
   gsub(%r{^/.*/swig}, 'swig').
@@ -86,11 +94,11 @@ def run_workflow e
   gsub(%r{^/.*/python}, 'python').
   gsub(%r{ *-I */opt/local/include[^ ]* *}, ' ').
   gsub(%r{ *-L */opt/local/lib[^ ]* *}, ' ').
-  gsub(%r{#{ENV['PYTHON_HOME']}}, '$PYTHON_HOME').
-  gsub(%r{#{ENV['RUBY_HOME']}}, '$RUBY_HOME').
-  gsub(%r{#{ENV['GUILE_HOME']}}, '$GUILE_HOME').
-  gsub(%r{#{ENV['JAVA_HOME']}}, '$JAVA_HOME').
-  gsub(%r{#{ENV['HOME']}}, '$HOME').
+  gsub(%r{#{ENV['PYTHON_HOME']}},  '$PYTHON_HOME').
+  gsub(%r{#{ENV['RUBY_HOME']}},    '$RUBY_HOME').
+  gsub(%r{#{ENV['GUILE_HOME']}},   '$GUILE_HOME').
+  gsub(%r{#{ENV['JAVA_HOME']}},    '$JAVA_HOME').
+  gsub(%r{#{ENV['HOME']}},         '$HOME').
   gsub(%r{  +}, ' ')
   lines = out.split("\n", 999999)
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
@@ -98,17 +106,13 @@ def run_workflow e
   lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
 end
 
-def make
-  'bin/build'
-end
-
 #####################################
 
 msg "Start"
 
-cmd "#{make} clean"
+cmd "bin/build clean"
 
-example_names = %w(polynomial.cc example1.c)
+example_names = %w(polynomial.cc polynomial_v2.cc example1.c)
 
 $examples = [ ]
 
@@ -135,30 +139,35 @@ example_names.each do | name |
   msg "  }}} Workflow : #{e[:name]}"
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
-#{lang} Header          | src/#{basename}.h        | - |
-#{lang} Library         | src/#{name}              | - |
-#{lang} Main            | src/#{basename}-native.#{suffix} | target/native/#{basename}
-#{lang} SWIG Interface  | src/#{basename}.i        | - | #{lang}
-Python                  | src/#{basename}.py       |   |
-Clojure (Java)          | src/#{basename}.clj      |   | Lisp
-Ruby                    | src/#{basename}.rb       |   |
-Guile                   | src/#{basename}.scm      |   | Scheme
-TCL                     | src/#{basename}.tcl      |   |
+#{lang} Header          | #{basename}.h        | - |
+#{lang} Library         | #{name}              | - |
+#{lang} Main            | #{basename}-native.#{suffix} | target/native/#{basename}
+#{lang} SWIG Interface  | #{basename}.i        | - | #{lang}
+Python                  | #{basename}.py       |   |
+Clojure (Java)          | #{basename}.clj      |   | Lisp
+Ruby                    | #{basename}.rb       |   |
+Guile                   | #{basename}.scm      |   | Scheme
+TCL                     | #{basename}.tcl      |   | Bash
+Python Tests            | #{basename}-test.py  | python3.10 -m pytest src/#{basename}-test.py |
 END
   e[:targets] =
     targets.
     map do |l|
       t = [:type, :file, :cmd, :lang].zip(l).to_h
-      t[:name] ||= t[:file]
-      if t[:cmd] == '-'
-        t[:cmd] = nil
-      else 
-        t[:cmd] ||= t[:file]
-      end
+      $context = t
+      t[:name] = t[:file]
       t[:lang] ||= t[:type].split(/\s+/).first
-      t[:code]       = code_lines(File.read(t[:file]))
-      t[:cmd_output] = t[:cmd] && lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:cmd]))))
-      msg t[:cmd_output]
+      t[:file] = "src/#{t[:file]}"
+      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]))
+      case t[:cmd]
+      when '-'
+      when nil
+        t[:run] = "bin/run #{t[:file]}"
+      else
+        t[:run] = t[:cmd]
+      end if t[:code]
+      t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:run]))))
+      msg t[:run_output]
       t
     end
   pe(e: e)

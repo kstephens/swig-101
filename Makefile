@@ -7,13 +7,23 @@ SILENT=@
 
 ############################
 
-SWIG_EXE?=$(shell which swig)
-SWIG_TARGETS=python clojure ruby tcl guile
-TARGET_SUFFIXES=py clj rb tcl scm
-SWIG_TARGET=UNDEFINED
+CFLAGS += -g
+INC    += -Isrc -I/opt/local/include # OSX macports
+CFLAGS += $(INC)
+CXXFLAGS += -g
+CXXFLAGS += $(INC)
 
 ############################
 
+EXAMPLES = polynomial.cc polynomial_v2.cc example1.c
+SWIG_TARGETS=python clojure ruby tcl guile
+TARGET_SUFFIXES=py clj rb tcl scm
+
+############################
+
+SWIG_TARGET=UNDEFINED
+
+SWIG_EXE?=$(shell which swig)
 SWIG_SO_PREFIX_DEFAULT=
 SWIG_SO_SUFFIX_DEFAULT=.so
 
@@ -39,7 +49,8 @@ endif
 ############################
 
 SWIG_OPTS += \
-	-addextern -I- -Isrc \
+	-addextern \
+	-I- $(INC) \
 	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
      -debug-module 1,2,3,4 \
@@ -57,14 +68,9 @@ SWIG_OPTS_x += \
 
 ############################
 
-CFLAGS += -g
-CFLAGS += -Isrc
-CFLAGS += -I/opt/local/include # OSX macports
 SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
 SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
-CXXFLAGS += -g
-CXXFLAGS += -Isrc
 
 ############################
 
@@ -118,10 +124,6 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
-EXAMPLES = polynomial.cc example1.c
-
-############################
-
 all: early build-examples
 
 early:
@@ -171,51 +173,15 @@ CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
 CFLAGS_SUFFIX.cc+= -std=c++17
 endif
 
-build-examples:
-	$(SILENT)echo "\n# Examples \n"
-	$(SILENT)set -e; for e in $(EXAMPLES) ;\
-	do \
-	  $(MAKE) build-example EXAMPLE=$$e ;\
-	done
-
-build-example: early build-example-begin build-native build-targets build-example-end
-
-build-example-begin:
-	$(SILENT)echo "\n# Build $(EXAMPLE) \n"
-
-build-example-end:
-
 #################################
+
+NATIVE_SRCS = \
+  src/$(EXAMPLE) \
+  src/$(EXAMPLE_NAME).h
 
 NATIVE_DEPS = \
   target/native/$(EXAMPLE_NAME).o \
-  target/native/$(EXAMPLE_NAME) \
-
-build-native: early build-native-begin $(NATIVE_DEPS) build-native-end
-
-build-native-begin:
-	$(SILENT)echo "\n## Build $(EXAMPLE) Native Code\n\`\`\`"
-
-build-native-end:
-	$(SILENT)echo "\`\`\`\n"
-
-target/native/$(EXAMPLE_NAME).o : src/$(EXAMPLE)
-	$(SILENT)echo "\n# Compile native library:"
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE))
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)echo "\n# Compile and link native program:"
-	$(CC) $(CFLAGS) -o $@ $< target/native/$(EXAMPLE_NAME).o
-
-#################################
-
-build-targets : Makefile
-	$(SILENT)set -e ;\
-	for t in $(SWIG_TARGETS) ;\
-	do \
-	  $(MAKE) build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
-	done
+  target/native/$(EXAMPLE_NAME)
 
 TARGET_SWIG=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)$(EXAMPLE_SUFFIX)
 TARGET_SWIG_O=$(TARGET_SWIG).o
@@ -240,37 +206,84 @@ TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
 endif
 endif
 
-#############################
+#################################
+
+build-examples:
+	$(SILENT)set -e; for e in $(EXAMPLES) ;\
+	do \
+	  $(MAKE) build-example EXAMPLE=$$e ;\
+	done
+
+build-example: early build-example-begin build-native build-targets build-example-end
+
+build-example-begin:
+	$(SILENT)echo "\n## Workflow - $(EXAMPLE) \n"
+
+build-example-end:
+
+#################################
+
+build-native: early build-native-begin $(NATIVE_DEPS) build-native-end
+
+build-native-begin:
+	$(SILENT)echo "### Compile native code:\n"
+	$(SILENT)echo "\`\`\`\n"
+
+target/native/$(EXAMPLE_NAME).o : $(NATIVE_SRCS)
+	$(SILENT)echo "# Compile native library:"
+	$(CC) $(CFLAGS) -c -o $@ $<
+	$(SILENT)echo ""
+
+target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE)) target/native/$(EXAMPLE_NAME).o
+	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)echo "# Compile and link native program:"
+	$(CC) $(CFLAGS) -o $@ $< $@.o
+	$(SILENT)echo ""
+
+build-native-end:
+	$(SILENT)echo "\`\`\`\n"
+
+#################################
+
+build-targets:
+	$(SILENT)set -e ;\
+	for t in $(SWIG_TARGETS) ;\
+	do \
+	  $(MAKE) build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
+	done
 
 build-target: early build-target-begin $(TARGET_DEPS) build-target-end
 
 build-target-begin:
-	$(SILENT)echo "\n## Build $(SWIG_TARGET) bindings\n\`\`\`"
+	$(SILENT)echo "### Build $(SWIG_TARGET) bindings\n\`\`\`\n"
 
 build-target-end:
 	$(SILENT)echo "\`\`\`\n"
 
-$(TARGET_SWIG) : src/$(EXAMPLE_NAME).i src/$(EXAMPLE_NAME).h
+$(TARGET_SWIG) : src/$(EXAMPLE_NAME).i $(NATIVE_SRCS)
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)echo "\n# Generate $(SWIG_TARGET) bindings:"
+	$(SILENT)echo "# Generate $(SWIG_TARGET) bindings:"
 	$(SWIG_EXE) $(SWIG_OPTS) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
-	$(SILENT)echo "\n# Code statistics:"
+	$(SILENT)echo "# Code statistics:"
 	wc -l src/$(EXAMPLE_NAME).h src/$(EXAMPLE_NAME).i
 	$(SILENT)echo ''
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
-#	$(SILENT)echo ''
+	$(SILENT)echo ''
 #	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
+#	$(SILENT)echo ''
 	-$(SILENT)$(SWIG_EXE) $(SWIG_OPTS) -xml -o $@ src/$(EXAMPLE_NAME).i 2>/dev/null || true
 
 $(TARGET_SWIG_O) : $(TARGET_SWIG)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "\n# Compile $(SWIG_TARGET) bindings:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
+	$(SILENT)echo ""
 
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "\n# Link $(SWIG_TARGET) dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
+	$(SILENT)echo ""
 
 #################################
 
@@ -284,24 +297,25 @@ demo-run:
 	   (set -x; $(RUN) target/native/$$example) ;\
 	   for suffix in $(TARGET_SUFFIXES) ;\
 	   do \
-	     (set -x; $(RUN) src/$$example.$$suffix) ;\
+	     [ -f src/$$example.$$suffix ] && (set -x; $(RUN) src/$$example.$$suffix) ;\
 	   done \
 	done
 
 #################################
 
 macports-prereq:
-	sudo port install $(SWIG_TARGETS:%=swig-%) python310 tcl guile
+	sudo port install python310 py310-pip tcl guile
+	pip-3.10 install pytest
 
 debian-prereq:
-	sudo apt-get install swig tcl-dev guile-2.2-dev
+	sudo apt-get install tcl-dev guile-2.2-dev
 
 #################################
 
 README.md : tmp/README.md 
 	mv tmp/$@ $@
 tmp/README.md: doc/README.md.erb doc/*.* src/*.* Makefile
-	$(MAKE) clean >/dev/null
+	$(MAKE) clean
 	mkdir -p tmp
 	erb $< > $@
 

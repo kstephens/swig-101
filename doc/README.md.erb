@@ -66,12 +66,13 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Alternatives
 
-## Rewrite it in Language X
+## Rewrite in Language X, Y and Z
 
-* Does not leverage existing work.
+* Does not leverage existing code, fixes, future improvements.
 * Does not target multiple languages.
 * Increased cost of ownership.
 * Adoption barriers.
+* Incongruent language idioms.
 
 ## Native Language APIs
 
@@ -118,36 +119,39 @@ The examples below target:
 * Guile Scheme
 
 <% $examples.each do | e |
-    targets = e[:targets] %>
+     targets = e[:targets] %>
 
-# <%= e[:basename].capitalize %>
+## <%= e[:name] %>
 
-<% targets.each do | t | %>
-## <%= t[:type] %> : <%= t[:file] %>
+<%   targets.select{|t| t[:code]}.each do | t | %>
+### <%= t[:type] %> : <%= t[:file] %>
 
 ```<%= t[:lang] %>
 <%= t[:code] %>
 ```
 
-<% if t[:cmd] %>
-```
-$ <%= t[:cmd] %>
-<%= t[:cmd_output] %>
-```
-<%
-    end # if
-  end # targets
-%>
-
-## Output
-<% targets.select{|t| t[:cmd]}.each do | t | %>
+<%     if t[:run] %>
+----
 
 ```
-$ <%= t[:cmd] %>
-<%= t[:cmd_output] %>
+$ <%= t[:run] %>
+<%= t[:run_output] %>
+```
+
+----
+<%     end # if t[:run] %>
+<%   end # targets %>
+
+### Output
+
+<%   targets.select{|t| t[:run_output]}.each do | t | %>
+```
+$ <%= t[:run] %>
+<%= t[:run_output] %>
 
 ```
 
+----
 <%   end # targets %>
 <% end # $examples %>
 
@@ -164,6 +168,8 @@ else
 end 
 %>
 
+# Example Workflows
+
 <% $examples.each do | e | %>
 <%= e[:workflow_output] %>
 <% end %>
@@ -175,6 +181,7 @@ end
 * https://github.com/kstephens/swig-101
 * https://github.com/libffi/libffi
 * https://www.chiark.greenend.org.uk/doc/libffi-dev/html/
+* https://www.swig.org/papers/PyTutorial98/PyTutorial98.pdf
 
 # HOW-TO
 
@@ -196,6 +203,7 @@ $ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
 ### Debian (Ubuntu 18.04+)
 
 * Install a Python 3.10 distribution with python3.10 in $PATH.
+* `pip install pytest`
 * Run `bin/build debian-prereq`
 
 ### OSX

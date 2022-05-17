@@ -1,7 +1,9 @@
 #include <vector>
-#define POLYNOMIAL_VERSION "2.3.5"
+
+#define POLYNOMIAL_VERSION "1.2.1"
+
 class Polynomial {
- public:
+public:
   std::vector<double> coeffs;
   double evaluate(double x);
 };
