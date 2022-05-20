@@ -24,15 +24,15 @@ prog-path() { # VAR prog
   # export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
 }
 
-for swig_exe in "$SWIG_EXE" "$dir/../swig/swig" "$HOME/local/bin/swig" "$(which swig)" CANNOT-FIND-SWIG
+PATH="$dir/bin:$dir/local/bin:$PATH"
+for swig_exe in "$SWIG_EXE" "$(which swig)" "$dir/local/bin/swig" "$dir/../swig/swig" "$HOME/local/bin/swig" CANNOT-FIND-SWIG
 do
   [[ -x "$swig_exe" ]] && break
 done
-export SWIG_EXE="${swig_exe:?}"
-PATH="$(dirname "${swig_exe}"):$PATH"
-PATH="$dir/bin:$PATH"
+export SWIG_EXE="${swig_exe}"
+PATH="$(dirname "${SWIG_EXE}"):$PATH"
 
-# (set -x; which swig); # exit
+# (set -x; env | sort; which swig); # exit
 
 # set -x
 prog-path PYTHON  python3.10
@@ -53,7 +53,7 @@ in
     export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
     export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
     export CLASSPATH="$target_dir:$(clojure -Spath 2>/dev/null):$CLASSPATH"
-    for java in $target_dir/*.java
+    for java in "$target_dir"/*.java
     do
       class="${java%.java}.class"
       [[ "$java" -nt "$class" ]] && javac "$java" 2>/dev/null

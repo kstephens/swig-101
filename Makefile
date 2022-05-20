@@ -7,6 +7,9 @@ SWIG_TARGETS     = python  # clojure  ruby  tcl  guile
 TARGET_SUFFIXES  = py      # clj      rb    tcl  scm
 LIBS += -ltommath
 
+SWIG_CFLAGS_libtommath.c+=-Wno-sentinel
+SWIG_CFLAGS+=-Wno-sentinel
+
 ############################
 
 MAKE+=--no-print-directory
@@ -76,12 +79,6 @@ SWIG_OPTS_x += \
 
 ############################
 
-SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
-SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
-#SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
-
-############################
-
 SUFFIX_ruby=rb
 SWIG_OPTS_ruby=-ruby
 SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
@@ -132,9 +129,17 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
+SWIG_CFLAGS+=$(SWIG_CFLAGS_$(SWIG_TARGET))
+SWIG_CFLAGS+=$(SWIG_CFLAGS_$(EXAMPLE_NAME))
+SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
+SWIG_LDFLAGS+=$(SWIG_LDFLAGS_$(EXAMPLE_NAME))
+#SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
+
+############################
+
 all: early build-examples
 
-early:
+early: local-dirs
 	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
 #################################
@@ -319,11 +324,11 @@ demo-run:
 #################################
 
 macports-prereq:
-	sudo port install python310 py310-pip tcl guile
+	sudo port    install automake libtool autoconf bison tcl     guile python310 py310-pip
 	pip-3.10 install pytest
 
 debian-prereq:
-	sudo apt-get install tcl-dev guile-2.2-dev
+	sudo apt-get install automake libtool autoconf bison tcl-dev guile-2.2-dev
 
 #################################
 
@@ -346,15 +351,45 @@ clean-example:
 
 #################################
 
-libtommath : local/lib/libtommath.a 
+local-tools: swig libtommath
 
-local/src/libtommath :
-	git clone https://github.com/libtom/libtommath.git $@
-	cd $@ && git checkout 4b473685013
+local-dirs:
+	mkdir -p local/src local/lib local/include local/bin
 
-local/lib/libtommath.a : local/src/libtommath local/src/libtommath/*.[ch]
-	mkdir -p local/lib local/include/libtommath
+#################################
+
+swig : local-dirs local/bin/swig
+
+local/bin/swig : local/src/swig/pcre/README
 	@set -xe ;\
+	export PREFIX="$$(/bin/pwd)/local" ;\
+	git clone https://github.com/swig/swig.git local/src/swig
+	cd local/src/swig ;\
+	git checkout 6939d91e4c6ea ;\
+	cd local/src/swig ;\
+	./autogen.sh ;\
+	./configure --prefix="$$PREFIX" ;\
+	make -j ;\
+	make install
+
+local/src/swig/pcre/README :
+	@set -xe ;\
+	mkdir -p local/src/swig ;\
+	cd local/src/swig ;\
+	pcre2_version='10.39' ;\
+	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/pcre2-$$pcre2_version/pcre2-$$pcre2_version.tar.gz ;\
+	./Tools/pcre-build.sh
+
+#################################
+
+libtommath : local-dirs local/lib/libtommath.a
+
+local/lib/libtommath.a :
+	@set -xe ;\
+	git clone https://github.com/libtom/libtommath.git local/src/libtommath ;\
+	cd local/src/libtommath ;\
+	git checkout 4b473685013 ;\
+	mkdir -p local/lib local/include/libtommath
 	(mkdir -p local/src/libtommath/build ;\
 	cd local/src/libtommath/build ;\
 	cmake .. ;\
@@ -363,3 +398,4 @@ local/lib/libtommath.a : local/src/libtommath local/src/libtommath/*.[ch]
 	) ;\
 	cp -p local/src/libtommath/build/libtommath.a $@ ;\
 	cp -p local/src/libtommath/*.h local/include/libtommath/
+
