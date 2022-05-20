@@ -26,14 +26,6 @@ INC_DIRS      += -Ilocal/include
 LIB_DIRS      += -Llocal/lib
 
 ############################
-# OSX macports
-
-INC_DIRS      += -I/opt/local/include
-LIB_DIRS      += -L/opt/local/lib
-
-############################
-
-############################
 
 SWIG_TARGET=UNDEFINED
 
@@ -55,7 +47,9 @@ ifeq "$(UNAME_S)" "Linux"
   # CFLAGS_SO += -fPIC -shared	
 endif
 ifeq "$(UNAME_S)" "Darwin"
-  #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
+  # OSX macports
+  INC_DIRS      += -I/opt/local/include
+  LIB_DIRS      += -L/opt/local/lib
   CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
   SWIG_SO_SUFFIX_ruby:=.bundle
 endif
