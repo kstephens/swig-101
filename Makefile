@@ -348,8 +348,12 @@ clean-example:
 
 libtommath : local/lib/libtommath.a 
 
-local/lib/libtommath.a : local/src/libtommath/*.[ch]
-	mkdir -p local/lib local/include
+local/src/libtommath :
+	git clone https://github.com/libtom/libtommath.git $@
+	cd $@ && git checkout 4b473685013
+
+local/lib/libtommath.a : local/src/libtommath local/src/libtommath/*.[ch]
+	mkdir -p local/lib local/include/libtommath
 	@set -xe ;\
 	(mkdir -p local/src/libtommath/build ;\
 	cd local/src/libtommath/build ;\
@@ -358,4 +362,4 @@ local/lib/libtommath.a : local/src/libtommath/*.[ch]
 	make -j ;\
 	) ;\
 	cp -p local/src/libtommath/build/libtommath.a $@ ;\
-	cp -p local/src/libtommath/*.h local/include/
+	cp -p local/src/libtommath/*.h local/include/libtommath/

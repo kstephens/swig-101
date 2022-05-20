@@ -6,5 +6,5 @@
 %{
 #include "libtommath.h"
 %}
-%include "tommath.h"
+%include "libtommath/tommath.h"
 %include "libtommath.h"

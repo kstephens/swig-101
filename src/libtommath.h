@@ -4,7 +4,7 @@
 #define true   1
 #define false  0
 #endif
-#include "tommath.h"
+#include "libtommath/tommath.h"
 
 char*    mp_int_to_charP(mp_int* self);
 

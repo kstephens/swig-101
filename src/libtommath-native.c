@@ -1,4 +1,4 @@
-#include "libtommath.h"
+#include "libtommath/tommath.h"
 
 int main(int argc, char **argv) {
   mp_int a, b, c, d;
