@@ -9,17 +9,14 @@
 %include "libtommath.h"
 %include "tommath.h"
 
-#if 0
 %extend mp_int {
   mp_int() {
-    mp_int* impl = malloc(sizeof(*impl));
-    mp_init(impl);
-    return impl;
+    return mp_int_new(0);
   }
-  
-  void ~mp_int() {
-    mp_clear($self);
-    free($self);
+  mp_int(mp_digit n) {
+    return mp_int_new(n);
+  }
+  ~mp_int() {
+    mp_int_delete(self);
   }
 }
-#endif
