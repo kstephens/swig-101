@@ -11,14 +11,14 @@ char* mp_int_to_charP(mp_int* self) {
   return buf;
 }
 
-mp_int* mp_int_new(mp_digit n) {
+mp_int* swig_mp_int_new(mp_digit n) {
   mp_int* self = malloc(sizeof(*self));
   (void) mp_init(self); // TODO: error handing.
   mp_set(self, n);
   return self;
 }
 
-void mp_int_delete(mp_int* self) {
+void swig_mp_int_delete(mp_int* self) {
   mp_clear(self);
   free(self);
 }

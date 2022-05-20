@@ -6,17 +6,5 @@
 %{
 #include "libtommath.h"
 %}
-%include "libtommath.h"
 %include "tommath.h"
-
-%extend mp_int {
-  mp_int() {
-    return mp_int_new(0);
-  }
-  mp_int(mp_digit n) {
-    return mp_int_new(n);
-  }
-  ~mp_int() {
-    mp_int_delete(self);
-  }
-}
+%include "libtommath.h"
