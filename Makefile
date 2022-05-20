@@ -2,9 +2,9 @@
 
 ############################
 
-EXAMPLES         = libtommath.c # polynomial.cc polynomial_v2.cc example1.c
-SWIG_TARGETS     = python  # clojure  ruby  tcl  guile
-TARGET_SUFFIXES  = py      # clj      rb    tcl  scm
+EXAMPLES         = libtommath.c polynomial.cc polynomial_v2.cc example1.c
+SWIG_TARGETS     = python  clojure  ruby  tcl  guile
+TARGET_SUFFIXES  = py      clj      rb    tcl  scm
 LIBS += -ltommath
 
 SWIG_CFLAGS_libtommath.c+=-Wno-sentinel
