@@ -24,7 +24,6 @@ prog-path() { # VAR prog
   # export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
 }
 
-
 for swig_exe in "$SWIG_EXE" "$dir/../swig/swig" "$HOME/local/bin/swig" "$(which swig)" CANNOT-FIND-SWIG
 do
   [[ -x "$swig_exe" ]] && break
@@ -45,7 +44,7 @@ prog-path JAVA    java
 export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
 export GUILE_AUTO_COMPILE=0
 export CLASSPATH="$dir/target/clojure:$CLASSPATH"
-export PYTHON_LIB="$dir/target/python:$PYTHON_LIB"
+export PYTHONPATH="$dir/target/python:$PYTHONPATH"
 
 case "${cmd[0]}"
 in
