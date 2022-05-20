@@ -1,5 +1,14 @@
 #!bin/build
 
+############################
+
+EXAMPLES         = libtommath.c # polynomial.cc polynomial_v2.cc example1.c
+SWIG_TARGETS     = python  # clojure  ruby  tcl  guile
+TARGET_SUFFIXES  = py      # clj      rb    tcl  scm
+LIBS += -ltommath
+
+############################
+
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 UNAME_S:=$(shell uname -s)
@@ -7,17 +16,22 @@ SILENT=@
 
 ############################
 
-CFLAGS += -g
-INC    += -Isrc -I/opt/local/include # OSX macports
-CFLAGS += $(INC)
-CXXFLAGS += -g
-CXXFLAGS += $(INC)
+DEBUG     += -g
+CFLAGS    += $(DEBUG) $(INC_DIRS)
+CXXFLAGS  += $(DEBUG) $(INC_DIRS)
+LDFLAGS   += $(LIB_DIRS) $(LIBS)
+
+INC_DIRS      += -Isrc
+INC_DIRS      += -Ilocal/include
+LIB_DIRS      += -Llocal/lib
 
 ############################
+# OSX macports
 
-EXAMPLES = polynomial.cc polynomial_v2.cc example1.c
-SWIG_TARGETS=python clojure ruby tcl guile
-TARGET_SUFFIXES=py clj rb tcl scm
+INC_DIRS      += -I/opt/local/include
+LIB_DIRS      += -L/opt/local/lib
+
+############################
 
 ############################
 
@@ -50,7 +64,7 @@ endif
 
 SWIG_OPTS += \
 	-addextern \
-	-I- $(INC) \
+	-I- $(INC_DIRS) \
 	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
      -debug-module 1,2,3,4 \
@@ -237,7 +251,7 @@ target/native/$(EXAMPLE_NAME).o : $(NATIVE_SRCS)
 target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE)) target/native/$(EXAMPLE_NAME).o
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "# Compile and link native program:"
-	$(CC) $(CFLAGS) -o $@ $< $@.o
+	$(CC) $(CFLAGS) -o $@ $< $@.o $(LDFLAGS)
 	$(SILENT)echo ""
 
 build-native-end:
@@ -282,7 +296,7 @@ $(TARGET_SWIG_O) : $(TARGET_SWIG)
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "\n# Link $(SWIG_TARGET) dynamic library:"
-	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
+	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS) $(LDFLAGS)
 	$(SILENT)echo ""
 
 #################################
@@ -313,7 +327,7 @@ debian-prereq:
 #################################
 
 README.md : tmp/README.md 
-	mv tmp/$@ $@
+	cp tmp/$@ $@
 tmp/README.md: doc/README.md.erb doc/*.* src/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
@@ -328,3 +342,19 @@ clean:
 clean-example:
 	$(SILENT)rm -rf target/*/*$(EXAMPLE_NAME)*
 
+
+#################################
+
+libtommath : local/lib/libtommath.a 
+
+local/lib/libtommath.a : local/src/libtommath/*.[ch]
+	mkdir -p local/lib local/include
+	@set -xe ;\
+	(mkdir -p local/src/libtommath/build ;\
+	cd local/src/libtommath/build ;\
+	cmake .. ;\
+	make clean ;\
+	make -j ;\
+	) ;\
+	cp -p local/src/libtommath/build/libtommath.a $@ ;\
+	cp -p local/src/libtommath/*.h local/include/
