@@ -1,15 +1,13 @@
 %module libtommath_swig
-#define mp_digit unsigned int
-%include "libtommath.h"
-%include "tommath.h"
-
+#define mp_digit unsigned long long // HACK
  // missing sentinel in function call
-%ignore mp_init_multi;
-%ignore mp_clear_multi;
-
+%varargs(10, mp_int *ip = NULL) mp_init_multi;
+%varargs(10, mp_int *ip = NULL) mp_clear_multi;
 %{
 #include "libtommath.h"
 %}
+%include "libtommath.h"
+%include "tommath.h"
 
 #if 0
 %extend mp_int {
