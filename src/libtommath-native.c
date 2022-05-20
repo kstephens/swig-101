@@ -1,13 +1,8 @@
 #include "libtommath.h"
 
-static void print(const char* n, mp_int *v) {
-  printf("%s = ", n);
-  mp_fwrite(v, 10, stdout);
-  printf("\n");
-}
-
 int main(int argc, char **argv) {
   mp_int a, b, c, d;
+
   mp_init_multi(&a, &b, &c, &d, NULL);
   
   (void) mp_set(&a, 2357111317);
@@ -15,9 +10,10 @@ int main(int argc, char **argv) {
   (void) mp_mul(&a, &b, &c);
   (void) mp_mul(&c, &b, &d);
 
-#define P(N) print(#N, &N);
+#define P(N) printf("%s = ", #N); mp_fwrite(&N, 10, stdout); fputc('\n', stdout);
   P(a); P(b); P(c); P(d); 
   mp_clear_multi(&a, &b, &c, &d, NULL);
+
   return 0;
 }
 
