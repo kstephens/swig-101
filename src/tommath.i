@@ -1,4 +1,4 @@
-%module libtommath_swig
+%module tommath_swig
 %include "stdint.i" // mp_digit typedef
  // "missing sentinel in function call"
 %varargs(10, mp_int *ip = NULL) mp_init_multi;
@@ -10,7 +10,7 @@
 //%ignore true;
 //%ignore false;
 %{
-#include "libtommath.h"
+#include "tommath.h"
 %}
 %include "libtommath/tommath.h"
-%include "libtommath.h"
+%include "tommath.h"

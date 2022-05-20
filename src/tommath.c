@@ -1,4 +1,4 @@
-#include "libtommath.h"
+#include "tommath.h"
 #include <stdlib.h>
 
 char* swig_mp_int_to_charP(mp_int* self, int radix) {

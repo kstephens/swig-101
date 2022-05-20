@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.10
 
-import libtommath_swig
-from libtommath_swig import mp_int, mp_init, mp_clear, mp_set, mp_mul
+import tommath_swig
+from tommath_swig import mp_int, mp_init, mp_clear, mp_set, mp_mul
 
-print({"MP_ITER": libtommath_swig.MP_ITER})
+print({"MP_ITER": tommath_swig.MP_ITER})
 
 a = mp_int(); mp_set(a, 2357111317)    # <-- awkard!
 b = mp_int(1113171923)                 # <-- better!
