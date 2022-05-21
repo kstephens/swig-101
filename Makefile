@@ -319,7 +319,7 @@ demo-run:
 	   do \
 	     for prog in src/"$$example"*."$$suffix" ;\
 	     do \
-	       [ -f "$$prog" ] && (set -x; $(RUN) "$$prog") ;\
+	       [ -f "$$prog" ] && (echo ''; set -x; $(RUN) "$$prog") ;\
 	     done \
 	   done \
 	done
