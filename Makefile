@@ -322,7 +322,8 @@ demo-run:
 	       [ -f "$$prog" ] && (echo ''; set -x; $(RUN) "$$prog") ;\
 	     done \
 	   done \
-	done
+	done ;\
+	exit 0
 
 #################################
 
@@ -354,51 +355,44 @@ clean-example:
 
 #################################
 
+LOCAL:=$(shell /bin/pwd)/local
+
 local-tools: swig libtommath
 
 local-dirs:
-	mkdir -p local/src local/lib local/include local/bin
+	mkdir -p $(LOCAL)/src $(LOCAL)/lib $(LOCAL)/include $(LOCAL)/bin
 
 #################################
 
-swig : local-dirs local/bin/swig
+swig : local-dirs $(LOCAL)/bin/swig
 
-local/bin/swig : local/src/swig/pcre/README
+$(LOCAL)/bin/swig :
 	@set -xe ;\
-	export PREFIX="$$(/bin/pwd)/local" ;\
-	git clone https://github.com/swig/swig.git local/src/swig
-	cd local/src/swig ;\
+	git clone https://github.com/swig/swig.git $(LOCAL)/src/swig ;\
+	cd $(LOCAL)/src/swig ;\
 	git checkout 6939d91e4c6ea ;\
-	cd local/src/swig ;\
+	pcre2_version='pcre2-10.39' ;\
+	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$$pcre2_version/$$pcre2_version.tar.gz ;\
+	./Tools/pcre-build.sh ;\
 	./autogen.sh ;\
-	./configure --prefix="$$PREFIX" ;\
+	./configure --prefix='$(LOCAL)' ;\
 	make -j ;\
 	make install
 
-local/src/swig/pcre/README :
-	@set -xe ;\
-	mkdir -p local/src/swig ;\
-	cd local/src/swig ;\
-	pcre2_version='10.39' ;\
-	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/pcre2-$$pcre2_version/pcre2-$$pcre2_version.tar.gz ;\
-	./Tools/pcre-build.sh
-
 #################################
 
-libtommath : local-dirs local/lib/libtommath.a
+libtommath : local-dirs $(LOCAL)/lib/libtommath.a
 
-local/lib/libtommath.a :
+$(LOCAL)/lib/libtommath.a :
 	@set -xe ;\
-	git clone https://github.com/libtom/libtommath.git local/src/libtommath ;\
-	cd local/src/libtommath ;\
+	git clone https://github.com/libtom/libtommath.git $(LOCAL)/src/libtommath ;\
+	cd $(LOCAL)/src/libtommath ;\
 	git checkout 4b473685013 ;\
-	mkdir -p local/lib local/include/libtommath
-	(mkdir -p local/src/libtommath/build ;\
-	cd local/src/libtommath/build ;\
+	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
+	cd $(LOCAL)/src/libtommath/build ;\
 	cmake .. ;\
 	make clean ;\
 	make -j ;\
-	) ;\
-	cp -p local/src/libtommath/build/libtommath.a $@ ;\
-	cp -p local/src/libtommath/*.h local/include/libtommath/
+	cp -p $(LOCAL)/src/libtommath/build/libtommath.a $@ ;\
+	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
 
