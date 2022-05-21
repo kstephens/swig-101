@@ -109,7 +109,7 @@ msg "Start"
 
 cmd "bin/build clean"
 
-example_names = %w(polynomial.cc polynomial_v2.cc example1.c)
+example_names = %w(example1.c polynomial.cc polynomial_v2.cc tommath.c)
 
 $examples = [ ]
 

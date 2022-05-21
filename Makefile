@@ -1,5 +1,17 @@
 #!bin/build
 
+############################
+
+EXAMPLES         = tommath.c polynomial.cc polynomial_v2.cc example1.c
+SWIG_TARGETS     = python  clojure  ruby  tcl  guile
+TARGET_SUFFIXES  = py      clj      rb    tcl  scm
+LIBS += -ltommath
+
+SWIG_CFLAGS_tommath.c+=-Wno-sentinel
+SWIG_CFLAGS+=-Wno-sentinel
+
+############################
+
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 UNAME_S:=$(shell uname -s)
@@ -7,17 +19,14 @@ SILENT=@
 
 ############################
 
-CFLAGS += -g
-INC    += -Isrc -I/opt/local/include # OSX macports
-CFLAGS += $(INC)
-CXXFLAGS += -g
-CXXFLAGS += $(INC)
+DEBUG     += -g
+CFLAGS    += $(DEBUG) $(INC_DIRS)
+CXXFLAGS  += $(DEBUG) $(INC_DIRS)
+LDFLAGS   += $(LIB_DIRS) $(LIBS)
 
-############################
-
-EXAMPLES = polynomial.cc polynomial_v2.cc example1.c
-SWIG_TARGETS=python clojure ruby tcl guile
-TARGET_SUFFIXES=py clj rb tcl scm
+INC_DIRS      += -Isrc
+INC_DIRS      += -Ilocal/include
+LIB_DIRS      += -Llocal/lib
 
 ############################
 
@@ -41,7 +50,9 @@ ifeq "$(UNAME_S)" "Linux"
   # CFLAGS_SO += -fPIC -shared	
 endif
 ifeq "$(UNAME_S)" "Darwin"
-  #CFLAGS_SO += -Wl,-undefined,dynamic_lookup -Wl,-multiply_defined,suppress
+  # OSX macports
+  INC_DIRS      += -I/opt/local/include
+  LIB_DIRS      += -L/opt/local/lib
   CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
   SWIG_SO_SUFFIX_ruby:=.bundle
 endif
@@ -50,7 +61,7 @@ endif
 
 SWIG_OPTS += \
 	-addextern \
-	-I- $(INC) \
+	-I- $(INC_DIRS) \
 	$(SWIG_OPTS_$(SWIG_TARGET))
 SWIG_OPTS_x += \
      -debug-module 1,2,3,4 \
@@ -65,12 +76,6 @@ SWIG_OPTS_x += \
      -debug-typemap  \
      -debug-tmsearch \
      -debug-tmused
-
-############################
-
-SWIG_CFLAGS=$(SWIG_CFLAGS_$(SWIG_TARGET))
-SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
-#SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
 
 ############################
 
@@ -124,9 +129,17 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
+SWIG_CFLAGS+=$(SWIG_CFLAGS_$(SWIG_TARGET))
+SWIG_CFLAGS+=$(SWIG_CFLAGS_$(EXAMPLE_NAME))
+SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
+SWIG_LDFLAGS+=$(SWIG_LDFLAGS_$(EXAMPLE_NAME))
+#SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
+
+############################
+
 all: early build-examples
 
-early:
+early: local-dirs
 	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
 #################################
@@ -206,6 +219,13 @@ TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
 endif
 endif
 
+ifeq "$(EXAMPLE_NAME)" "tommath"
+# tcl.h forward declares struct mp_int!
+# target/tcl/libtommath_swig.c:2330:19: error: incomplete definition of type 'struct mp_int'
+SWIG_TARGETS:=$(filter-out tcl, $(SWIG_TARGETS))
+TARGET_DEPS:=$(filter-out tcl, $(TARGET_DEPS))
+endif
+
 #################################
 
 build-examples:
@@ -237,7 +257,7 @@ target/native/$(EXAMPLE_NAME).o : $(NATIVE_SRCS)
 target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE)) target/native/$(EXAMPLE_NAME).o
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "# Compile and link native program:"
-	$(CC) $(CFLAGS) -o $@ $< $@.o
+	$(CC) $(CFLAGS) -o $@ $< $@.o $(LDFLAGS)
 	$(SILENT)echo ""
 
 build-native-end:
@@ -282,7 +302,7 @@ $(TARGET_SWIG_O) : $(TARGET_SWIG)
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "\n# Link $(SWIG_TARGET) dynamic library:"
-	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS)
+	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS) $(LDFLAGS)
 	$(SILENT)echo ""
 
 #################################
@@ -294,26 +314,30 @@ demo-run:
 	$(SILENT)set -e ;\
 	for example in $(basename $(EXAMPLES)) ;\
 	do \
-	   (set -x; $(RUN) target/native/$$example) ;\
+	   (set -x; $(RUN) target/native/"$$example") ;\
 	   for suffix in $(TARGET_SUFFIXES) ;\
 	   do \
-	     [ -f src/$$example.$$suffix ] && (set -x; $(RUN) src/$$example.$$suffix) ;\
+	     for prog in src/"$$example"*."$$suffix" ;\
+	     do \
+	       [ -f "$$prog" ] && (echo ''; set -x; $(RUN) "$$prog") ;\
+	     done \
 	   done \
-	done
+	done ;\
+	exit 0
 
 #################################
 
 macports-prereq:
-	sudo port install python310 py310-pip tcl guile
+	sudo port    install automake libtool autoconf bison tcl     guile python310 py310-pip
 	pip-3.10 install pytest
 
 debian-prereq:
-	sudo apt-get install tcl-dev guile-2.2-dev
+	sudo apt-get install automake libtool autoconf bison tcl-dev guile-2.2-dev
 
 #################################
 
 README.md : tmp/README.md 
-	mv tmp/$@ $@
+	cp tmp/$@ $@
 tmp/README.md: doc/README.md.erb doc/*.* src/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
@@ -327,4 +351,48 @@ clean:
 
 clean-example:
 	$(SILENT)rm -rf target/*/*$(EXAMPLE_NAME)*
+
+
+#################################
+
+LOCAL:=$(shell /bin/pwd)/local
+
+local-tools: swig libtommath
+
+local-dirs:
+	mkdir -p $(LOCAL)/src $(LOCAL)/lib $(LOCAL)/include $(LOCAL)/bin
+
+#################################
+
+swig : local-dirs $(LOCAL)/bin/swig
+
+$(LOCAL)/bin/swig :
+	@set -xe ;\
+	git clone https://github.com/swig/swig.git $(LOCAL)/src/swig ;\
+	cd $(LOCAL)/src/swig ;\
+	git checkout 6939d91e4c6ea ;\
+	pcre2_version='pcre2-10.39' ;\
+	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$$pcre2_version/$$pcre2_version.tar.gz ;\
+	./Tools/pcre-build.sh ;\
+	./autogen.sh ;\
+	./configure --prefix='$(LOCAL)' ;\
+	make -j ;\
+	make install
+
+#################################
+
+libtommath : local-dirs $(LOCAL)/lib/libtommath.a
+
+$(LOCAL)/lib/libtommath.a :
+	@set -xe ;\
+	git clone https://github.com/libtom/libtommath.git $(LOCAL)/src/libtommath ;\
+	cd $(LOCAL)/src/libtommath ;\
+	git checkout 4b473685013 ;\
+	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
+	cd $(LOCAL)/src/libtommath/build ;\
+	cmake .. ;\
+	make clean ;\
+	make -j ;\
+	cp -p $(LOCAL)/src/libtommath/build/libtommath.a $@ ;\
+	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
 

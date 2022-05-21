@@ -28,12 +28,14 @@ namespace mathlib {
       return n == y.n && d == y.d; 
     }
     std::string __str__() const {
-      std::ostringstream oss(std::ostringstream::out);
-      oss << n << "/" << d;
-      return oss.str();
+      std::ostringstream os(std::ostringstream::out);
+      os << n << "/" << d;
+      return os.str();
     }
     std::string __repr__() const {
-      return this->__str__();
+      std::ostringstream os(std::ostringstream::out);
+      os << "rational(" << n << "," << d << ")";
+      return os.str();
     }
   };
 

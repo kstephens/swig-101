@@ -191,14 +191,10 @@ end
 * rbenv install 2.7.1
 * Install JVM 11.0
 * Install clojure + clojure-tools
-* Build swig from source:
+* Install Prerequisites below.
+* Build local tools.
 
-```
-$ cd ..
-$ git clone https://github.com/swig/swig.git
-$ cd swig
-$ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
-```
+## Prerequisites
 
 ### Debian (Ubuntu 18.04+)
 
@@ -210,6 +206,12 @@ $ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
 
 * Install macports
 * Run `bin/build macports-prereq`
+
+### Local tools
+
+```
+$ bin/build local-tools
+```
 
 ## Build
 
