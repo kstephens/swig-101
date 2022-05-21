@@ -120,591 +120,6 @@ The examples below target:
 
 
 
-## polynomial.cc
-
-
-### C++ Header : src/polynomial.h
-
-```C++
-  1   #include <vector>
-  2   
-  3   #define POLYNOMIAL_VERSION "1.2.1"
-  4   
-  5   class Polynomial {
-  6   public:
-  7     std::vector<double> coeffs;
-  8     double evaluate(double x);
-  9   };
-```
-
-
-### C++ Library : src/polynomial.cc
-
-```C++
-  1   #include "polynomial.h"
-  2   
-  3   double Polynomial::evaluate(double x) {
-  4     double result = 0, xx = 1;
-  5     for ( auto c : this->coeffs ) {
-  6       result = result + c * xx;
-  7       xx = xx * x;
-  8     }
-  9     return result;
- 10   }
-```
-
-
-### C++ Main : src/polynomial-native.cc
-
-```C++
-  1   #include <iostream>
-  2   #include <iomanip>
-  3   #include "polynomial.h"
-  4   
-  5   int main(int argc, char **argv) {
-  6     std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";
-  7   
-  8     Polynomial p;
-  9     p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };
- 10     std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";
- 11   
- 12     return 0;
- 13   }
-```
-
-
-----
-
-```
-$ target/native/polynomial
-POLYNOMIAL_VERSION 1.2.1
-17.3020736
-```
-
-----
-
-### C++ SWIG Interface : src/polynomial.i
-
-```C++
-  1   // Name of generated bindings:
-  2   %module polynomial_swig
-  3   
-  4   // Include std::vector<T> support:
-  5   %include "std_vector.i"
-  6   
-  7   // Template instantiation:
-  8   %template(VectorDouble) std::vector<double>;
-  9   
- 10   // Include C++ declarations as SWIG interface definitions:
- 11   %include "polynomial.h"
- 12   
- 13   // Prepend C++ code in generated bindings:
- 14   %{
- 15   #include "polynomial.h"
- 16   %}
-```
-
-
-### Python : src/polynomial.py
-
-```Python
-  1   # Setup DLL search path:
-  2   import sys ; sys.path.append('target/python')
-  3   
-  4   # Import library bindings:
-  5   from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
-  6   
-  7   # #define constants:
-  8   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
-  9   
- 10   # Instantiate object:
- 11   poly = Polynomial()
- 12   poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
- 13   
- 14   # Invoke methods:
- 15   print(list(poly.coeffs))
- 16   print(poly.evaluate(1.2))
-```
-
-
-----
-
-```
-$ bin/run src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-```
-
-----
-
-### Clojure (Java) : src/polynomial.clj
-
-```Lisp
-  1   ;; Load Java bindings dynamic library:
-  2   (clojure.lang.RT/loadLibrary "polynomial_swig")
-  3   
-  4   ;; Import Java namespace:
-  5   (import 'polynomial_swig)
-  6   
-  7   ;; #define constants:
-  8   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
-  9   
- 10   ;; Instantiate object:
- 11   (def p (Polynomial.))
- 12   (.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
- 13   
- 14   ;; Invoke methods:
- 15   (prn (.getCoeffs p))
- 16   (prn (.evaluate p 1.2))
-```
-
-
-----
-
-```
-$ bin/run src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-```
-
-----
-
-### Ruby : src/polynomial.rb
-
-```Ruby
-  1   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
-  2   $:.unshift 'target/ruby'
-  3   
-  4   require 'polynomial_swig'
-  5   include Polynomial_swig
-  6   
-  7   pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
-  8   
-  9   p = Polynomial.new
- 10   p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
- 11   
- 12   pp p.coeffs.to_a
- 13   pp p.evaluate(1.2)
-```
-
-
-----
-
-```
-$ bin/run src/polynomial.rb
-{:POLYNOMIAL_VERSION=>"1.2.1"}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-```
-
-----
-
-### Guile : src/polynomial.scm
-
-```Scheme
-  1   (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")
-  2   
-  3   (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
-  4   
-  5   (define p (new-Polynomial))
-  6   (Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))
-  7   
-  8   (write (Polynomial-coeffs-get p)) (newline)
-  9   (write (Polynomial-evaluate p 1.2)) (newline)
-```
-
-
-----
-
-```
-$ bin/run src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 7fa6ba604080>
-17.3020736
-```
-
-----
-
-### TCL : src/polynomial.tcl
-
-```Bash
-  1   load target/tcl/polynomial_swig.so Polynomial_swig
-  2   
-  3   puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
-  4   
-  5   Polynomial poly
-  6   VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }
-  7   poly configure -coeffs c
-  8   
-  9   puts [poly cget -coeffs]
- 10   puts [poly evaluate 1.2]
-```
-
-
-----
-
-```
-$ bin/run src/polynomial.tcl
-POLYNOMIAL_VERSION 1.2.1
-_f078000ef07f0000_p_std__vectorT_double_t
-17.3020736
-```
-
-----
-
-### Python Tests : src/polynomial-test.py
-
-```Python
-  1   import sys ; sys.path.append('target/python')
-  2   
-  3   from polynomial_swig import Polynomial, VectorDouble
-  4   import pytest
-  5   
-  6   def test_empty_coeffs():
-  7       p = Polynomial()
-  8       assert p.evaluate(1.2) == 0.0
-  9   def test_one_coeff():
- 10       p = Polynomial()
- 11       p.coeffs = VectorDouble([ 2.3 ])
- 12       assert p.evaluate(1.2) == 2.3
- 13       assert p.evaluate(999) == 2.3
-```
-
-
-----
-
-```
-$ python3.10 -m pytest src/polynomial-test.py
-============================= test session starts ==============================
-platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0
-rootdir: /Users/kstephens/src/dev/swig-101
-collected 2 items
-
-src/polynomial-test.py ..                                                [100%]
-
-============================== 2 passed in 0.01s ===============================
-```
-
-----
-
-### Output
-
-
-```
-$ target/native/polynomial
-POLYNOMIAL_VERSION 1.2.1
-17.3020736
-
-```
-
-----
-
-```
-$ bin/run src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-
-```
-
-----
-
-```
-$ bin/run src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-
-```
-
-----
-
-```
-$ bin/run src/polynomial.rb
-{:POLYNOMIAL_VERSION=>"1.2.1"}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-
-```
-
-----
-
-```
-$ bin/run src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 7fa6ba604080>
-17.3020736
-
-```
-
-----
-
-```
-$ bin/run src/polynomial.tcl
-POLYNOMIAL_VERSION 1.2.1
-_f078000ef07f0000_p_std__vectorT_double_t
-17.3020736
-
-```
-
-----
-
-```
-$ python3.10 -m pytest src/polynomial-test.py
-============================= test session starts ==============================
-platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0
-rootdir: /Users/kstephens/src/dev/swig-101
-collected 2 items
-
-src/polynomial-test.py ..                                                [100%]
-
-============================== 2 passed in 0.01s ===============================
-
-```
-
-----
-
-
-## polynomial_v2.cc
-
-
-### C++ Header : src/polynomial_v2.h
-
-```C++
-  1   #include <vector>
-  2   
-  3   #define POLYNOMIAL_VERSION "2.0.2"
-  4   
-  5   namespace mathlib {
-  6     template < typename R >
-  7     class polynomial {
-  8     public:
-  9       std::vector< R > coeffs;
- 10       R evaluate(const R &x) const;
- 11     };
- 12   }
-```
-
-
-### C++ Library : src/polynomial_v2.cc
-
-```C++
-  1   #include "polynomial_v2.h"
-  2   #include "rational.h"
-  3   
-  4   namespace mathlib {
-  5     template < typename R >
-  6     R polynomial< R >::evaluate(const R &x) const {
-  7       R result(0), xx(1);
-  8       for ( const auto &c : this->coeffs ) {
-  9         result = result + c * xx;
- 10         xx = xx * x;
- 11       }
- 12       return result;
- 13     };
- 14   
- 15     // Instantiate templates:
- 16     template class polynomial<int>;
- 17     template class polynomial<double>;
- 18     template class polynomial<rational<int>>;
- 19   }
-```
-
-
-### C++ Main : src/polynomial_v2-native.cc
-
-```C++
-  1   #include <iostream>
-  2   #include <iomanip>
-  3   #include "polynomial_v2.h"
-  4   #include "rational.h"
-  5   
-  6   using namespace mathlib;
-  7   
-  8   int main(int argc, char **argv) {
-  9     std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";
- 10   
- 11     polynomial<double> pd;
- 12     pd.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };
- 13     std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";
- 14   
- 15     polynomial<int> pi;
- 16     pi.coeffs = { 2, -3, 5 };
- 17     std::cout << pi.evaluate(3) << "\n";
- 18   
- 19     typedef rational<int> R;
- 20     polynomial<R> pr;
- 21     pr.coeffs = { R(7,11), R(11,13), R(13,17) };
- 22     std::cout << pr.evaluate(R(5,7)) << "\n";
- 23   
- 24     return 0;
- 25   }
-```
-
-
-----
-
-```
-$ target/native/polynomial_v2
-POLYNOMIAL_VERSION 2.0.2
-17.3020736
-38
-194273/119119
-```
-
-----
-
-### C++ SWIG Interface : src/polynomial_v2.i
-
-```C++
-  1   // Name of generated bindings:
-  2   %module polynomial_v2_swig
-  3   
-  4   // Include C++ declarations as SWIG interface definitions:
-  5   %include "polynomial_v2.h"
-  6   %include "rational.h"
-  7   
-  8   // Template instantiation:
-  9   %{
- 10   #include "polynomial_v2.h"
- 11   #include "rational.h"
- 12   
- 13   template class mathlib::polynomial<int>;
- 14   template class mathlib::polynomial<double>;
- 15   template class mathlib::rational<int>;
- 16   template class mathlib::polynomial<mathlib::rational<int>>;
- 17   template class std::vector<mathlib::rational<int>>;
- 18   %}
- 19   
- 20   %include "std_string.i"        // python __str__(), __repr__()
- 21   %template(RationalV2)            mathlib::rational<int>;
- 22   
- 23   %include "std_vector.i"
- 24   %template(VectorDoubleV2)        std::vector<double>;
- 25   %template(VectorIntV2)           std::vector<int>;
- 26   %template(VectorRationalV2)      std::vector<mathlib::rational<int>>;
- 27   
- 28   %template(PolynomialDoubleV2)    mathlib::polynomial<double>;
- 29   %template(PolynomialIntV2)       mathlib::polynomial<int>;
- 30   %template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;
- 31   
- 32   // Prepend C++ code in generated bindings:
- 33   %{
- 34   #include "polynomial_v2.h"
- 35   #include "rational.h"
- 36   %}
-```
-
-
-### Python : src/polynomial_v2.py
-
-```Python
-  1   import sys ; sys.path.append('target/python')
-  2   
-  3   from polynomial_v2_swig import PolynomialDoubleV2, VectorDoubleV2, PolynomialRationalV2, VectorRationalV2, RationalV2, POLYNOMIAL_VERSION
-  4   
-  5   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
-  6   
-  7   poly = PolynomialDoubleV2()
-  8   poly.coeffs = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
-  9   print(list(poly.coeffs))
- 10   print(poly.evaluate(1.2))
- 11   
- 12   poly = PolynomialRationalV2()
- 13   poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ])
- 14   print(list(poly.coeffs))
- 15   print(poly.evaluate(RationalV2(5, 7)))
-```
-
-
-----
-
-```
-$ bin/run src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-[7/11, 11/13, 13/17]
-194273/119119
-```
-
-----
-
-### Clojure (Java) : src/polynomial_v2.clj
-
-```Lisp
-  1   (clojure.lang.RT/loadLibrary "polynomial_v2_swig")
-  2   
-  3   (import 'polynomial_v2_swig)
-  4   
-  5   (prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})
-  6   
-  7   (def p (PolynomialDoubleV2.))
-  8   (.setCoeffs p (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
-  9   (prn (.getCoeffs p))
- 10   (prn (.evaluate p 1.2))
- 11   
- 12   (def p (PolynomialRationalV2.))
- 13   (.setCoeffs p (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ]))
- 14   (prn (mapv #(.__str__ %) (.getCoeffs p)))
- 15   (prn (.__str__ (.evaluate p (RationalV2. 5, 7))))
-```
-
-
-----
-
-```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-["7/11" "11/13" "13/17"]
-"194273/119119"
-```
-
-----
-
-### Output
-
-
-```
-$ target/native/polynomial_v2
-POLYNOMIAL_VERSION 2.0.2
-17.3020736
-38
-194273/119119
-
-```
-
-----
-
-```
-$ bin/run src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-[7/11, 11/13, 13/17]
-194273/119119
-
-```
-
-----
-
-```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-["7/11" "11/13" "13/17"]
-"194273/119119"
-
-```
-
-----
-
-
 ## example1.c
 
 
@@ -940,6 +355,826 @@ EXAMPLE1_VERSION = 1.2.3
 
 ----
 
+
+## polynomial.cc
+
+
+### C++ Header : src/polynomial.h
+
+```C++
+  1   #include <vector>
+  2   
+  3   #define POLYNOMIAL_VERSION "1.2.1"
+  4   
+  5   class Polynomial {
+  6   public:
+  7     std::vector<double> coeffs;
+  8     double evaluate(double x);
+  9   };
+```
+
+
+### C++ Library : src/polynomial.cc
+
+```C++
+  1   #include "polynomial.h"
+  2   
+  3   double Polynomial::evaluate(double x) {
+  4     double result = 0, xx = 1;
+  5     for ( auto c : this->coeffs ) {
+  6       result = result + c * xx;
+  7       xx = xx * x;
+  8     }
+  9     return result;
+ 10   }
+```
+
+
+### C++ Main : src/polynomial-native.cc
+
+```C++
+  1   #include <iostream>
+  2   #include <iomanip>
+  3   #include "polynomial.h"
+  4   
+  5   int main(int argc, char **argv) {
+  6     std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";
+  7   
+  8     Polynomial p;
+  9     p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };
+ 10     std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";
+ 11   
+ 12     return 0;
+ 13   }
+```
+
+
+----
+
+```
+$ target/native/polynomial
+POLYNOMIAL_VERSION 1.2.1
+17.3020736
+```
+
+----
+
+### C++ SWIG Interface : src/polynomial.i
+
+```C++
+  1   // Name of generated bindings:
+  2   %module polynomial_swig
+  3   
+  4   // Include std::vector<T> support:
+  5   %include "std_vector.i"
+  6   
+  7   // Template instantiation:
+  8   %template(VectorDouble) std::vector<double>;
+  9   
+ 10   // Include C++ declarations as SWIG interface definitions:
+ 11   %include "polynomial.h"
+ 12   
+ 13   // Prepend C++ code in generated bindings:
+ 14   %{
+ 15   #include "polynomial.h"
+ 16   %}
+```
+
+
+### Python : src/polynomial.py
+
+```Python
+  1   # Setup DLL search path:
+  2   import sys ; sys.path.append('target/python')
+  3   
+  4   # Import library bindings:
+  5   from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
+  6   
+  7   # #define constants:
+  8   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
+  9   
+ 10   # Instantiate object:
+ 11   poly = Polynomial()
+ 12   poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
+ 13   
+ 14   # Invoke methods:
+ 15   print(list(poly.coeffs))
+ 16   print(poly.evaluate(1.2))
+```
+
+
+----
+
+```
+$ bin/run src/polynomial.py
+{'POLYNOMIAL_VERSION': '1.2.1'}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+```
+
+----
+
+### Clojure (Java) : src/polynomial.clj
+
+```Lisp
+  1   ;; Load Java bindings dynamic library:
+  2   (clojure.lang.RT/loadLibrary "polynomial_swig")
+  3   
+  4   ;; Import Java namespace:
+  5   (import 'polynomial_swig)
+  6   
+  7   ;; #define constants:
+  8   (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
+  9   
+ 10   ;; Instantiate object:
+ 11   (def p (Polynomial.))
+ 12   (.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
+ 13   
+ 14   ;; Invoke methods:
+ 15   (prn (.getCoeffs p))
+ 16   (prn (.evaluate p 1.2))
+```
+
+
+----
+
+```
+$ bin/run src/polynomial.clj
+{:POLYNOMIAL_VERSION "1.2.1"}
+[2.3 3.5 5.7 7.11 11.13 -13.17]
+17.3020736
+```
+
+----
+
+### Ruby : src/polynomial.rb
+
+```Ruby
+  1   ENV["LD_LIBRARY_PATH"] = 'target/ruby'
+  2   $:.unshift 'target/ruby'
+  3   
+  4   require 'polynomial_swig'
+  5   include Polynomial_swig
+  6   
+  7   pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
+  8   
+  9   p = Polynomial.new
+ 10   p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
+ 11   
+ 12   pp p.coeffs.to_a
+ 13   pp p.evaluate(1.2)
+```
+
+
+----
+
+```
+$ bin/run src/polynomial.rb
+{:POLYNOMIAL_VERSION=>"1.2.1"}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+```
+
+----
+
+### Guile : src/polynomial.scm
+
+```Scheme
+  1   (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")
+  2   
+  3   (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
+  4   
+  5   (define p (new-Polynomial))
+  6   (Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))
+  7   
+  8   (write (Polynomial-coeffs-get p)) (newline)
+  9   (write (Polynomial-evaluate p 1.2)) (newline)
+```
+
+
+----
+
+```
+$ bin/run src/polynomial.scm
+(POLYNOMIAL-VERSION "1.2.1")
+#<swig-pointer std::vector< double > * 7fba0fc07130>
+17.3020736
+```
+
+----
+
+### TCL : src/polynomial.tcl
+
+```Bash
+  1   load target/tcl/polynomial_swig.so Polynomial_swig
+  2   
+  3   puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
+  4   
+  5   Polynomial poly
+  6   VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }
+  7   poly configure -coeffs c
+  8   
+  9   puts [poly cget -coeffs]
+ 10   puts [poly evaluate 1.2]
+```
+
+
+----
+
+```
+$ bin/run src/polynomial.tcl
+POLYNOMIAL_VERSION 1.2.1
+_404270d1867f0000_p_std__vectorT_double_t
+17.3020736
+```
+
+----
+
+### Python Tests : src/polynomial-test.py
+
+```Python
+  1   import sys ; sys.path.append('target/python')
+  2   
+  3   from polynomial_swig import Polynomial, VectorDouble
+  4   import pytest
+  5   
+  6   def test_empty_coeffs():
+  7       p = Polynomial()
+  8       assert p.evaluate(1.2) == 0.0
+  9   def test_one_coeff():
+ 10       p = Polynomial()
+ 11       p.coeffs = VectorDouble([ 2.3 ])
+ 12       assert p.evaluate(1.2) == 2.3
+ 13       assert p.evaluate(999) == 2.3
+```
+
+
+----
+
+```
+$ python3.10 -m pytest src/polynomial-test.py
+============================= test session starts ==============================
+platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0
+rootdir: /Users/kstephens/src/dev/opt/swig-101
+collected 2 items
+
+src/polynomial-test.py ..                                                [100%]
+
+============================== 2 passed in 0.01s ===============================
+```
+
+----
+
+### Output
+
+
+```
+$ target/native/polynomial
+POLYNOMIAL_VERSION 1.2.1
+17.3020736
+
+```
+
+----
+
+```
+$ bin/run src/polynomial.py
+{'POLYNOMIAL_VERSION': '1.2.1'}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+
+```
+
+----
+
+```
+$ bin/run src/polynomial.clj
+{:POLYNOMIAL_VERSION "1.2.1"}
+[2.3 3.5 5.7 7.11 11.13 -13.17]
+17.3020736
+
+```
+
+----
+
+```
+$ bin/run src/polynomial.rb
+{:POLYNOMIAL_VERSION=>"1.2.1"}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+
+```
+
+----
+
+```
+$ bin/run src/polynomial.scm
+(POLYNOMIAL-VERSION "1.2.1")
+#<swig-pointer std::vector< double > * 7fba0fc07130>
+17.3020736
+
+```
+
+----
+
+```
+$ bin/run src/polynomial.tcl
+POLYNOMIAL_VERSION 1.2.1
+_404270d1867f0000_p_std__vectorT_double_t
+17.3020736
+
+```
+
+----
+
+```
+$ python3.10 -m pytest src/polynomial-test.py
+============================= test session starts ==============================
+platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0
+rootdir: /Users/kstephens/src/dev/opt/swig-101
+collected 2 items
+
+src/polynomial-test.py ..                                                [100%]
+
+============================== 2 passed in 0.01s ===============================
+
+```
+
+----
+
+
+## polynomial_v2.cc
+
+
+### C++ Header : src/polynomial_v2.h
+
+```C++
+  1   #include <vector>
+  2   
+  3   #define POLYNOMIAL_VERSION "2.0.2"
+  4   
+  5   namespace mathlib {
+  6     template < typename R >
+  7     class polynomial {
+  8     public:
+  9       std::vector< R > coeffs;
+ 10       R evaluate(const R &x) const;
+ 11     };
+ 12   }
+```
+
+
+### C++ Library : src/polynomial_v2.cc
+
+```C++
+  1   #include "polynomial_v2.h"
+  2   #include "rational.h"
+  3   
+  4   namespace mathlib {
+  5     template < typename R >
+  6     R polynomial< R >::evaluate(const R &x) const {
+  7       R result(0), xx(1);
+  8       for ( const auto &c : this->coeffs ) {
+  9         result = result + c * xx;
+ 10         xx = xx * x;
+ 11       }
+ 12       return result;
+ 13     };
+ 14   
+ 15     // Instantiate templates:
+ 16     template class polynomial<int>;
+ 17     template class polynomial<double>;
+ 18     template class polynomial<rational<int>>;
+ 19   }
+```
+
+
+### C++ Main : src/polynomial_v2-native.cc
+
+```C++
+  1   #include <iostream>
+  2   #include <iomanip>
+  3   #include "polynomial_v2.h"
+  4   #include "rational.h"
+  5   
+  6   using namespace mathlib;
+  7   
+  8   int main(int argc, char **argv) {
+  9     std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";
+ 10   
+ 11     polynomial<double> pd;
+ 12     pd.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };
+ 13     std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";
+ 14   
+ 15     polynomial<int> pi;
+ 16     pi.coeffs = { 2, -3, 5 };
+ 17     std::cout << pi.evaluate(3) << "\n";
+ 18   
+ 19     typedef rational<int> R;
+ 20     polynomial<R> pr;
+ 21     pr.coeffs = { R(7,11), R(11,13), R(13,17) };
+ 22     std::cout << pr.evaluate(R(5,7)) << "\n";
+ 23   
+ 24     return 0;
+ 25   }
+```
+
+
+----
+
+```
+$ target/native/polynomial_v2
+POLYNOMIAL_VERSION 2.0.2
+17.3020736
+38
+194273/119119
+```
+
+----
+
+### C++ SWIG Interface : src/polynomial_v2.i
+
+```C++
+  1   // Name of generated bindings:
+  2   %module polynomial_v2_swig
+  3   
+  4   // Include C++ declarations as SWIG interface definitions:
+  5   %include "polynomial_v2.h"
+  6   %include "rational.h"
+  7   
+  8   // Template instantiation:
+  9   %{
+ 10   #include "polynomial_v2.h"
+ 11   #include "rational.h"
+ 12   
+ 13   template class mathlib::polynomial<int>;
+ 14   template class mathlib::polynomial<double>;
+ 15   template class mathlib::rational<int>;
+ 16   template class mathlib::polynomial<mathlib::rational<int>>;
+ 17   template class std::vector<mathlib::rational<int>>;
+ 18   %}
+ 19   
+ 20   %include "std_string.i"        // python __str__(), __repr__()
+ 21   %template(RationalV2)            mathlib::rational<int>;
+ 22   
+ 23   %include "std_vector.i"
+ 24   %template(VectorDoubleV2)        std::vector<double>;
+ 25   %template(VectorIntV2)           std::vector<int>;
+ 26   %template(VectorRationalV2)      std::vector<mathlib::rational<int>>;
+ 27   
+ 28   %template(PolynomialDoubleV2)    mathlib::polynomial<double>;
+ 29   %template(PolynomialIntV2)       mathlib::polynomial<int>;
+ 30   %template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;
+ 31   
+ 32   // Prepend C++ code in generated bindings:
+ 33   %{
+ 34   #include "polynomial_v2.h"
+ 35   #include "rational.h"
+ 36   %}
+```
+
+
+### Python : src/polynomial_v2.py
+
+```Python
+  1   import sys ; sys.path.append('target/python')
+  2   
+  3   from polynomial_v2_swig import PolynomialDoubleV2, VectorDoubleV2, PolynomialRationalV2, VectorRationalV2, RationalV2, POLYNOMIAL_VERSION
+  4   
+  5   print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
+  6   
+  7   poly = PolynomialDoubleV2()
+  8   poly.coeffs = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
+  9   print(list(poly.coeffs))
+ 10   print(poly.evaluate(1.2))
+ 11   
+ 12   poly = PolynomialRationalV2()
+ 13   poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ])
+ 14   print(list(poly.coeffs))
+ 15   print(poly.evaluate(RationalV2(5, 7)))
+```
+
+
+----
+
+```
+$ bin/run src/polynomial_v2.py
+{'POLYNOMIAL_VERSION': '2.0.2'}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+[rational(7,11), rational(11,13), rational(13,17)]
+194273/119119
+```
+
+----
+
+### Clojure (Java) : src/polynomial_v2.clj
+
+```Lisp
+  1   (clojure.lang.RT/loadLibrary "polynomial_v2_swig")
+  2   
+  3   (import 'polynomial_v2_swig)
+  4   
+  5   (prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})
+  6   
+  7   (def p (PolynomialDoubleV2.))
+  8   (.setCoeffs p (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
+  9   (prn (.getCoeffs p))
+ 10   (prn (.evaluate p 1.2))
+ 11   
+ 12   (def p (PolynomialRationalV2.))
+ 13   (.setCoeffs p (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ]))
+ 14   (prn (mapv #(.__str__ %) (.getCoeffs p)))
+ 15   (prn (.__str__ (.evaluate p (RationalV2. 5, 7))))
+```
+
+
+----
+
+```
+$ bin/run src/polynomial_v2.clj
+{:POLYNOMIAL_VERSION "2.0.2"}
+[2.3 3.5 5.7 7.11 11.13 -13.17]
+17.3020736
+["7/11" "11/13" "13/17"]
+"194273/119119"
+```
+
+----
+
+### Output
+
+
+```
+$ target/native/polynomial_v2
+POLYNOMIAL_VERSION 2.0.2
+17.3020736
+38
+194273/119119
+
+```
+
+----
+
+```
+$ bin/run src/polynomial_v2.py
+{'POLYNOMIAL_VERSION': '2.0.2'}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+[rational(7,11), rational(11,13), rational(13,17)]
+194273/119119
+
+```
+
+----
+
+```
+$ bin/run src/polynomial_v2.clj
+{:POLYNOMIAL_VERSION "2.0.2"}
+[2.3 3.5 5.7 7.11 11.13 -13.17]
+17.3020736
+["7/11" "11/13" "13/17"]
+"194273/119119"
+
+```
+
+----
+
+
+## tommath.c
+
+
+### C Header : src/tommath.h
+
+```C
+  1   #include <stddef.h>
+  2   #include <stdint.h>
+  3   // #include <stdbool.h> // C99
+  4   #ifndef bool
+  5   #define bool   _Bool
+  6   #define true   1
+  7   #define false  0
+  8   #endif
+  9   #include "libtommath/tommath.h"
+ 10   
+ 11   /*********************************************************************
+ 12    * Convert mp_int <-> string
+ 13    */
+ 14   
+ 15   char*    swig_mp_int_to_charP(mp_int* self, int radix);
+ 16   mp_int*  swig_charP_to_mp_int(const char* str, int radix);
+ 17   
+ 18   #if SWIG
+ 19   %extend mp_int {
+ 20     char* __str__(int radix = 10) {
+ 21       return swig_mp_int_to_charP(self, radix);
+ 22     }
+ 23     char* __repr__(int radix = 10) {
+ 24       char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
+ 25       if ( radix == 10 )
+ 26         asprintf(&repr, "mp_int(\"%s\")", str);
+ 27       else
+ 28         asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);
+ 29       return free(str), repr;
+ 30     }
+ 31   }
+ 32   #endif
+ 33   
+ 34   /*********************************************************************
+ 35    * Memory Management
+ 36   
+ 37   tommath `mp_int` internal memory is managed by:
+ 38   
+ 39   * mp_init(mp_int*)
+ 40   * mp_clear(mp_int*)
+ 41   
+ 42   tommath expects these functions to be called
+ 43   before and after using a mp_int value, respectively.
+ 44   
+ 45    */
+ 46   mp_int*  swig_mp_int_new(mp_digit n);
+ 47   void     swig_mp_int_delete(mp_int* self);
+ 48   
+ 49   #if SWIG
+ 50   /***********************************************
+ 51   
+ 52   SWIG wraps `struct mp_int` values with pointer `malloc(sizeof(mp_int))`.
+ 53   
+ 54   `%extend mp_int` defines constructors and destructors for `mp_int`.
+ 55   
+ 56   */
+ 57   %extend mp_int {
+ 58     mp_int(mp_digit n = 0) {
+ 59       return swig_mp_int_new(n);
+ 60     }
+ 61     mp_int(const char *str, int radix = 10) {
+ 62       return swig_charP_to_mp_int(str, radix);
+ 63     }
+ 64     ~mp_int() {
+ 65       swig_mp_int_delete(self);
+ 66     }
+ 67   }
+ 68   #endif
+```
+
+
+### C Library : src/tommath.c
+
+```C
+  1   #include "tommath.h"
+  2   #include <stdlib.h>
+  3   
+  4   char* swig_mp_int_to_charP(mp_int* self, int radix) {
+  5     size_t size = 0, written = 0;
+  6     (void) mp_radix_size(self, radix, &size);
+  7     char* buf = malloc(size + 1);
+  8     (void) mp_to_radix(self, buf, size, &written, radix);
+  9     buf[written] = 0;
+ 10     return buf;
+ 11   }
+ 12   
+ 13   mp_int* swig_charP_to_mp_int(const char* str, int radix) {
+ 14     mp_int* self = swig_mp_int_new(0);
+ 15     (void) mp_read_radix(self, str, radix);
+ 16     return self;
+ 17   }
+ 18   
+ 19   mp_int* swig_mp_int_new(mp_digit n) {
+ 20     mp_int* self = malloc(sizeof(*self));
+ 21     (void) mp_init(self);
+ 22     mp_set(self, n);
+ 23     return self;
+ 24   }
+ 25   
+ 26   void swig_mp_int_delete(mp_int* self) {
+ 27     mp_clear(self);
+ 28     free(self);
+ 29   }
+```
+
+
+### C Main : src/tommath-native.c
+
+```C
+  1   #include "libtommath/tommath.h"
+  2   
+  3   int main(int argc, char **argv) {
+  4     printf("MP_ITER %d", MP_ITER);
+  5   
+  6     mp_int a, b, c, d, e;
+  7   
+  8     mp_init_multi(&a, &b, &c, &d, &e, NULL);
+  9   
+ 10     (void) mp_set(&a, 2357111317);
+ 11     (void) mp_set(&b, 1113171923);
+ 12     (void) mp_read_radix(&e, "12343456", 16);
+ 13   
+ 14     (void) mp_mul(&a, &b, &c);
+ 15     (void) mp_mul(&c, &b, &d);
+ 16   
+ 17   #define P(N) printf("%s = ", #N); (void) mp_fwrite(&N, 10, stdout); fputc('\n', stdout);
+ 18     P(a); P(b); P(c); P(d); P(e);
+ 19     mp_clear_multi(&a, &b, &c, &d, &e, NULL);
+ 20   
+ 21     return 0;
+ 22   }
+```
+
+
+----
+
+```
+$ target/native/tommath
+MP_ITER -4a = 2357111317 
+b = 1113171923 
+c = 2623870137469952591 
+d = 2920818566629701480442302493 
+e = 305411158 
+```
+
+----
+
+### C SWIG Interface : src/tommath.i
+
+```C
+  1   %module tommath_swig
+  2   %include "stdint.i" // mp_digit typedef
+  3    // "missing sentinel in function call"
+  4   %varargs(10, mp_int *ip = NULL) mp_init_multi;
+  5   %varargs(10, mp_int *ip = NULL) mp_clear_multi;
+  6   //%rename(bool)  _bool;
+  7   //%rename(true)  _true;
+  8   //%rename(false) _false;
+  9   //%ignore bool;
+ 10   //%ignore true;
+ 11   //%ignore false;
+ 12   %{
+ 13   #include "tommath.h"
+ 14   %}
+ 15   %include "libtommath/tommath.h"
+ 16   %include "tommath.h"
+```
+
+
+### Python : src/tommath.py
+
+```Python
+  1   import tommath_swig
+  2   from tommath_swig import mp_int, mp_init, mp_clear, mp_set, mp_mul
+  3   
+  4   print({"MP_ITER": tommath_swig.MP_ITER})
+  5   
+  6   a = mp_int(); mp_set(a, 2357111317)    # <-- awkard!
+  7   b = mp_int(1113171923)                 # <-- better!
+  8   c = mp_int()
+  9   d = mp_int()
+ 10   e = mp_int("12343456", 16)             # <-- yey!
+ 11   
+ 12   print({"a": a, "b": b, "c": c, "d": d, "e": e})
+ 13   
+ 14   mp_mul(a, b, c);
+ 15   mp_mul(c, b, d);
+ 16   
+ 17   print({"a": a, "b": b, "c": c, "d": d, "e": e})
+```
+
+
+----
+
+```
+$ bin/run src/tommath.py
+{'MP_ITER': -4}
+{'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
+{'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
+```
+
+----
+
+### Output
+
+
+```
+$ target/native/tommath
+MP_ITER -4a = 2357111317 
+b = 1113171923 
+c = 2623870137469952591 
+d = 2920818566629701480442302493 
+e = 305411158 
+
+```
+
+----
+
+```
+$ bin/run src/tommath.py
+{'MP_ITER': -4}
+{'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
+{'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
+
+```
+
+----
+
 # Workflow
 
 1. Create interface files. (once)
@@ -995,6 +1230,198 @@ EXAMPLE1_VERSION = 1.2.3
 # Example Workflows
 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+
+## Workflow - example1.c 
+
+### Compile native code: 
+
+``` 
+
+# Compile native library: 
+clang -g -Isrc -Ilocal/include -c -o target/native/example1.o src/example1.c 
+
+# Compile and link native program: 
+clang -g -Isrc -Ilocal/include -o target/native/example1 src/example1-native.c  \
+  target/native/example1.o -Llocal/lib -ltommath 
+
+``` 
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+### Build python bindings 
+``` 
+
+# Generate python bindings: 
+swig -addextern -I- -Isrc -Ilocal/include -python -outdir target/python/ -o  \
+  target/python/example1_swig.c src/example1.i 
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
+
+wc -l target/python/example1_swig.c target/python/example1_swig.py 
+3650 target/python/example1_swig.c 
+65 target/python/example1_swig.py 
+3715 total 
+
+
+# Compile python bindings: 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$PYTHON_HOME/include/python3.10  \
+  -I$PYTHON_HOME/include/python3.10 -Wno-unused-result -Wsign-compare  \
+  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -pipe  \
+  -Os -Wno-deprecated-declarations -c -o target/python/example1_swig.c.o  \
+  target/python/example1_swig.c 
+
+
+# Link python dynamic library: 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/python//_example1_swig.so target/native/example1.o  \
+  target/python/example1_swig.c.o  \
+  -L$PYTHON_HOME/lib/python3.10/config-3.10-darwin -ldl -framework  \
+  CoreFoundation -Llocal/lib -ltommath 
+
+``` 
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+### Build clojure bindings 
+``` 
+
+# Generate clojure bindings: 
+swig -addextern -I- -Isrc -Ilocal/include -java -outdir target/clojure/ -o  \
+  target/clojure/example1_swig.c src/example1.i 
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
+
+wc -l target/clojure/example1_swig.c target/clojure/example1*.java 
+243 target/clojure/example1_swig.c 
+15 target/clojure/example1_swig.java 
+12 target/clojure/example1_swigConstants.java 
+13 target/clojure/example1_swigJNI.java 
+283 total 
+
+
+# Compile clojure bindings: 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$JAVA_HOME/include  \
+  -I$JAVA_HOME/include/linux -I$JAVA_HOME/include/darwin -c -o  \
+  target/clojure/example1_swig.c.o target/clojure/example1_swig.c 
+
+
+# Link clojure dynamic library: 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/clojure//libexample1_swig.jnilib target/native/example1.o  \
+  target/clojure/example1_swig.c.o -Llocal/lib -ltommath 
+
+``` 
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+### Build ruby bindings 
+``` 
+
+# Generate ruby bindings: 
+swig -addextern -I- -Isrc -Ilocal/include -ruby -outdir target/ruby/ -o  \
+  target/ruby/example1_swig.c src/example1.i 
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
+
+wc -l target/ruby/example1_swig.c 
+2257 target/ruby/example1_swig.c 
+
+
+# Compile ruby bindings: 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$RUBY_HOME/include/ruby-2.7.0  \
+  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o  \
+  target/ruby/example1_swig.c.o target/ruby/example1_swig.c 
+
+
+# Link ruby dynamic library: 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby//example1_swig.bundle target/native/example1.o  \
+  target/ruby/example1_swig.c.o -Llocal/lib -ltommath 
+
+``` 
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+### Build tcl bindings 
+``` 
+
+# Generate tcl bindings: 
+swig -addextern -I- -Isrc -Ilocal/include -tcl -outdir target/tcl/ -o  \
+  target/tcl/example1_swig.c src/example1.i 
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
+
+wc -l target/tcl/example1_swig.c 
+2149 target/tcl/example1_swig.c 
+
+
+# Compile tcl bindings: 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I/usr/include/tcl -c -o  \
+  target/tcl/example1_swig.c.o target/tcl/example1_swig.c 
+
+
+# Link tcl dynamic library: 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/tcl//example1_swig.so target/native/example1.o  \
+  target/tcl/example1_swig.c.o -Llocal/lib -ltommath 
+
+``` 
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
+### Build guile bindings 
+``` 
+
+# Generate guile bindings: 
+swig -addextern -I- -Isrc -Ilocal/include -guile -outdir target/guile/ -o  \
+  target/guile/example1_swig.c src/example1.i 
+# Code statistics: 
+wc -l src/example1.h src/example1.i 
+7 src/example1.h 
+5 src/example1.i 
+12 total 
+
+wc -l target/guile/example1_swig.c 
+1605 target/guile/example1_swig.c 
+
+
+# Compile guile bindings: 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -D_THREAD_SAFE -c -o  \
+  target/guile/example1_swig.c.o target/guile/example1_swig.c 
+
+
+# Link guile dynamic library: 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/guile//libexample1_swig.so target/native/example1.o  \
+  target/guile/example1_swig.c.o -lguile-2.2 -lgc -Llocal/lib -ltommath 
+
+``` 
+
+
+
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 
 ## Workflow - polynomial.cc 
 
@@ -1003,21 +1430,25 @@ EXAMPLE1_VERSION = 1.2.3
 ``` 
 
 # Compile native library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -c -o  \
-  target/native/polynomial.o src/polynomial.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -c -o target/native/polynomial.o src/polynomial.cc 
 
 # Compile and link native program: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o  \
-  target/native/polynomial src/polynomial-native.cc target/native/polynomial.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -o target/native/polynomial src/polynomial-native.cc  \
+  target/native/polynomial.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build python bindings 
 ``` 
 
 # Generate python bindings: 
-swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o  \
-  target/python/polynomial_swig.cc src/polynomial.i 
+swig -addextern -I- -Isrc -Ilocal/include -python -c++ -outdir target/python/  \
+  -o target/python/polynomial_swig.cc src/polynomial.i 
 # Code statistics: 
 wc -l src/polynomial.h src/polynomial.i 
 10 src/polynomial.h 
@@ -1031,28 +1462,33 @@ wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py
 
 
 # Compile python bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$PYTHON_HOME/include/python3.10 -I$PYTHON_HOME/include/python3.10  \
-  -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic  \
-  -DNDEBUG -g -fwrapv -O3 -Wall -pipe -Os -Wno-deprecated-declarations -c -o  \
-  target/python/polynomial_swig.cc.o target/python/polynomial_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$PYTHON_HOME/include/python3.10  \
+  -I$PYTHON_HOME/include/python3.10 -Wno-unused-result -Wsign-compare  \
+  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -pipe  \
+  -Os -Wno-deprecated-declarations -c -o target/python/polynomial_swig.cc.o  \
+  target/python/polynomial_swig.cc 
 
 
 # Link python dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/python//_polynomial_swig.so  \
-  target/native/polynomial.o target/python/polynomial_swig.cc.o  \
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/python//_polynomial_swig.so target/native/polynomial.o  \
+  target/python/polynomial_swig.cc.o  \
   -L$PYTHON_HOME/lib/python3.10/config-3.10-darwin -ldl -framework  \
-  CoreFoundation 
+  CoreFoundation -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build clojure bindings 
 ``` 
 
 # Generate clojure bindings: 
-swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o  \
-  target/clojure/polynomial_swig.cc src/polynomial.i 
+swig -addextern -I- -Isrc -Ilocal/include -java -c++ -outdir target/clojure/  \
+  -o target/clojure/polynomial_swig.cc src/polynomial.i 
 # Code statistics: 
 wc -l src/polynomial.h src/polynomial.i 
 10 src/polynomial.h 
@@ -1068,23 +1504,28 @@ wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java
 
 
 # Compile clojure bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -I$JAVA_HOME/include/darwin -c  \
-  -o target/clojure/polynomial_swig.cc.o target/clojure/polynomial_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
+  -I$JAVA_HOME/include/darwin -c -o target/clojure/polynomial_swig.cc.o  \
+  target/clojure/polynomial_swig.cc 
 
 
 # Link clojure dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/clojure//libpolynomial_swig.jnilib  \
-  target/native/polynomial.o target/clojure/polynomial_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/clojure//libpolynomial_swig.jnilib target/native/polynomial.o  \
+  target/clojure/polynomial_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build ruby bindings 
 ``` 
 
 # Generate ruby bindings: 
-swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -ruby -c++ -outdir target/ruby/ -o  \
   target/ruby/polynomial_swig.cc src/polynomial.i 
 # Code statistics: 
 wc -l src/polynomial.h src/polynomial.i 
@@ -1097,24 +1538,28 @@ wc -l target/ruby/polynomial_swig.cc
 
 
 # Compile ruby bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$RUBY_HOME/include/ruby-2.7.0  \
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$RUBY_HOME/include/ruby-2.7.0  \
   -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o  \
   target/ruby/polynomial_swig.cc.o target/ruby/polynomial_swig.cc 
 
 
 # Link ruby dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/ruby//polynomial_swig.bundle  \
-  target/native/polynomial.o target/ruby/polynomial_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby//polynomial_swig.bundle target/native/polynomial.o  \
+  target/ruby/polynomial_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build tcl bindings 
 ``` 
 
 # Generate tcl bindings: 
-swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -tcl -c++ -outdir target/tcl/ -o  \
   target/tcl/polynomial_swig.cc src/polynomial.i 
 # Code statistics: 
 wc -l src/polynomial.h src/polynomial.i 
@@ -1127,23 +1572,27 @@ wc -l target/tcl/polynomial_swig.cc
 
 
 # Compile tcl bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I/usr/include/tcl -c -o target/tcl/polynomial_swig.cc.o  \
-  target/tcl/polynomial_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I/usr/include/tcl -c -o  \
+  target/tcl/polynomial_swig.cc.o target/tcl/polynomial_swig.cc 
 
 
 # Link tcl dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/tcl//polynomial_swig.so  \
-  target/native/polynomial.o target/tcl/polynomial_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/tcl//polynomial_swig.so target/native/polynomial.o  \
+  target/tcl/polynomial_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build guile bindings 
 ``` 
 
 # Generate guile bindings: 
-swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -guile -c++ -outdir target/guile/ -o  \
   target/guile/polynomial_swig.cc src/polynomial.i 
 # Code statistics: 
 wc -l src/polynomial.h src/polynomial.i 
@@ -1156,20 +1605,24 @@ wc -l target/guile/polynomial_swig.cc
 
 
 # Compile guile bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -D_THREAD_SAFE -c -o target/guile/polynomial_swig.cc.o  \
-  target/guile/polynomial_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -D_THREAD_SAFE -c -o  \
+  target/guile/polynomial_swig.cc.o target/guile/polynomial_swig.cc 
 
 
 # Link guile dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/guile//libpolynomial_swig.so  \
-  target/native/polynomial.o target/guile/polynomial_swig.cc.o -lguile-2.2 -lgc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/guile//libpolynomial_swig.so target/native/polynomial.o  \
+  target/guile/polynomial_swig.cc.o -lguile-2.2 -lgc -Llocal/lib -ltommath 
 
 ``` 
 
 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 
 ## Workflow - polynomial_v2.cc 
 
@@ -1178,22 +1631,25 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
 ``` 
 
 # Compile native library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -c -o  \
-  target/native/polynomial_v2.o src/polynomial_v2.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -c -o target/native/polynomial_v2.o src/polynomial_v2.cc 
 
 # Compile and link native program: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o  \
-  target/native/polynomial_v2 src/polynomial_v2-native.cc  \
-  target/native/polynomial_v2.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -o target/native/polynomial_v2 src/polynomial_v2-native.cc  \
+  target/native/polynomial_v2.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build python bindings 
 ``` 
 
 # Generate python bindings: 
-swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o  \
-  target/python/polynomial_v2_swig.cc src/polynomial_v2.i 
+swig -addextern -I- -Isrc -Ilocal/include -python -c++ -outdir target/python/  \
+  -o target/python/polynomial_v2_swig.cc src/polynomial_v2.i 
 # Code statistics: 
 wc -l src/polynomial_v2.h src/polynomial_v2.i 
 13 src/polynomial_v2.h 
@@ -1207,28 +1663,33 @@ wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py
 
 
 # Compile python bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$PYTHON_HOME/include/python3.10 -I$PYTHON_HOME/include/python3.10  \
-  -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic  \
-  -DNDEBUG -g -fwrapv -O3 -Wall -pipe -Os -Wno-deprecated-declarations -c -o  \
-  target/python/polynomial_v2_swig.cc.o target/python/polynomial_v2_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$PYTHON_HOME/include/python3.10  \
+  -I$PYTHON_HOME/include/python3.10 -Wno-unused-result -Wsign-compare  \
+  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -pipe  \
+  -Os -Wno-deprecated-declarations -c -o target/python/polynomial_v2_swig.cc.o  \
+  target/python/polynomial_v2_swig.cc 
 
 
 # Link python dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/python//_polynomial_v2_swig.so  \
-  target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o  \
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/python//_polynomial_v2_swig.so target/native/polynomial_v2.o  \
+  target/python/polynomial_v2_swig.cc.o  \
   -L$PYTHON_HOME/lib/python3.10/config-3.10-darwin -ldl -framework  \
-  CoreFoundation 
+  CoreFoundation -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build clojure bindings 
 ``` 
 
 # Generate clojure bindings: 
-swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o  \
-  target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i 
+swig -addextern -I- -Isrc -Ilocal/include -java -c++ -outdir target/clojure/  \
+  -o target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i 
 src/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to a  \
   valid identifier. 
 src/rational.h:26: Warning 503: Can't wrap 'operator *' unless renamed to a  \
@@ -1250,23 +1711,28 @@ wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java
 
 
 # Compile clojure bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -I$JAVA_HOME/include/darwin -c  \
-  -o target/clojure/polynomial_v2_swig.cc.o target/clojure/polynomial_v2_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
+  -I$JAVA_HOME/include/darwin -c -o target/clojure/polynomial_v2_swig.cc.o  \
+  target/clojure/polynomial_v2_swig.cc 
 
 
 # Link clojure dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/clojure//libpolynomial_v2_swig.jnilib  \
-  target/native/polynomial_v2.o target/clojure/polynomial_v2_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/clojure//libpolynomial_v2_swig.jnilib target/native/polynomial_v2.o  \
+  target/clojure/polynomial_v2_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build ruby bindings 
 ``` 
 
 # Generate ruby bindings: 
-swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -ruby -c++ -outdir target/ruby/ -o  \
   target/ruby/polynomial_v2_swig.cc src/polynomial_v2.i 
 # Code statistics: 
 wc -l src/polynomial_v2.h src/polynomial_v2.i 
@@ -1279,24 +1745,28 @@ wc -l target/ruby/polynomial_v2_swig.cc
 
 
 # Compile ruby bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I$RUBY_HOME/include/ruby-2.7.0  \
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I$RUBY_HOME/include/ruby-2.7.0  \
   -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o  \
   target/ruby/polynomial_v2_swig.cc.o target/ruby/polynomial_v2_swig.cc 
 
 
 # Link ruby dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/ruby//polynomial_v2_swig.bundle  \
-  target/native/polynomial_v2.o target/ruby/polynomial_v2_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby//polynomial_v2_swig.bundle target/native/polynomial_v2.o  \
+  target/ruby/polynomial_v2_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build tcl bindings 
 ``` 
 
 # Generate tcl bindings: 
-swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -tcl -c++ -outdir target/tcl/ -o  \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i 
 src/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to a  \
   valid identifier. 
@@ -1311,23 +1781,27 @@ wc -l target/tcl/polynomial_v2_swig.cc
 
 
 # Compile tcl bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -I/usr/include/tcl -c -o target/tcl/polynomial_v2_swig.cc.o  \
-  target/tcl/polynomial_v2_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -I/usr/include/tcl -c -o  \
+  target/tcl/polynomial_v2_swig.cc.o target/tcl/polynomial_v2_swig.cc 
 
 
 # Link tcl dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/tcl//polynomial_v2_swig.so  \
-  target/native/polynomial_v2.o target/tcl/polynomial_v2_swig.cc.o 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/tcl//polynomial_v2_swig.so target/native/polynomial_v2.o  \
+  target/tcl/polynomial_v2_swig.cc.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build guile bindings 
 ``` 
 
 # Generate guile bindings: 
-swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o  \
+swig -addextern -I- -Isrc -Ilocal/include -guile -c++ -outdir target/guile/ -o  \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i 
 src/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to a  \
   valid identifier. 
@@ -1346,187 +1820,185 @@ wc -l target/guile/polynomial_v2_swig.cc
 
 
 # Compile guile bindings: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17  \
-  -D_THREAD_SAFE -c -o target/guile/polynomial_v2_swig.cc.o  \
-  target/guile/polynomial_v2_swig.cc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -Wno-sentinel -D_THREAD_SAFE -c -o  \
+  target/guile/polynomial_v2_swig.cc.o target/guile/polynomial_v2_swig.cc 
 
 
 # Link guile dynamic library: 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib  \
-  -Wl,-undefined,dynamic_lookup -o target/guile//libpolynomial_v2_swig.so  \
-  target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o -lguile-2.2  \
-  -lgc 
+clang++ -g -Isrc -Ilocal/include -Wno-c++11-extensions -stdlib=libc++  \
+  -std=c++17 -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/guile//libpolynomial_v2_swig.so target/native/polynomial_v2.o  \
+  target/guile/polynomial_v2_swig.cc.o -lguile-2.2 -lgc -Llocal/lib -ltommath 
 
 ``` 
 
 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 
-## Workflow - example1.c 
+## Workflow - tommath.c 
 
 ### Compile native code: 
 
 ``` 
 
 # Compile native library: 
-clang -g -Isrc -c -o target/native/example1.o src/example1.c 
+clang -g -Isrc -Ilocal/include -c -o target/native/tommath.o src/tommath.c 
 
 # Compile and link native program: 
-clang -g -Isrc -o target/native/example1 src/example1-native.c  \
-  target/native/example1.o 
+clang -g -Isrc -Ilocal/include -o target/native/tommath src/tommath-native.c  \
+  target/native/tommath.o -Llocal/lib -ltommath 
+src/tommath-native.c:8:3: warning: ignoring return value of function declared  \
+  with 'warn_unused_result' attribute [-Wunused-result] 
+mp_init_multi(&a, &b, &c, &d, &e, NULL); 
+^~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~ 
+1 warning generated. 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build python bindings 
 ``` 
 
 # Generate python bindings: 
-swig -addextern -I- -Isrc -python -outdir target/python/ -o  \
-  target/python/example1_swig.c src/example1.i 
+swig -addextern -I- -Isrc -Ilocal/include -python -outdir target/python/ -o  \
+  target/python/tommath_swig.c src/tommath.i 
 # Code statistics: 
-wc -l src/example1.h src/example1.i 
-7 src/example1.h 
-5 src/example1.i 
-12 total 
+wc -l src/tommath.h src/tommath.i 
+68 src/tommath.h 
+16 src/tommath.i 
+84 total 
 
-wc -l target/python/example1_swig.c target/python/example1_swig.py 
-3650 target/python/example1_swig.c 
-65 target/python/example1_swig.py 
-3715 total 
+wc -l target/python/tommath_swig.c target/python/tommath_swig.py 
+9192 target/python/tommath_swig.c 
+477 target/python/tommath_swig.py 
+9669 total 
 
 
 # Compile python bindings: 
-clang -g -Isrc -I$PYTHON_HOME/include/python3.10  \
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$PYTHON_HOME/include/python3.10  \
   -I$PYTHON_HOME/include/python3.10 -Wno-unused-result -Wsign-compare  \
   -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -pipe  \
-  -Os -Wno-deprecated-declarations -c -o target/python/example1_swig.c.o  \
-  target/python/example1_swig.c 
+  -Os -Wno-deprecated-declarations -c -o target/python/tommath_swig.c.o  \
+  target/python/tommath_swig.c 
 
 
 # Link python dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/python//_example1_swig.so target/native/example1.o  \
-  target/python/example1_swig.c.o  \
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/python//_tommath_swig.so target/native/tommath.o  \
+  target/python/tommath_swig.c.o  \
   -L$PYTHON_HOME/lib/python3.10/config-3.10-darwin -ldl -framework  \
-  CoreFoundation 
+  CoreFoundation -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build clojure bindings 
 ``` 
 
 # Generate clojure bindings: 
-swig -addextern -I- -Isrc -java -outdir target/clojure/ -o  \
-  target/clojure/example1_swig.c src/example1.i 
+swig -addextern -I- -Isrc -Ilocal/include -java -outdir target/clojure/ -o  \
+  target/clojure/tommath_swig.c src/tommath.i 
 # Code statistics: 
-wc -l src/example1.h src/example1.i 
-7 src/example1.h 
-5 src/example1.i 
-12 total 
+wc -l src/tommath.h src/tommath.i 
+68 src/tommath.h 
+16 src/tommath.i 
+84 total 
 
-wc -l target/clojure/example1_swig.c target/clojure/example1*.java 
-243 target/clojure/example1_swig.c 
-15 target/clojure/example1_swig.java 
-12 target/clojure/example1_swigConstants.java 
-13 target/clojure/example1_swigJNI.java 
-283 total 
+wc -l target/clojure/tommath_swig.c target/clojure/tommath*.java 
+3150 target/clojure/tommath_swig.c 
+541 target/clojure/tommath_swig.java 
+17 target/clojure/tommath_swigConstants.java 
+179 target/clojure/tommath_swigJNI.java 
+3887 total 
 
 
 # Compile clojure bindings: 
-clang -g -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/linux  \
-  -I$JAVA_HOME/include/darwin -c -o target/clojure/example1_swig.c.o  \
-  target/clojure/example1_swig.c 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$JAVA_HOME/include  \
+  -I$JAVA_HOME/include/linux -I$JAVA_HOME/include/darwin -c -o  \
+  target/clojure/tommath_swig.c.o target/clojure/tommath_swig.c 
 
 
 # Link clojure dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/clojure//libexample1_swig.jnilib target/native/example1.o  \
-  target/clojure/example1_swig.c.o 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/clojure//libtommath_swig.jnilib target/native/tommath.o  \
+  target/clojure/tommath_swig.c.o -Llocal/lib -ltommath 
 
 ``` 
 
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build ruby bindings 
 ``` 
 
 # Generate ruby bindings: 
-swig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o  \
-  target/ruby/example1_swig.c src/example1.i 
+swig -addextern -I- -Isrc -Ilocal/include -ruby -outdir target/ruby/ -o  \
+  target/ruby/tommath_swig.c src/tommath.i 
+src/tommath.h:6: Warning 314: 'true' is a ruby keyword, renaming to 'C_true' 
+src/tommath.h:7: Warning 314: 'false' is a ruby keyword, renaming to 'C_false' 
+local/include/libtommath/tommath.h:175: Warning 801: Wrong class name  \
+  (corrected to `Mp_int') 
+local/include/libtommath/tommath.h:175: Warning 801: Wrong class name  \
+  (corrected to `Mp_int') 
 # Code statistics: 
-wc -l src/example1.h src/example1.i 
-7 src/example1.h 
-5 src/example1.i 
-12 total 
+wc -l src/tommath.h src/tommath.i 
+68 src/tommath.h 
+16 src/tommath.i 
+84 total 
 
-wc -l target/ruby/example1_swig.c 
-2257 target/ruby/example1_swig.c 
+wc -l target/ruby/tommath_swig.c 
+7841 target/ruby/tommath_swig.c 
 
 
 # Compile ruby bindings: 
-clang -g -Isrc -I$RUBY_HOME/include/ruby-2.7.0  \
+clang -g -Isrc -Ilocal/include -Wno-sentinel -I$RUBY_HOME/include/ruby-2.7.0  \
   -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o  \
-  target/ruby/example1_swig.c.o target/ruby/example1_swig.c 
+  target/ruby/tommath_swig.c.o target/ruby/tommath_swig.c 
 
 
 # Link ruby dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/ruby//example1_swig.bundle target/native/example1.o  \
-  target/ruby/example1_swig.c.o 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/ruby//tommath_swig.bundle target/native/tommath.o  \
+  target/ruby/tommath_swig.c.o -Llocal/lib -ltommath 
 
 ``` 
 
-### Build tcl bindings 
-``` 
-
-# Generate tcl bindings: 
-swig -addextern -I- -Isrc -tcl -outdir target/tcl/ -o  \
-  target/tcl/example1_swig.c src/example1.i 
-# Code statistics: 
-wc -l src/example1.h src/example1.i 
-7 src/example1.h 
-5 src/example1.i 
-12 total 
-
-wc -l target/tcl/example1_swig.c 
-2149 target/tcl/example1_swig.c 
-
-
-# Compile tcl bindings: 
-clang -g -Isrc -I/usr/include/tcl -c -o target/tcl/example1_swig.c.o  \
-  target/tcl/example1_swig.c 
-
-
-# Link tcl dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/tcl//example1_swig.so target/native/example1.o  \
-  target/tcl/example1_swig.c.o 
-
-``` 
-
+mkdir -p $HOME/src/dev/opt/swig-101/local/src  \
+  $HOME/src/dev/opt/swig-101/local/lib $HOME/src/dev/opt/swig-101/local/include  \
+  $HOME/src/dev/opt/swig-101/local/bin 
 ### Build guile bindings 
 ``` 
 
 # Generate guile bindings: 
-swig -addextern -I- -Isrc -guile -outdir target/guile/ -o  \
-  target/guile/example1_swig.c src/example1.i 
+swig -addextern -I- -Isrc -Ilocal/include -guile -outdir target/guile/ -o  \
+  target/guile/tommath_swig.c src/tommath.i 
 # Code statistics: 
-wc -l src/example1.h src/example1.i 
-7 src/example1.h 
-5 src/example1.i 
-12 total 
+wc -l src/tommath.h src/tommath.i 
+68 src/tommath.h 
+16 src/tommath.i 
+84 total 
 
-wc -l target/guile/example1_swig.c 
-1605 target/guile/example1_swig.c 
+wc -l target/guile/tommath_swig.c 
+6408 target/guile/tommath_swig.c 
 
 
 # Compile guile bindings: 
-clang -g -Isrc -D_THREAD_SAFE -c -o target/guile/example1_swig.c.o  \
-  target/guile/example1_swig.c 
+clang -g -Isrc -Ilocal/include -Wno-sentinel -D_THREAD_SAFE -c -o  \
+  target/guile/tommath_swig.c.o target/guile/tommath_swig.c 
 
 
 # Link guile dynamic library: 
-clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
-  target/guile//libexample1_swig.so target/native/example1.o  \
-  target/guile/example1_swig.c.o -lguile-2.2 -lgc 
+clang -g -Isrc -Ilocal/include -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
+  target/guile//libtommath_swig.so target/native/tommath.o  \
+  target/guile/tommath_swig.c.o -lguile-2.2 -lgc -Llocal/lib -ltommath 
 
 ``` 
 
@@ -1550,14 +2022,10 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 * rbenv install 2.7.1
 * Install JVM 11.0
 * Install clojure + clojure-tools
-* Build swig from source:
+* Install Prerequisites below.
+* Build local tools.
 
-```
-$ cd ..
-$ git clone https://github.com/swig/swig.git
-$ cd swig
-$ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
-```
+## Prerequisites
 
 ### Debian (Ubuntu 18.04+)
 
@@ -1569,6 +2037,12 @@ $ ./autogen.sh && ./configure --prefix="$HOME/local" && make && make install
 
 * Install macports
 * Run `bin/build macports-prereq`
+
+### Local tools
+
+```
+$ bin/build local-tools
+```
 
 ## Build
 
