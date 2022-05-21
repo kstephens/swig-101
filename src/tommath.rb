@@ -11,6 +11,8 @@ c = Mp_int.new()
 d = Mp_int.new()
 e = Mp_int.new("12343456", 16)             # <-- yey!
 
+puts({"a": a, "b": b, "c": c, "d": d, "e": e})
+
 mp_mul(a, b, c);
 mp_mul(c, b, d);
 

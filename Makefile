@@ -314,10 +314,13 @@ demo-run:
 	$(SILENT)set -e ;\
 	for example in $(basename $(EXAMPLES)) ;\
 	do \
-	   (set -x; $(RUN) target/native/$$example) ;\
+	   (set -x; $(RUN) target/native/"$$example") ;\
 	   for suffix in $(TARGET_SUFFIXES) ;\
 	   do \
-	     [ -f src/$$example.$$suffix ] && (set -x; $(RUN) src/$$example.$$suffix) ;\
+	     for prog in src/"$$example"*."$$suffix" ;\
+	     do \
+	       [ -f "$$prog" ] && (set -x; $(RUN) "$$prog") ;\
+	     done \
 	   done \
 	done
 
