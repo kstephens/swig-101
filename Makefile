@@ -15,6 +15,7 @@ SWIG_CFLAGS+=-Wno-sentinel
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 UNAME_S:=$(shell uname -s)
+#ROOT_DIR:=$(shell /bin/pwd)
 SILENT=@
 
 ############################
@@ -372,7 +373,7 @@ clean-example:
 
 #################################
 
-LOCAL:=$(shell /bin/pwd)/local
+LOCAL:=$(ROOT_DIR)/local
 
 local-tools: swig libtommath
 

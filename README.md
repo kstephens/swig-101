@@ -949,72 +949,63 @@ $ bin/run src/polynomial_v2.clj
 ```C
   1   #include <stddef.h>
   2   #include <stdint.h>
-  3   // #include <stdbool.h> // C99
-  4   #ifndef bool
-  5   #define bool   _Bool
-  6   #define true   1
-  7   #define false  0
-  8   #endif
-  9   #include "libtommath/tommath.h"
- 10   
- 11   /*********************************************************************
- 12    * Convert mp_int <-> string
- 13    */
- 14   
- 15   char*    swig_mp_int_to_charP(mp_int* self, int radix);
- 16   mp_int*  swig_charP_to_mp_int(const char* str, int radix);
- 17   
- 18   #if SWIG
- 19   %extend mp_int {
- 20     char* __str__(int radix = 10) {
- 21       return swig_mp_int_to_charP(self, radix);
- 22     }
- 23     char* __repr__(int radix = 10) {
- 24       char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
- 25       if ( radix == 10 )
- 26         asprintf(&repr, "mp_int(\"%s\")", str);
- 27       else
- 28         asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);
- 29       return free(str), repr;
- 30     }
- 31   }
- 32   #endif
- 33   
- 34   /*********************************************************************
- 35    * Memory Management
- 36   
- 37   tommath `mp_int` internal memory is managed by:
- 38   
- 39   * mp_init(mp_int*)
- 40   * mp_clear(mp_int*)
- 41   
- 42   tommath expects these functions to be called
- 43   before and after using a mp_int value, respectively.
+  3   #include "bool.h"
+  4   #include "libtommath/tommath.h"
+  5   
+  6   /*********************************************************************
+  7    * Convert mp_int <-> string
+  8    */
+  9   
+ 10   char*    swig_mp_int_to_charP(mp_int* self, int radix);
+ 11   mp_int*  swig_charP_to_mp_int(const char* str, int radix);
+ 12   char*    swig_mp_int_rep(mp_int* self, int radix);
+ 13   
+ 14   #if SWIG
+ 15   %extend mp_int {
+ 16     char* __str__(int radix = 10) {
+ 17       return swig_mp_int_to_charP(self, radix);
+ 18     }
+ 19     char* __repr__(int radix = 10) {
+ 20       return swig_mp_int_rep(self, radix);
+ 21     }
+ 22   }
+ 23   #endif
+ 24   
+ 25   /*********************************************************************
+ 26    * Memory Management
+ 27   
+ 28   tommath `mp_int` internal memory is managed by:
+ 29   
+ 30   * mp_init(mp_int*)
+ 31   * mp_clear(mp_int*)
+ 32   
+ 33   tommath expects these functions to be called
+ 34   before and after using a mp_int value, respectively.
+ 35   
+ 36    */
+ 37   mp_int*  swig_mp_int_new(mp_digit n);
+ 38   void     swig_mp_int_delete(mp_int* self);
+ 39   
+ 40   #if SWIG
+ 41   /***********************************************
+ 42   
+ 43   SWIG wraps `struct mp_int` values with pointer `malloc(sizeof(mp_int))`.
  44   
- 45    */
- 46   mp_int*  swig_mp_int_new(mp_digit n);
- 47   void     swig_mp_int_delete(mp_int* self);
- 48   
- 49   #if SWIG
- 50   /***********************************************
- 51   
- 52   SWIG wraps `struct mp_int` values with pointer `malloc(sizeof(mp_int))`.
- 53   
- 54   `%extend mp_int` defines constructors and destructors for `mp_int`.
- 55   
- 56   */
- 57   %extend mp_int {
- 58     mp_int(mp_digit n = 0) {
- 59       return swig_mp_int_new(n);
- 60     }
- 61     mp_int(const char *str, int radix = 10) {
- 62       return swig_charP_to_mp_int(str, radix);
- 63     }
- 64     ~mp_int() {
- 65       swig_mp_int_delete(self);
- 66     }
- 67   }
- 68   #endif
+ 45   `%extend mp_int` defines constructors and destructors for `mp_int`.
+ 46   
+ 47   */
+ 48   %extend mp_int {
+ 49     mp_int(mp_digit n = 0) {
+ 50       return swig_mp_int_new(n);
+ 51     }
+ 52     mp_int(const char *str, int radix = 10) {
+ 53       return swig_charP_to_mp_int(str, radix);
+ 54     }
+ 55     ~mp_int() {
+ 56       swig_mp_int_delete(self);
+ 57     }
+ 58   }
+ 59   #endif
 ```
 
 
@@ -1024,32 +1015,43 @@ $ bin/run src/polynomial_v2.clj
   1   #include "tommath.h"
   2   #include <stdlib.h>
   3   
-  4   char* swig_mp_int_to_charP(mp_int* self, int radix) {
-  5     size_t size = 0, written = 0;
-  6     (void) mp_radix_size(self, radix, &size);
-  7     char* buf = malloc(size + 1);
-  8     (void) mp_to_radix(self, buf, size, &written, radix);
-  9     buf[written] = 0;
- 10     return buf;
- 11   }
- 12   
- 13   mp_int* swig_charP_to_mp_int(const char* str, int radix) {
- 14     mp_int* self = swig_mp_int_new(0);
- 15     (void) mp_read_radix(self, str, radix);
- 16     return self;
- 17   }
- 18   
- 19   mp_int* swig_mp_int_new(mp_digit n) {
- 20     mp_int* self = malloc(sizeof(*self));
- 21     (void) mp_init(self);
- 22     mp_set(self, n);
- 23     return self;
- 24   }
- 25   
- 26   void swig_mp_int_delete(mp_int* self) {
- 27     mp_clear(self);
- 28     free(self);
- 29   }
+  4   /* swig <-> mp_int helpers */
+  5   
+  6   char* swig_mp_int_to_charP(mp_int* self, int radix) {
+  7     size_t size = 0, written = 0;
+  8     (void) mp_radix_size(self, radix, &size);
+  9     char* buf = malloc(size + 1);
+ 10     (void) mp_to_radix(self, buf, size, &written, radix);
+ 11     buf[written] = 0;
+ 12     return buf;
+ 13   }
+ 14   
+ 15   char* swig_mp_int_rep(mp_int* self, int radix) {
+ 16     char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
+ 17     if ( radix == 10 )
+ 18       asprintf(&repr, "mp_int(\"%s\")", str);
+ 19     else
+ 20       asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);
+ 21     return free(str), repr;
+ 22   }
+ 23   
+ 24   mp_int* swig_charP_to_mp_int(const char* str, int radix) {
+ 25     mp_int* self = swig_mp_int_new(0);
+ 26     (void) mp_read_radix(self, str, radix);
+ 27     return self;
+ 28   }
+ 29   
+ 30   mp_int* swig_mp_int_new(mp_digit n) {
+ 31     mp_int* self = malloc(sizeof(*self));
+ 32     (void) mp_init(self);
+ 33     mp_set(self, n);
+ 34     return self;
+ 35   }
+ 36   
+ 37   void swig_mp_int_delete(mp_int* self) {
+ 38     mp_clear(self);
+ 39     free(self);
+ 40   }
 ```
 
 
