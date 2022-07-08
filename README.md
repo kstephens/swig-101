@@ -557,7 +557,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 146e08230>
+#<swig-pointer std::vector< double > * 154804080>
 17.3020736
 ```
 
@@ -584,7 +584,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a04d003601000000_p_std__vectorT_double_t
+_2048f04101000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -669,7 +669,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 146e08230>
+#<swig-pointer std::vector< double > * 154804080>
 17.3020736
 
 ```
@@ -679,7 +679,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a04d003601000000_p_std__vectorT_double_t
+_2048f04101000000_p_std__vectorT_double_t
 17.3020736
 
 ```
