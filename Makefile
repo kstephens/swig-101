@@ -53,20 +53,12 @@ ifeq "$(UNAME_S)" "Linux"
 endif
 ifeq "$(UNAME_S)" "Darwin"
   # OSX macports
-  INC_DIRS      += -I/opt/local/include
-  LIB_DIRS      += -L/opt/local/lib
+  #INC_DIRS      += -I/opt/local/include
+  #LIB_DIRS      += -L/opt/local/lib
 
   # OSX brew
   INC_DIRS      += -I/opt/homebrew/include
   LIB_DIRS      += -L/opt/homebrew/lib
-
-  INC_DIRS      += -I/opt/homebrew/opt/tcl-tk/include
-  LIB_DIRS      += -L/opt/homebrew/opt/tcl-tk/lib
-
-  INC_DIRS      += -I/opt/homebrew/opt/python@3.10/include
-  LIB_DIRS      += -L/opt/homebrew/opt/python@3.10/lib
-
-  INC_DIRS      += -I/opt/homebrew/opt/openjdk/include
 
   CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
   SWIG_SO_SUFFIX_ruby:=.bundle
@@ -382,7 +374,7 @@ tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.
 	$(MAKE) clean
 	mkdir -p tmp
 	erb $< > $@
-README.md.html : README.md
+# README.md.html : README.md
 
 #################################
 
