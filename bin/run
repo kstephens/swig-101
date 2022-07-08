@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export ROOT_DIR
+: "${ROOT_DIR:=$(/bin/pwd)}"
+
 bin_dirs=(
   /opt/local/libexec/gnubin
   /opt/homebrew/opt/*/libexec/gnubin

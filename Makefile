@@ -401,9 +401,8 @@ local-dirs:
 
 swig : local-dirs $(LOCAL)/bin/swig
 
-$(LOCAL)/bin/swig :
+$(LOCAL)/bin/swig : $(LOCAL)/src/swig
 	@set -xe ;\
-	git clone https://github.com/swig/swig.git $(LOCAL)/src/swig ;\
 	cd $(LOCAL)/src/swig ;\
 	git checkout 6939d91e4c6ea ;\
 	pcre2_version='pcre2-10.39' ;\
@@ -414,13 +413,15 @@ $(LOCAL)/bin/swig :
 	make -j ;\
 	make install
 
+$(LOCAL)/src/swig :
+	git clone https://github.com/swig/swig.git $@
+
 #################################
 
 libtommath : local-dirs $(LOCAL)/lib/libtommath.a
 
-$(LOCAL)/lib/libtommath.a :
+$(LOCAL)/lib/libtommath.a : $(LOCAL)/src/libtommath
 	@set -xe ;\
-	git clone https://github.com/libtom/libtommath.git $(LOCAL)/src/libtommath ;\
 	cd $(LOCAL)/src/libtommath ;\
 	git checkout 4b473685013 ;\
 	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
@@ -430,3 +431,6 @@ $(LOCAL)/lib/libtommath.a :
 	make -j ;\
 	cp -p $(LOCAL)/src/libtommath/build/libtommath.a $@ ;\
 	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
+
+$(LOCAL)/src/libtommath:
+	git clone https://github.com/libtom/libtommath.git $@
