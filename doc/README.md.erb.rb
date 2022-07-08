@@ -70,15 +70,31 @@ def dedup_empty_lines(lines)
   result
 end
 
-def line_numbers! lines
-  lines.map!.with_index(1) {|line, i| "%3d   %s" % [i, line] }
+def line_numbers! lines, lang
+  com_beg, com_end = comment_for_lang(lang)
+  max_width = [lines.map(&:size).max, 70].max
+  fmt = "%%-%ds  %s %%2d %s" % [max_width, com_beg, com_end]
+  lines.map!.with_index(1) {|line, i| fmt % [line, i] }
 end
 
-def code_lines s
+def comment_for_lang lang
+  case lang.to_s.downcase
+  when /^c/
+    %w(//) # %w(/* */)
+  when /lisp|scheme|scm|clojure|clj/i
+    %w(;;)
+  when /py|tcl|shell|sh|ruby|rb/i
+    %w(#)
+  else
+    %w(#)
+  end
+end
+
+def code_lines s, lang
   lines = string_to_lines(s)
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
-  line_numbers!(lines)
+  line_numbers!(lines, lang)
   lines_to_string(lines)
 end
 
@@ -194,7 +210,7 @@ Python                  | #{basename}.py       |   |
 Clojure (Java)          | #{basename}.clj      |   | Lisp
 Ruby                    | #{basename}.rb       |   |
 Guile                   | #{basename}.scm      |   | Scheme
-TCL                     | #{basename}.tcl      |   | Bash
+TCL                     | #{basename}.tcl      |   | Shell
 Python Tests            | #{basename}-test.py  | python3.10 -m pytest src/#{basename}-test.py |
 END
   e[:targets] =
@@ -204,8 +220,9 @@ END
       $context = t
       t[:name] = t[:file]
       t[:lang] ||= t[:type].split(/\s+/).first
+      t[:code_style] ||= t[:lang].downcase
       t[:file] = "src/#{t[:file]}"
-      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]))
+      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]), t[:lang])
       case t[:cmd]
       when '-'
       when nil
