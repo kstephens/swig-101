@@ -203,24 +203,6 @@ endif
 
 #################################
 
-NATIVE_SRCS = \
-  src/$(EXAMPLE) \
-  src/$(EXAMPLE_NAME).h
-
-NATIVE_DEPS = \
-  target/native/$(EXAMPLE_NAME).o \
-  target/native/$(EXAMPLE_NAME)
-
-TARGET_SWIG=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)$(EXAMPLE_SUFFIX)
-TARGET_SWIG_O=$(TARGET_SWIG).o
-TARGET_SWIG_SO=$(dir $(TARGET_SWIG_O))/$(SWIG_SO_PREFIX)$(EXAMPLE_SWIG)$(SWIG_SO_SUFFIX)
-TARGET_DEPS:= \
-	$(TARGET_SWIG) \
-	$(TARGET_SWIG_O) \
-	$(TARGET_SWIG_SO)
-
-#############################
-
 ifeq "$(EXAMPLE_NAME)" "polynomial"
 ifeq "$(UNAME_S)" "Linux"
 # target/ruby/polynomial.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
@@ -243,6 +225,29 @@ endif
 
 #################################
 
+NATIVE_SRCS = \
+  src/$(EXAMPLE) \
+  src/$(EXAMPLE_NAME).h
+
+NATIVE_DEPS = \
+  target/native/$(EXAMPLE_NAME).o \
+  target/native/$(EXAMPLE_NAME)
+
+TARGET_SWIG=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)$(EXAMPLE_SUFFIX)
+TARGET_SWIG_O=$(TARGET_SWIG).o
+TARGET_SWIG_SO=$(dir $(TARGET_SWIG_O))/$(SWIG_SO_PREFIX)$(EXAMPLE_SWIG)$(SWIG_SO_SUFFIX)
+TARGET_DEPS:= \
+	$(TARGET_SWIG) \
+	$(TARGET_SWIG_O) \
+	$(TARGET_SWIG_SO)
+
+native-srcs: $(NATIVE_SRCS)
+native-deps: $(NATIVE_DEPS)
+target-deps: $(TARGET_DEPS)
+.PHONY: native-srcs native-deps target-deps
+
+#################################
+
 build-examples:
 	$(SILENT)set -e; for e in $(EXAMPLES) ;\
 	do \
@@ -253,16 +258,22 @@ build-example: early build-example-begin build-native build-targets build-exampl
 
 build-example-begin:
 	$(SILENT)echo "\n## Workflow - $(EXAMPLE) \n"
+	$(SILENT)echo ""
 
 build-example-end:
+#	$(SILENT)echo "\`\`\`\n"
+	$(SILENT)echo ""
+
+.PHONY: build-examples build-example build-example-begin build-example-end
 
 #################################
 
-build-native: early build-native-begin $(NATIVE_DEPS) build-native-end
+build-native: early build-native-begin native-deps build-native-end
 
 build-native-begin:
-	$(SILENT)echo "### Compile native code:\n"
-	$(SILENT)echo "\`\`\`\n"
+	$(SILENT)echo "### Compile Native Code"
+	$(SILENT)echo ""
+	$(SILENT)echo "\`\`\`"
 
 target/native/$(EXAMPLE_NAME).o : $(NATIVE_SRCS)
 	$(SILENT)echo "# Compile native library:"
@@ -276,7 +287,10 @@ target/native/$(EXAMPLE_NAME) : src/$(EXAMPLE_NAME)-native$(suffix $(EXAMPLE)) t
 	$(SILENT)echo ""
 
 build-native-end:
-	$(SILENT)echo "\`\`\`\n"
+	$(SILENT)echo "\`\`\`"
+	$(SILENT)echo ""
+
+.PHONY: build-native build-native-begin build-native-end
 
 #################################
 
@@ -287,21 +301,28 @@ build-targets:
 	  $(MAKE) build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
 	done
 
-build-target: early build-target-begin $(TARGET_DEPS) build-target-end
+build-target: early build-target-begin target-deps build-target-end
 
 build-target-begin:
-	$(SILENT)echo "### Build $(SWIG_TARGET) bindings\n\`\`\`\n"
+	$(SILENT)echo "### Build $(SWIG_TARGET) Bindings"
+	$(SILENT)echo ""
+	$(SILENT)echo "\`\`\`"
 
 build-target-end:
-	$(SILENT)echo "\`\`\`\n"
+	$(SILENT)echo "\`\`\`"
+	$(SILENT)echo ""
+
+.PHONY: build-targets build-target build-target-begin build-target-end
 
 $(TARGET_SWIG) : src/$(EXAMPLE_NAME).i $(NATIVE_SRCS)
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)echo "# Generate $(SWIG_TARGET) bindings:"
 	$(SWIG_EXE) $(SWIG_OPTS) -outdir $(dir $@) -o $@ src/$(EXAMPLE_NAME).i
-	$(SILENT)echo "# Code statistics:"
+	$(SILENT)echo ''
+	$(SILENT)echo "# Source code statistics:"
 	wc -l src/$(EXAMPLE_NAME).h src/$(EXAMPLE_NAME).i
 	$(SILENT)echo ''
+	$(SILENT)echo "# Generated code statistics:"
 	wc -l $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
 	$(SILENT)echo ''
 #	grep -siH $(EXAMPLE_NAME) $@ $(SWIG_GENERATED_FILES_$(SWIG_TARGET))
@@ -310,13 +331,13 @@ $(TARGET_SWIG) : src/$(EXAMPLE_NAME).i $(NATIVE_SRCS)
 
 $(TARGET_SWIG_O) : $(TARGET_SWIG)
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)echo "\n# Compile $(SWIG_TARGET) bindings:"
+	$(SILENT)echo "# Compile $(SWIG_TARGET) bindings:"
 	$(CC) $(CFLAGS) $(SWIG_CFLAGS) -c -o $@ $<
 	$(SILENT)echo ""
 
 $(TARGET_SWIG_SO) : $(TARGET_SWIG_O)
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)echo "\n# Link $(SWIG_TARGET) dynamic library:"
+	$(SILENT)echo "# Link $(SWIG_TARGET) dynamic library:"
 	$(CC) $(CFLAGS) $(CFLAGS_SO) -o $@ target/native/$(EXAMPLE_NAME).o $< $(SWIG_LDFLAGS) $(LDFLAGS)
 	$(SILENT)echo ""
 
@@ -357,10 +378,11 @@ debian-prereq:
 
 README.md : tmp/README.md 
 	cp tmp/$@ $@
-tmp/README.md: doc/README.md.erb doc/*.* src/*.* Makefile
+tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
 	erb $< > $@
+README.md.html : README.md
 
 #################################
 

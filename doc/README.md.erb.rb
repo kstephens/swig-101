@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # Prevent accidental Makefile recursion:
 exit! if ENV['_SWIG_101_README_MD']
@@ -11,8 +12,8 @@ $msg = $verbose # || true
 $context = nil
 
 def msg *args
-  if $msg
-    $stderr.puts "\n  !!! #{$$} : README.md.erb : #{args * ' '}"
+  if $msg # || true
+    $stderr.puts "\n  !!! #{$$} : README.md.erb.rb : #{args * ' '}"
   end
 end
 
@@ -33,6 +34,7 @@ def cmd cmd
   ok = $?.success?
   # puts File.read("tmp/cmd.out")
   out = File.read("tmp/cmd.out")
+  out = lines_to_string(string_to_lines(out))
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless ok
   out
 end
@@ -42,7 +44,7 @@ def remove_shebang s
 end
 
 def lines_to_string lines
-  lines.join("\n")
+  lines.join("\n") # + (lines.empty? ? "" : "\n")
 end
 
 def string_to_lines s
@@ -54,6 +56,18 @@ def trim_empty_lines!(lines)
   lines.shift while lines[ 0] && lines[ 0].empty?
   lines.pop   while lines[-1] && lines[-1].empty?
   lines
+end
+
+def dedup_empty_lines(lines)
+  result = [ ]
+  last = nil
+  while line = lines.shift
+    unless last == "" && line == ""
+      result << line
+    end
+    last = line
+  end
+  result
 end
 
 def line_numbers! lines
@@ -80,36 +94,63 @@ def wrap_line str, width = 78, newline =  " \\\n  "
   out << line
 end
 
+def rx str
+  Regexp.new(Regexp.escape(str))
+end
+
 def run_workflow e
   out = cmd "bin/build clean-example build-example EXAMPLE=#{e[:name]}"
   out = out.
-  gsub('/opt/local/bin/gmake', 'make').
-  gsub('/opt/homebrew/bin/gmake', 'make').
-  gsub(%r{^/.*/swig}, 'swig').
-  gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
+  gsub(%r{//+}, '/').
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
-  gsub(%r{^/.*/python}, 'python').
-  gsub(%r{ *-I */opt/local/include[^ ]* *}, ' ').
-  gsub(%r{ *-L */opt/local/lib[^ ]* *}, ' ').
-  gsub(%r{ *-I */opt/homebrew/include[^ ]* *}, ' ').
-  gsub(%r{ *-L */opt/homebrew/lib[^ ]* *}, ' ').
-  gsub(%r{ *-I */opt/homebrew/opt/[^/]+/include[^ ]* *}, ' ').
-  gsub(%r{ *-L */opt/homebrew/opt/[^/]+/lib[^ ]* *}, ' ').
-  gsub(%r{#{ENV['PYTHON_HOME']}},  '$PYTHON_HOME').
-  gsub(%r{#{ENV['RUBY_HOME']}},    '$RUBY_HOME').
-  gsub(%r{#{ENV['GUILE_HOME']}},   '$GUILE_HOME').
-  gsub(%r{#{ENV['JAVA_HOME']}},    '$JAVA_HOME').
-  gsub(%r{#{ENV['HOME']}},         '$HOME').
-  gsub(%r{\$PYTHON_HOME/Frameworks/Python.framework/Versions/[^/]+}, '$PYTHON_HOME').
-  gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(include|lib)}, '$GUILE_HOME/\1').
+  # Linux:
+  gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
+  # macports:
+  gsub(%r{-I */opt/local/include[^ ]* *}, ' ').
+  gsub(%r{-L */opt/local/lib[^ ]* *}, ' ').
+  # brew:
+  gsub(%r{-I */opt/homebrew/include[^ ]* *}, ' ').
+  gsub(%r{-L */opt/homebrew/lib[^ ]* *}, ' ').
+  gsub(%r{-I *\S+/opt/\S*include[^ ]* *}, ' ').
+  gsub(%r{-L *\S+/opt/\S*lib[^ ]* *}, ' ').
+  gsub(%r{-I *\S+/opt/\S+ *}, ' ').
+  gsub(%r{-L *\S+/opt/\S+ *}, ' ').
+  # local/:
+  gsub(%r{-I *include[^ ]* *}, ' ').
+  gsub(%r{-I *local/include[^ ]* *}, ' ').
+  gsub(%r{-L *local/lib[^ ]* *}, ' ').
   gsub(%r{  +}, ' ')
-  lines = out.split("\n", -1)
+  lines = clean_up_lines(dedup_empty_lines(string_to_lines(out)))
+  lines_to_string(lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))})
+end
+
+def clean_up_lines lines
+  lines.map! do | line |
+    line.
+    gsub('\0', ''). # mp_fwrite adds NULL?!?
+    gsub('/opt/local/bin/gmake',    'make').
+    gsub('/opt/homebrew/bin/gmake', 'make').
+    gsub('gmake',                   'make').
+    gsub(%r{/\S*/swig}, 'swig').
+    gsub(%r{/\S*/python}, 'python').
+    # OSX:
+    gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
+    gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
+    gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
+    gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
+    gsub(ENV['JAVA_HOME'],    '$JAVA_HOME').
+    gsub(ENV['HOME'],         '$HOME').
+    gsub(ENV['ROOT_DIR'],     '.').
+    # brew:
+    gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
+    gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1')
+  end
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
-  lines.reject!{|l| l =~ /WARNING: .*clojure.*use -M/} # clojure
+  lines.reject!{|l| l =~ /WARNING: .*clojure\.main.*use -M/} # clojure
   lines.reject!{|l| l =~ /rootdir: .*swig-101/} # pytest
   lines.reject!{|l| l =~ /ld: warning: directory not found for option/} # ld
-  lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))}.join("\n")
+  lines
 end
 
 #####################################
@@ -172,7 +213,7 @@ END
       else
         t[:run] = t[:cmd]
       end if t[:code]
-      t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(string_to_lines(cmd(t[:run]))))
+      t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(clean_up_lines(string_to_lines(cmd(t[:run])))))
       msg t[:run_output]
       t
     end
