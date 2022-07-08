@@ -9,6 +9,7 @@
 
 char*    swig_mp_int_to_charP(mp_int* self, int radix);
 mp_int*  swig_charP_to_mp_int(const char* str, int radix);
+char*    swig_mp_int_rep(mp_int* self, int radix);
 
 #if SWIG
 %extend mp_int {
@@ -16,12 +17,7 @@ mp_int*  swig_charP_to_mp_int(const char* str, int radix);
     return swig_mp_int_to_charP(self, radix);
   }
   char* __repr__(int radix = 10) {
-    char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
-    if ( radix == 10 )
-      asprintf(&repr, "mp_int(\"%s\")", str);
-    else
-      asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);
-    return free(str), repr;
+    return swig_mp_int_rep(self, radix);
   }
 }
 #endif

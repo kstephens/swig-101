@@ -1,6 +1,8 @@
 #include "tommath.h"
 #include <stdlib.h>
 
+/* swig <-> mp_int helpers */
+
 char* swig_mp_int_to_charP(mp_int* self, int radix) {
   size_t size = 0, written = 0;
   (void) mp_radix_size(self, radix, &size);
@@ -8,6 +10,15 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {
   (void) mp_to_radix(self, buf, size, &written, radix);
   buf[written] = 0;
   return buf;
+}
+
+char* swig_mp_int_rep(mp_int* self, int radix) {
+  char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
+  if ( radix == 10 )
+    asprintf(&repr, "mp_int(\"%s\")", str);
+  else
+    asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);
+  return free(str), repr;
 }
 
 mp_int* swig_charP_to_mp_int(const char* str, int radix) {
