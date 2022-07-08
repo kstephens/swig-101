@@ -53,6 +53,19 @@ ifeq "$(UNAME_S)" "Darwin"
   # OSX macports
   INC_DIRS      += -I/opt/local/include
   LIB_DIRS      += -L/opt/local/lib
+
+  # OSX brew
+  INC_DIRS      += -I/opt/homebrew/include
+  LIB_DIRS      += -L/opt/homebrew/lib
+
+  INC_DIRS      += -I/opt/homebrew/opt/tcl-tk/include
+  LIB_DIRS      += -L/opt/homebrew/opt/tcl-tk/lib
+
+  INC_DIRS      += -I/opt/homebrew/opt/python@3.10/include
+  LIB_DIRS      += -L/opt/homebrew/opt/python@3.10/lib
+
+  INC_DIRS      += -I/opt/homebrew/opt/openjdk/include
+
   CFLAGS_SO += -dynamiclib -Wl,-undefined,dynamic_lookup
   SWIG_SO_SUFFIX_ruby:=.bundle
 endif
@@ -328,11 +341,15 @@ demo-run:
 #################################
 
 macports-prereq:
-	sudo port    install automake libtool autoconf bison tcl     guile python310 py310-pip
+	sudo port install automake libtool autoconf cmake bison tcl guile python310 py310-pip
 	pip-3.10 install pytest
 
+brew-prereq:
+	brew install automake libtool autoconf cmake bison tcl-tk guile python\@3.10 brew-pip openjdk
+	bin/run pip install pytest
+
 debian-prereq:
-	sudo apt-get install automake libtool autoconf bison tcl-dev guile-2.2-dev
+	sudo apt-get install automake libtool autoconf cmake bison tcl-dev guile-2.2-dev
 
 #################################
 
@@ -352,15 +369,17 @@ clean:
 clean-example:
 	$(SILENT)rm -rf target/*/*$(EXAMPLE_NAME)*
 
-
 #################################
 
 LOCAL:=$(shell /bin/pwd)/local
 
 local-tools: swig libtommath
 
+local-tools-clean:
+	rm -rf '$(LOCAL)'
+
 local-dirs:
-	mkdir -p $(LOCAL)/src $(LOCAL)/lib $(LOCAL)/include $(LOCAL)/bin
+	@mkdir -p $(LOCAL)/src $(LOCAL)/lib $(LOCAL)/include $(LOCAL)/bin
 
 #################################
 
@@ -395,4 +414,3 @@ $(LOCAL)/lib/libtommath.a :
 	make -j ;\
 	cp -p $(LOCAL)/src/libtommath/build/libtommath.a $@ ;\
 	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
-

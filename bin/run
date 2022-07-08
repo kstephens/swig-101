@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-PATH="/opt/local/libexec/gnubin:$PATH" # macports
+bin_dirs=(
+  /opt/local/libexec/gnubin
+  /opt/homebrew/opt/*/libexec/gnubin
+  /opt/homebrew/opt/python@3.10/bin
+  /opt/homebrew/opt/python@3.10/libexec/bin # pip
+  /opt/homebrew/opt/tcl-tk/bin
+  /opt/homebrew/opt/openjdk/bin
+)
+
+for d in "${bin_dirs[@]}"
+do
+  [[ -d "$d" ]] && PATH="$d:$PATH"
+done
 
 cmd=("$@")
 dir="$(/bin/pwd)"
@@ -17,7 +29,7 @@ prog-path() { # VAR prog
   : "${prog_lib:=$prog_home/lib}"
   # set -x
   export \
-    "${var}_HOME=$prog_home" "${var}_EXE=$prog_exe" \
+    "${var}_HOME=$prog_home" "${var}_EXE=$prog_exe" "${var}_CMD=$prog_exe" \
     "${var}_INC=$prog_inc" "${var}_LIB=$prog_lib"
   export PATH="$prog_dir:$PATH"
   # export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
