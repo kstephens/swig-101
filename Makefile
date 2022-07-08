@@ -370,16 +370,18 @@ debian-prereq:
 
 README.md : tmp/README.md 
 	cp tmp/$@ $@
+
 tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
-	erb $< > $@
+	erb doc/README.md.erb > $@
+
 # README.md.html : README.md
 
 #################################
 
 clean:
-	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
+	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go tmp/README.md
 	rm -rf target/*
 
 clean-example:

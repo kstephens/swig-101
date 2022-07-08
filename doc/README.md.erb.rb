@@ -33,7 +33,7 @@ def cmd cmd
   system "#{cmd} >tmp/cmd.out 2>&1"
   ok = $?.success?
   # puts File.read("tmp/cmd.out")
-  out = File.read("tmp/cmd.out")
+  out = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out))
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless ok
   out

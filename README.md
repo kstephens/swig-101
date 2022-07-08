@@ -1085,11 +1085,11 @@ $ bin/run src/polynomial_v2.clj
 
 ```
 $ target/native/tommath
-MP_ITER -4a = 2357111317 
-b = 1113171923 
-c = 2623870137469952591 
-d = 2920818566629701480442302493 
-e = 305411158 
+MP_ITER -4a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ----
@@ -1120,7 +1120,7 @@ e = 305411158 
 
 ```Python
   1   import tommath_swig
-  2   from tommath_swig import mp_int, mp_init, mp_clear, mp_set, mp_mul
+  2   from tommath_swig import mp_int, mp_set, mp_mul
   3   
   4   print({"MP_ITER": tommath_swig.MP_ITER})
   5   
@@ -1155,11 +1155,11 @@ $ bin/run src/tommath.py
 
 ```
 $ target/native/tommath
-MP_ITER -4a = 2357111317 
-b = 1113171923 
-c = 2623870137469952591 
-d = 2920818566629701480442302493 
-e = 305411158 
+MP_ITER -4a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 
 ```
 
@@ -1935,13 +1935,13 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o  \
 
 ### Local tools
 
-```
-$ bin/build local-tools
+```Shell
+bin/build local-tools
 ```
 
 ## Build
 
-```
-$ rbenv shell 2.7.6
-$ bin/build clean demo
+```Shell
+rbenv shell 2.7.6
+bin/build clean demo
 ```

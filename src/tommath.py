@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.10
 
 import tommath_swig
-from tommath_swig import mp_int, mp_init, mp_clear, mp_set, mp_mul
+from tommath_swig import mp_int, mp_set, mp_mul
 
 print({"MP_ITER": tommath_swig.MP_ITER})
 
@@ -17,4 +17,3 @@ mp_mul(a, b, c);
 mp_mul(c, b, d);
 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})
-
