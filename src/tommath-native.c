@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
 
   mp_int a, b, c, d, e;
 
-  mp_init_multi(&a, &b, &c, &d, &e, NULL);
+  (void) mp_init_multi(&a, &b, &c, &d, &e, NULL);
   
   (void) mp_set(&a, 2357111317);
   (void) mp_set(&b, 1113171923);
