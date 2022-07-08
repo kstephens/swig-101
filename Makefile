@@ -25,6 +25,7 @@ CXXFLAGS  += $(DEBUG) $(INC_DIRS)
 LDFLAGS   += $(LIB_DIRS) $(LIBS)
 
 INC_DIRS      += -Isrc
+INC_DIRS      += -Iinclude
 INC_DIRS      += -Ilocal/include
 LIB_DIRS      += -Llocal/lib
 

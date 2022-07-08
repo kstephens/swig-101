@@ -1,11 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
-// #include <stdbool.h> // C99
-#ifndef bool
-#define bool   _Bool
-#define true   1
-#define false  0
-#endif
+#include "bool.h"
 #include "libtommath/tommath.h"
 
 /*********************************************************************
