@@ -305,7 +305,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ target/native/example1
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 ----
@@ -314,7 +313,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ bin/run src/example1.py
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 ----
@@ -323,7 +321,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ bin/run src/example1.clj
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 ----
@@ -332,7 +329,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ bin/run src/example1.rb
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 ----
@@ -341,7 +337,6 @@ EXAMPLE1_VERSION = 1.2.3
 $ bin/run src/example1.scm
 (EXAMPLE1-VERSION = "1.2.3")
 129.0
-
 ```
 
 ----
@@ -350,7 +345,6 @@ $ bin/run src/example1.scm
 $ bin/run src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
-
 ```
 
 ----
@@ -557,7 +551,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 154804080>
+#<swig-pointer std::vector< double > * 112704080>
 17.3020736
 ```
 
@@ -584,7 +578,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_2048f04101000000_p_std__vectorT_double_t
+_0049902501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -631,7 +625,6 @@ src/polynomial-test.py ..                                                [100%]
 $ target/native/polynomial
 POLYNOMIAL_VERSION 1.2.1
 17.3020736
-
 ```
 
 ----
@@ -641,7 +634,6 @@ $ bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
-
 ```
 
 ----
@@ -651,7 +643,6 @@ $ bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
-
 ```
 
 ----
@@ -661,7 +652,6 @@ $ bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
-
 ```
 
 ----
@@ -669,9 +659,8 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 154804080>
+#<swig-pointer std::vector< double > * 112704080>
 17.3020736
-
 ```
 
 ----
@@ -679,9 +668,8 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_2048f04101000000_p_std__vectorT_double_t
+_0049902501000000_p_std__vectorT_double_t
 17.3020736
-
 ```
 
 ----
@@ -695,7 +683,6 @@ collected 2 items
 src/polynomial-test.py ..                                                [100%]
 
 ============================== 2 passed in 0.00s ===============================
-
 ```
 
 ----
@@ -909,7 +896,6 @@ POLYNOMIAL_VERSION 2.0.2
 17.3020736
 38
 194273/119119
-
 ```
 
 ----
@@ -921,7 +907,6 @@ $ bin/run src/polynomial_v2.py
 17.3020736
 [rational(7,11), rational(11,13), rational(13,17)]
 194273/119119
-
 ```
 
 ----
@@ -933,7 +918,6 @@ $ bin/run src/polynomial_v2.clj
 17.3020736
 ["7/11" "11/13" "13/17"]
 "194273/119119"
-
 ```
 
 ----
@@ -1160,7 +1144,6 @@ b = 1113171923
 c = 2623870137469952591
 d = 2920818566629701480442302493
 e = 305411158
-
 ```
 
 ----
@@ -1170,7 +1153,6 @@ $ bin/run src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
-
 ```
 
 ----
