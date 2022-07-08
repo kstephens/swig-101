@@ -3,3 +3,6 @@ README.md.html
 /tmp
 __pycache__
 /local
+/.clj-kondo/
+/.lsp/
+/.vscode/
