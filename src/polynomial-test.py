@@ -2,7 +2,7 @@
 
 import sys ; sys.path.append('target/python')
 
-from polynomial_swig import Polynomial, VectorDouble
+from polynomial_swig import *
 import pytest
 
 def test_empty_coeffs():

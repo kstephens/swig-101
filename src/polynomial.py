@@ -4,7 +4,7 @@
 import sys ; sys.path.append('target/python')
 
 # Import library bindings:
-from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION
+from polynomial_swig import *
 
 # #define constants:
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
