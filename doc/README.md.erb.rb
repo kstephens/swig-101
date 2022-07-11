@@ -110,6 +110,23 @@ def wrap_line str, width = 78, newline =  " \\\n  "
   out << line
 end
 
+def markdeep str
+  if ENV['MARKDEEP']
+    str
+  else
+    markdeep_to_markdown(str)
+  end
+end
+
+def markdeep_to_markdown str
+  lines = string_to_lines(str)
+  lines.map! do |s|
+    s.gsub(/^\* /, '').
+      gsub(/^\*\*\*+ *$/m, '```')
+  end
+  lines_to_string(lines)
+end
+
 def rx str
   Regexp.new(Regexp.escape(str))
 end

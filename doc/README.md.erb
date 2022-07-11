@@ -156,16 +156,7 @@ $ <%= t[:run] %>
 
 # Workflow
 
-<%=
-workflow = File.read("doc/workflow.txt")
-if ENV['MARKDEEP']
-  workflow
-else
-  workflow.
-    gsub(/^\* /, '').
-    gsub(/^\*\*\*+\s*$/, '```')
-end 
-%>
+<%= markdeep(File.read("doc/workflow.txt")) %>
 
 # Example Workflows
 

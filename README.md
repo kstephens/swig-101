@@ -439,22 +439,22 @@ POLYNOMIAL_VERSION 1.2.1
 ### Python : src/polynomial.py
 
 ```python
-# Setup DLL search path:                                                  #  1 
-import sys ; sys.path.append('target/python')                             #  2 
-                                                                          #  3 
-# Import library bindings:                                                #  4 
-from polynomial_swig import Polynomial, VectorDouble, POLYNOMIAL_VERSION  #  5 
-                                                                          #  6 
-# #define constants:                                                      #  7 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                         #  8 
-                                                                          #  9 
-# Instantiate object:                                                     # 10 
-poly = Polynomial()                                                       # 11 
-poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])        # 12 
-                                                                          # 13 
-# Invoke methods:                                                         # 14 
-print(list(poly.coeffs))                                                  # 15 
-print(poly.evaluate(1.2))                                                 # 16 
+# Setup DLL search path:                                                #  1 
+import sys ; sys.path.append('target/python')                           #  2 
+                                                                        #  3 
+# Import library bindings:                                              #  4 
+from polynomial_swig import *                                           #  5 
+                                                                        #  6 
+# #define constants:                                                    #  7 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                       #  8 
+                                                                        #  9 
+# Instantiate object:                                                   # 10 
+poly = Polynomial()                                                     # 11 
+poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])      # 12 
+                                                                        # 13 
+# Invoke methods:                                                       # 14 
+print(list(poly.coeffs))                                                # 15 
+print(poly.evaluate(1.2))                                               # 16 
 ```
 
 
@@ -552,7 +552,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 15b704090>
+#<swig-pointer std::vector< double > * 114704090>
 17.3020736
 ```
 
@@ -579,7 +579,7 @@ puts [poly evaluate 1.2]                                                # 10
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b06e604a01000000_p_std__vectorT_double_t
+_b05a702701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -590,7 +590,7 @@ _b06e604a01000000_p_std__vectorT_double_t
 ```python
 import sys ; sys.path.append('target/python')                           #  1 
                                                                         #  2 
-from polynomial_swig import Polynomial, VectorDouble                    #  3 
+from polynomial_swig import *                                           #  3 
 import pytest                                                           #  4 
                                                                         #  5 
 def test_empty_coeffs():                                                #  6 
@@ -660,7 +660,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 15b704090>
+#<swig-pointer std::vector< double > * 114704090>
 17.3020736
 ```
 
@@ -669,7 +669,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b06e604a01000000_p_std__vectorT_double_t
+_b05a702701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -823,21 +823,23 @@ template class std::vector<mathlib::rational<int>>;                            /
 ### Python : src/polynomial_v2.py
 
 ```python
-import sys ; sys.path.append('target/python')                                                                                              #  1 
-                                                                                                                                           #  2 
-from polynomial_v2_swig import PolynomialDoubleV2, VectorDoubleV2, PolynomialRationalV2, VectorRationalV2, RationalV2, POLYNOMIAL_VERSION  #  3 
-                                                                                                                                           #  4 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                                                                          #  5 
-                                                                                                                                           #  6 
-poly = PolynomialDoubleV2()                                                                                                                #  7 
-poly.coeffs = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                                                                       #  8 
-print(list(poly.coeffs))                                                                                                                   #  9 
-print(poly.evaluate(1.2))                                                                                                                  # 10 
-                                                                                                                                           # 11 
-poly = PolynomialRationalV2()                                                                                                              # 12 
-poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ])                                               # 13 
-print(list(poly.coeffs))                                                                                                                   # 14 
-print(poly.evaluate(RationalV2(5, 7)))                                                                                                     # 15 
+import sys ; sys.path.append('target/python')                           #  1 
+                                                                        #  2 
+from polynomial_v2_swig import *                                        #  3 
+                                                                        #  4 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                       #  5 
+                                                                        #  6 
+coeffs = [ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ]                         #  7 
+poly         = PolynomialDoubleV2()                                     #  8 
+poly.coeffs  = VectorDoubleV2(coeffs)                                   #  9 
+print(list(poly.coeffs))                                                # 10 
+print(poly.evaluate(1.2))                                               # 11 
+                                                                        # 12 
+coeffs = [ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]   # 13 
+poly         = PolynomialRationalV2()                                   # 14 
+poly.coeffs  = VectorRationalV2(coeffs)                                 # 15 
+print(list(poly.coeffs))                                                # 16 
+print(poly.evaluate(RationalV2(5, 7)))                                  # 17 
 ```
 
 
@@ -1092,23 +1094,22 @@ e = 305411158
 ### Python : src/tommath.py
 
 ```python
-import tommath_swig                                                     #  1 
-from tommath_swig import mp_int, mp_set, mp_mul                         #  2 
-                                                                        #  3 
-print({"MP_ITER": tommath_swig.MP_ITER})                                #  4 
-                                                                        #  5 
-a = mp_int(); mp_set(a, 2357111317)    # <-- awkard!                    #  6 
-b = mp_int(1113171923)                 # <-- better!                    #  7 
-c = mp_int()                                                            #  8 
-d = mp_int()                                                            #  9 
-e = mp_int("12343456", 16)             # <-- yey!                       # 10 
-                                                                        # 11 
-print({"a": a, "b": b, "c": c, "d": d, "e": e})                         # 12 
-                                                                        # 13 
-mp_mul(a, b, c);                                                        # 14 
-mp_mul(c, b, d);                                                        # 15 
-                                                                        # 16 
-print({"a": a, "b": b, "c": c, "d": d, "e": e})                         # 17 
+from tommath_swig import *                                              #  1 
+                                                                        #  2 
+print({"MP_ITER": MP_ITER})                                             #  3 
+                                                                        #  4 
+a = mp_int(); mp_set(a, 2357111317)    # <-- awkard!                    #  5 
+b = mp_int(1113171923)                 # <-- better!                    #  6 
+c = mp_int()                                                            #  7 
+d = mp_int()                                                            #  8 
+e = mp_int("12343456", 16)             # <-- yey!                       #  9 
+                                                                        # 10 
+print({"a": a, "b": b, "c": c, "d": d, "e": e})                         # 11 
+                                                                        # 12 
+mp_mul(a, b, c);                                                        # 13 
+mp_mul(c, b, d);                                                        # 14 
+                                                                        # 15 
+print({"a": a, "b": b, "c": c, "d": d, "e": e})                         # 16 
 ```
 
 
@@ -1155,48 +1156,56 @@ $ bin/run src/tommath.py
 5. Load dynamic library.
 
 ```
-   +---------------------------+
-+--+           foo.h           |
-|  +---------------------------+
-|  | double f(double, double); |
-|  +------------------+--------+
+
+   +---------------------------------+
++--+           foo.h                 |
+|  +---------------------------------+
+|  |  double f(int, double, char*);  |
+|  +---------------------------------+
 |                  
-|  +---------------------------+ 
-|  |            foo.i          | 
-|  +---------------------------+ 
-|  | %module foo_swig          | 
-|  | %include "foo.h"          |
-|  +-+-------------------------+ 
+|  +---------------------------------+ 
+|  |            foo.i                | 
+|  +---------------------------------+ 
+|  |  %module foo_swig               | 
+|  |  %include "foo.h"               |
+|  +-+-------------------------------+ 
+|    |
 +----+  2. swig -python foo.i    \
-     v       -o bld/foo_swig.c
+     |       -o bld/foo_swig.c
+     v                               
    +-------------------+
 +--+  bld/foo_swig.py  |
 |  |  bld/foo_swig.c   |
 |  +-+-----------------+
+|    |
 |    |  3. cc -c bld/foo_swig.c
 |    v                       
 |  +-------------------+  
 |  |  bld/foo_swig.о   |  
 |  +-+-----------------+  
+|    |
 |    |  4. cc -dynamiclib         \   
 |    |       -о bld/_foo_swig.so  \   
 |    |       bld/foo_swig.о       \
-|    v       -l foo 
+|    |       -l foo 
+|    v
 |  +-------------------+ 
 |  |  bld/foo_swig.sо  | 
-|  +-+-----------------+ 
+|  +-+-----------------+
+|    | 
 +----+  5. python script.py
      v
-   +--------------------------+
-   |        scripy.py         |
-   +--------------------------+
-   | import sys               |
-   | sys.path.append('bld')   |
-   | import foo_swig as foo   |
-   | print(foo.f(2.0, 3.0))   |
-   +--------------------------+
+   +------------------------------+
+   |        scripy.py             |
+   +------------------------------+
+   | import sys                   |
+   | sys.path.append('bld')       |
+   | import foo_swig as foo       |
+   | print(foo.f(2, 3.5, 'str))   |
+   +------------------------------+
 
 ```
+
 
 # Example Workflows
 
