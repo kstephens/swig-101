@@ -11,10 +11,12 @@ $pe  = $verbose # || true
 $msg = $verbose # || true
 $context = nil
 
+def log *args
+  $stderr.puts "  ### README.md.erb.rb : #{args * ' '}"
+end
+
 def msg *args
-  if $msg # || true
-    $stderr.puts "\n  !!! #{$$} : README.md.erb.rb : #{args * ' '}"
-  end
+  log *args if $msg
 end
 
 def pe_ x
@@ -29,13 +31,13 @@ def pe x
 end
 
 def cmd cmd
-  msg "cmd : #{cmd.inspect}"
+  log "cmd : RUN  ... : #{cmd}"
   system "#{cmd} >tmp/cmd.out 2>&1"
-  ok = $?.success?
-  # puts File.read("tmp/cmd.out")
+  result = $?
   out = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out))
-  raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless ok
+  log "cmd : EXIT #{result.exitstatus}   : #{cmd}"
+  raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
 
@@ -245,7 +247,7 @@ END
       when nil
         t[:run] = "bin/run #{t[:file]}"
       else
-        t[:run] = t[:cmd]
+        t[:run] = "bin/run #{t[:cmd]}"
       end if t[:code]
       t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(clean_up_lines(string_to_lines(cmd(t[:run])))))
       msg t[:run_output]
