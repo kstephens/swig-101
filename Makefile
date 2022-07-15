@@ -356,15 +356,15 @@ demo-run:
 #################################
 
 macports-prereq:
-	sudo port install automake libtool autoconf cmake bison tcl guile python310 py310-pip
-	pip-3.10 install pytest
+	sudo port install     automake libtool autoconf cmake bison tcl     guile python310    py310-pip
+	pip-3.10 install      pytest
 
 brew-prereq:
-	brew install automake libtool autoconf cmake bison tcl-tk guile python\@3.10 brew-pip openjdk
-	bin/run pip install pytest
+	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk
+	bin/run pip install   pytest
 
 debian-prereq:
-	sudo apt-get install automake libtool autoconf cmake bison tcl-dev guile-2.2-dev
+	sudo apt-get install  automake libtool autoconf cmake bison tcl-dev  guile-2.2-dev
 
 #################################
 
