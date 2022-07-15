@@ -5,6 +5,6 @@
 class Polynomial {
 public:
   std::vector<double> coeffs;
-  double evaluate(double x);
+  double evaluate(double x) const;
 };
 

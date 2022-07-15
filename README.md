@@ -364,7 +364,7 @@ EXAMPLE1_VERSION = 1.2.3
 class Polynomial {                                                      //  5 
 public:                                                                 //  6 
   std::vector<double> coeffs;                                           //  7 
-  double evaluate(double x);                                            //  8 
+  double evaluate(double x) const;                                      //  8 
 };                                                                      //  9 
 ```
 
@@ -374,7 +374,7 @@ public:                                                                 //  6
 ```c++
 #include "polynomial.h"                                                 //  1 
                                                                         //  2 
-double Polynomial::evaluate(double x) {                                 //  3 
+double Polynomial::evaluate(double x) const {                           //  3 
   double result = 0, xx = 1;                                            //  4 
   for ( auto c : this->coeffs ) {                                       //  5 
     result = result + c * xx;                                           //  6 
