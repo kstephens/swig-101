@@ -19,16 +19,16 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 * SWIG interface defintions are a superset of C/C++.
 * Many C/C++ header files are also SWIG interface definition files.
 * Can target multiple languages with little effort.
-* Generated binding code is generated, compiled and linked.
+* Bindings are generated, compiled and linked.
 * Bindings can be dynamically loaded or statically linked.
 * Generated code is self-contained.
-* Hinting for improved integration and representation.
+* Hinting improves integration and representation.
 * Template-driven: users can create specialized generators.
 * Consistency between target languages.
 
 # Applications
 
-* Use dynamic language to test C/C++ code.
+* Use dynamic languages to test C/C++ code.
 * Improve library adoption.
 * Integration with other tools.
 
@@ -142,7 +142,10 @@ $ <%= t[:run] %>
 <%     end # if t[:run] %>
 <%   end # targets %>
 
-### Output
+----
+----
+
+### Outputs - Recap
 
 <%   targets.select{|t| t[:run_output]}.each do | t | %>
 ```

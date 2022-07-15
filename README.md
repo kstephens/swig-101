@@ -22,7 +22,7 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 * Generated binding code is generated, compiled and linked.
 * Bindings can be dynamically loaded or statically linked.
 * Generated code is self-contained.
-* Hinting for improved integration and representation.
+* Hinting improves integration and representation.
 * Template-driven: users can create specialized generators.
 * Consistency between target languages.
 
@@ -299,7 +299,10 @@ EXAMPLE1_VERSION = 1.2.3
 
 ----
 
-### Output
+----
+----
+
+### Outputs - Recap
 
 
 ```
@@ -552,7 +555,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 114704090>
+#<swig-pointer std::vector< double > * 122608230>
 17.3020736
 ```
 
@@ -579,7 +582,7 @@ puts [poly evaluate 1.2]                                                # 10
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b05a702701000000_p_std__vectorT_double_t
+_40bf604101000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -619,7 +622,10 @@ src/polynomial-test.py ..                                                [100%]
 
 ----
 
-### Output
+----
+----
+
+### Outputs - Recap
 
 
 ```
@@ -660,7 +666,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 114704090>
+#<swig-pointer std::vector< double > * 122608230>
 17.3020736
 ```
 
@@ -669,7 +675,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b05a702701000000_p_std__vectorT_double_t
+_40bf604101000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -890,7 +896,10 @@ $ bin/run src/polynomial_v2.clj
 
 ----
 
-### Output
+----
+----
+
+### Outputs - Recap
 
 
 ```
@@ -1124,7 +1133,10 @@ $ bin/run src/tommath.py
 
 ----
 
-### Output
+----
+----
+
+### Outputs - Recap
 
 
 ```

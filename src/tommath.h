@@ -11,6 +11,9 @@ mp_int*  swig_charP_to_mp_int(const char* str, int radix);
 char*    swig_mp_int_rep(mp_int* self, int radix);
 
 #if SWIG
+// This extends generated classes with two
+// methods which behave as Python's methods.
+// Also for Ruby and other language targets.
 %extend mp_int {
   char* __str__(int radix = 10) {
     return swig_mp_int_to_charP(self, radix);
