@@ -149,6 +149,9 @@ all: early build-examples
 early: local-dirs
 	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
+EXAMPLES:
+	$(SILENT)echo '$(EXAMPLES)'
+
 #################################
 
 EXAMPLE_NAME:=$(basename $(EXAMPLE))
@@ -356,32 +359,34 @@ demo-run:
 #################################
 
 macports-prereq:
-	sudo port install automake libtool autoconf cmake bison tcl guile python310 py310-pip
-	pip-3.10 install pytest
+	sudo port install     automake libtool autoconf cmake bison tcl     guile python310    py310-pip
+	pip-3.10 install      pytest
 
 brew-prereq:
-	brew install automake libtool autoconf cmake bison tcl-tk guile python\@3.10 brew-pip openjdk
-	bin/run pip install pytest
+	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk
+	bin/run pip install   pytest
 
 debian-prereq:
-	sudo apt-get install automake libtool autoconf cmake bison tcl-dev guile-2.2-dev
+	sudo apt-get install  automake libtool autoconf cmake bison tcl-dev  guile-2.2-dev
 
 #################################
 
-README.md : tmp/README.md 
-	cp tmp/$@ $@
+README.md : tmp/README.md
+	cp $< $@
+.PRECIOUS: README.md
 
 tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
 	erb doc/README.md.erb > $@
+	ls -l $@
 
 # README.md.html : README.md
 
 #################################
 
 clean:
-	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go tmp/README.md
+	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
 	rm -rf target/*
 
 clean-example:

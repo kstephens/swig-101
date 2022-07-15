@@ -11,10 +11,12 @@ $pe  = $verbose # || true
 $msg = $verbose # || true
 $context = nil
 
+def log *args
+  $stderr.puts "  ### #{args * ' '}"
+end
+
 def msg *args
-  if $msg # || true
-    $stderr.puts "\n  !!! #{$$} : README.md.erb.rb : #{args * ' '}"
-  end
+  log *args if $msg
 end
 
 def pe_ x
@@ -29,13 +31,13 @@ def pe x
 end
 
 def cmd cmd
-  msg "cmd : #{cmd.inspect}"
+  log "cmd : #{cmd} : ..."
   system "#{cmd} >tmp/cmd.out 2>&1"
-  ok = $?.success?
-  # puts File.read("tmp/cmd.out")
+  result = $?
   out = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out))
-  raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless ok
+  log "cmd : #{cmd} : DONE #{result.exitstatus}"
+  raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
 
@@ -98,16 +100,20 @@ def code_lines s, lang
   lines_to_string(lines)
 end
 
-def wrap_line str, width = 78, newline =  " \\\n  "
-  out, line = String.new, String.new
+def wrap_line str, width = 78, newline =  "  \\\n", indent = '  '
+  lines, line = [ ], String.new
   str.strip.split(/\s+/).each do | word |
     if line.size + word.size > width
-      out << line << newline
-      line.clear
+      lines << line
+      line = indent.dup
     end
     line << word << ' '
   end
-  out << line
+  lines << line
+  lines.each{|line| line.sub!(/\s+$/, '')}
+  max_length = [(lines.map(&:size).max), width].min
+  lines.map!{|line| "%-#{max_length}s" % [ line ]}
+  lines * newline
 end
 
 def markdeep str
@@ -168,6 +174,7 @@ def clean_up_lines lines
     gsub(%r{/\S*/python}, 'python').
     # OSX:
     gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
+    gsub(%r{-framework \S+ }, ' ').
     gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
     gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
     gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
@@ -176,7 +183,10 @@ def clean_up_lines lines
     gsub(ENV['ROOT_DIR'],     '.').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
-    gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1')
+    gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
+    # Duplicates:
+    gsub(%r{(-[IL]\S*)\s+\1}, ' ').
+    sub(%r{\s+$}, '')
   end
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
@@ -192,7 +202,7 @@ msg "Start"
 
 cmd "bin/build clean"
 
-example_names = %w(example1.c polynomial.cc polynomial_v2.cc tommath.c)
+example_names = `bin/build EXAMPLES`.split(/\s+/)
 
 $examples = [ ]
 
@@ -245,7 +255,7 @@ END
       when nil
         t[:run] = "bin/run #{t[:file]}"
       else
-        t[:run] = t[:cmd]
+        t[:run] = "bin/run #{t[:cmd]}"
       end if t[:code]
       t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(clean_up_lines(string_to_lines(cmd(t[:run])))))
       msg t[:run_output]
@@ -258,4 +268,3 @@ END
 end
 
 msg 'DONE'
-
