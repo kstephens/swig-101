@@ -31,12 +31,12 @@ def pe x
 end
 
 def cmd cmd
-  log "cmd : RUN  ... : #{cmd}"
+  log "cmd : #{cmd} : ..."
   system "#{cmd} >tmp/cmd.out 2>&1"
   result = $?
   out = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out))
-  log "cmd : EXIT #{result.exitstatus}   : #{cmd}"
+  log "cmd : #{cmd} : DONE #{result.exitstatus}"
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
@@ -202,7 +202,7 @@ msg "Start"
 
 cmd "bin/build clean"
 
-example_names = %w(example1.c polynomial.cc polynomial_v2.cc tommath.c)
+example_names = `bin/build EXAMPLES`.split(/\s+/)
 
 $examples = [ ]
 
@@ -268,4 +268,3 @@ END
 end
 
 msg 'DONE'
-

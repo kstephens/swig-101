@@ -149,6 +149,9 @@ all: early build-examples
 early: local-dirs
 	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
 
+EXAMPLES:
+	$(SILENT)echo '$(EXAMPLES)'
+
 #################################
 
 EXAMPLE_NAME:=$(basename $(EXAMPLE))
