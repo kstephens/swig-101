@@ -10,22 +10,30 @@ bin_dirs=(
   /opt/homebrew/opt/python@3.10/libexec/bin # pip
   /opt/homebrew/opt/tcl-tk/bin
   /opt/homebrew/opt/openjdk/bin
+  /usr/lib/jvm/java-*-openjdk-amd64/bin
+  "$ROOT_DIR/local/bin"
 )
 
+PATH_OPT="$PATH"
 for d in "${bin_dirs[@]}"
 do
-  [[ -d "$d" ]] && PATH="$d:$PATH"
+  [[ -d "$d" ]] && PATH_OPT="$d:$PATH_OPT"
 done
 
 cmd=("$@")
 dir="$(/bin/pwd)"
+
+-which() {
+  PATH="$PATH_OPT" which "$@" 2>&1 | head -1
+}
 
 prog-path() { # VAR prog
   local var="$1"
   prog_name="$2" prog_exe= prog_dir= prog_home= prog_inc= prog_lib=
   shift 2
   "$@"
-  : "${prog_exe:=$(which "$prog_name" || echo "$prog_name")}"
+  : "${prog_exe:=$(-which "$prog_name" || echo "$prog_name")}"
+  prog_exe="$(readlink -f "$prog_exe" 2>/dev/null || echo "$prog_exe")"
   : "${prog_dir:=$(dirname "$prog_exe")}"
   : "${prog_home:=$(cd "$prog_dir/.." && /bin/pwd)}"
   : "${prog_inc:=$prog_home/include}"
@@ -55,7 +63,9 @@ prog-path RUBY    ruby        declare prog_exe="$(rbenv which ruby)"
 prog-path TCL     tclsh
 prog-path GUILE   guile
 prog-path JAVA    java
+prog-path CLOJURE clojure
 
+JAVA_INC="${JAVA_INC//\/jre\//\/}"
 export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
 export RUBYLIB="$dir/src:$RUBYLIB"
 export GUILE_AUTO_COMPILE=0
