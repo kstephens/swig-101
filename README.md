@@ -550,7 +550,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 142608230>
+#<swig-pointer std::vector< double > * 124e04080>
 17.3020736
 ```
 
@@ -577,7 +577,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_005b804e01000000_p_std__vectorT_double_t
+_0045002701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -655,7 +655,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 142608230>
+#<swig-pointer std::vector< double > * 124e04080>
 17.3020736
 ```
 
@@ -663,7 +663,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_005b804e01000000_p_std__vectorT_double_t
+_0045002701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1233,7 +1233,7 @@ clang -g -Isrc -o target/native/example1 src/example1-native.c                  
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -addextern -I- -Isrc -python -outdir target/python/ -o                     \
+$HOMEswig -addextern -I- -Isrc -python -outdir target/python/ -o                \
   target/python/example1_swig.c src/example1.i                                
                                                                               
 # Source code statistics:                                                     
@@ -1265,7 +1265,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -addextern -I- -Isrc -java -outdir target/clojure/ -o                      \
+$HOMEswig -addextern -I- -Isrc -java -outdir target/clojure/ -o                 \
   target/clojure/example1_swig.c src/example1.i                               
                                                                               
 # Source code statistics:                                                     
@@ -1297,7 +1297,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o                         \
+$HOMEswig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o                    \
   target/ruby/example1_swig.c src/example1.i                                  
                                                                               
 # Source code statistics:                                                     
@@ -1325,7 +1325,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -addextern -I- -Isrc -tcl -outdir target/tcl/ -o                           \
+$HOMEswig -addextern -I- -Isrc -tcl -outdir target/tcl/ -o                      \
   target/tcl/example1_swig.c src/example1.i                                   
                                                                               
 # Source code statistics:                                                     
@@ -1339,8 +1339,8 @@ wc -l target/tcl/example1_swig.c
 2149 target/tcl/example1_swig.c                                               
                                                                               
 # Compile tcl bindings:                                                       
-clang -g -Isrc -Wno-sentinel -I/usr/include/tcl -c -o                           \
-  target/tcl/example1_swig.c.o target/tcl/example1_swig.c                     
+clang -g -Isrc -Wno-sentinel -Itcl -c -o target/tcl/example1_swig.c.o           \
+  target/tcl/example1_swig.c                                                  
                                                                               
 # Link tcl dynamic library:                                                   
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
@@ -1353,7 +1353,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -addextern -I- -Isrc -guile -outdir target/guile/ -o                       \
+$HOMEswig -addextern -I- -Isrc -guile -outdir target/guile/ -o                  \
   target/guile/example1_swig.c src/example1.i                                 
                                                                               
 # Source code statistics:                                                     
@@ -1367,14 +1367,14 @@ wc -l target/guile/example1_swig.c
 1605 target/guile/example1_swig.c                                             
                                                                               
 # Compile guile bindings:                                                     
-clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c  \
-  -o target/guile/example1_swig.c.o target/guile/example1_swig.c              
+clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o        \
+  target/guile/example1_swig.c.o target/guile/example1_swig.c                 
                                                                               
 # Link guile dynamic library:                                                 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/guile/libexample1_swig.so target/native/example1.o                     \
-  target/guile/example1_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread   \
-  -ltommath                                                                   
+  target/guile/example1_swig.c.o -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc  \
+  -lpthread -ltommath                                                         
                                                                               
 ```                                                                           
                                                                               
@@ -1403,7 +1403,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o             
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o                \
+$HOMEswig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o           \
   target/python/polynomial_swig.cc src/polynomial.i                           
                                                                               
 # Source code statistics:                                                     
@@ -1435,7 +1435,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o                 \
+$HOMEswig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o            \
   target/clojure/polynomial_swig.cc src/polynomial.i                          
                                                                               
 # Source code statistics:                                                     
@@ -1467,7 +1467,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o                    \
+$HOMEswig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o               \
   target/ruby/polynomial_swig.cc src/polynomial.i                             
                                                                               
 # Source code statistics:                                                     
@@ -1496,7 +1496,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o                      \
+$HOMEswig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o                 \
   target/tcl/polynomial_swig.cc src/polynomial.i                              
                                                                               
 # Source code statistics:                                                     
@@ -1511,8 +1511,7 @@ wc -l target/tcl/polynomial_swig.cc
                                                                               
 # Compile tcl bindings:                                                       
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -I/usr/include/tcl -c -o target/tcl/polynomial_swig.cc.o                      \
-  target/tcl/polynomial_swig.cc                                               
+  -Itcl -c -o target/tcl/polynomial_swig.cc.o target/tcl/polynomial_swig.cc   
                                                                               
 # Link tcl dynamic library:                                                   
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
@@ -1525,7 +1524,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o                  \
+$HOMEswig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o             \
   target/guile/polynomial_swig.cc src/polynomial.i                            
                                                                               
 # Source code statistics:                                                     
@@ -1540,14 +1539,14 @@ wc -l target/guile/polynomial_swig.cc
                                                                               
 # Compile guile bindings:                                                     
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                          \
+  -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o                                   \
   target/guile/polynomial_swig.cc.o target/guile/polynomial_swig.cc           
                                                                               
 # Link guile dynamic library:                                                 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_swig.so           \
   target/native/polynomial.o target/guile/polynomial_swig.cc.o                  \
-  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread -ltommath                      
+  -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc -lpthread -ltommath           
                                                                               
 ```                                                                           
                                                                               
@@ -1576,7 +1575,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o             
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o                \
+$HOMEswig -addextern -I- -Isrc -python -c++ -outdir target/python/ -o           \
   target/python/polynomial_v2_swig.cc src/polynomial_v2.i                     
                                                                               
 # Source code statistics:                                                     
@@ -1609,7 +1608,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o                 \
+$HOMEswig -addextern -I- -Isrc -java -c++ -outdir target/clojure/ -o            \
   target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i                    
 include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
@@ -1649,7 +1648,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o                    \
+$HOMEswig -addextern -I- -Isrc -ruby -c++ -outdir target/ruby/ -o               \
   target/ruby/polynomial_v2_swig.cc src/polynomial_v2.i                       
                                                                               
 # Source code statistics:                                                     
@@ -1678,7 +1677,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o                      \
+$HOMEswig -addextern -I- -Isrc -tcl -c++ -outdir target/tcl/ -o                 \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i                        
 include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
@@ -1695,7 +1694,7 @@ wc -l target/tcl/polynomial_v2_swig.cc
                                                                               
 # Compile tcl bindings:                                                       
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -I/usr/include/tcl -c -o target/tcl/polynomial_v2_swig.cc.o                   \
+  -Itcl -c -o target/tcl/polynomial_v2_swig.cc.o                                \
   target/tcl/polynomial_v2_swig.cc                                            
                                                                               
 # Link tcl dynamic library:                                                   
@@ -1709,7 +1708,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o                  \
+$HOMEswig -addextern -I- -Isrc -guile -c++ -outdir target/guile/ -o             \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i                      
 include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
@@ -1730,14 +1729,14 @@ wc -l target/guile/polynomial_v2_swig.cc
                                                                               
 # Compile guile bindings:                                                     
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                          \
+  -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o                                   \
   target/guile/polynomial_v2_swig.cc.o target/guile/polynomial_v2_swig.cc     
                                                                               
 # Link guile dynamic library:                                                 
 clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_v2_swig.so        \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
-  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread -ltommath                      
+  -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc -lpthread -ltommath           
                                                                               
 ```                                                                           
                                                                               
@@ -1764,7 +1763,7 @@ clang -g -Isrc -o target/native/tommath src/tommath-native.c                    
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -addextern -I- -Isrc -python -outdir target/python/ -o                     \
+$HOMEswig -addextern -I- -Isrc -python -outdir target/python/ -o                \
   target/python/tommath_swig.c src/tommath.i                                  
                                                                               
 # Source code statistics:                                                     
@@ -1796,7 +1795,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -addextern -I- -Isrc -java -outdir target/clojure/ -o                      \
+$HOMEswig -addextern -I- -Isrc -java -outdir target/clojure/ -o                 \
   target/clojure/tommath_swig.c src/tommath.i                                 
                                                                               
 # Source code statistics:                                                     
@@ -1828,7 +1827,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o                         \
+$HOMEswig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o                    \
   target/ruby/tommath_swig.c src/tommath.i                                    
 local/include/libtommath/tommath.h:175: Warning 801: Wrong class name           \
   (corrected to `Mp_int')                                                     
@@ -1860,7 +1859,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -addextern -I- -Isrc -guile -outdir target/guile/ -o                       \
+$HOMEswig -addextern -I- -Isrc -guile -outdir target/guile/ -o                  \
   target/guile/tommath_swig.c src/tommath.i                                   
                                                                               
 # Source code statistics:                                                     
@@ -1874,14 +1873,14 @@ wc -l target/guile/tommath_swig.c
 6397 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
-clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c  \
-  -o target/guile/tommath_swig.c.o target/guile/tommath_swig.c                
+clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o        \
+  target/guile/tommath_swig.c.o target/guile/tommath_swig.c                   
                                                                               
 # Link guile dynamic library:                                                 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/guile/libtommath_swig.so target/native/tommath.o                       \
-  target/guile/tommath_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread    \
-  -ltommath                                                                   
+  target/guile/tommath_swig.c.o -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc   \
+  -lpthread -ltommath                                                         
                                                                               
 ```                                                                           
                                                                               
