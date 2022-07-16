@@ -88,7 +88,7 @@ SWIG_OPTS_x += \
 
 SUFFIX_ruby=rb
 SWIG_OPTS_ruby=-ruby
-SWIG_CFLAGS_ruby:=$(shell ruby tool/ruby-cflags.rb)
+SWIG_CFLAGS_ruby:=$(shell $(RUBY_EXE) tool/ruby-cflags.rb)
 
 ############################
 
