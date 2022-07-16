@@ -11,4 +11,3 @@ def test_one_coeff():
     p.coeffs = VectorDouble([ 2.3 ])
     assert p.evaluate(1.2) == 2.3
     assert p.evaluate(999) == 2.3
-

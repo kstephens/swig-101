@@ -5,8 +5,10 @@
 
 (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
 
+;; Instantiate object:
 (define p (new-Polynomial))
 (Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))
 
+;; Invoke methods:
 (write (Polynomial-coeffs-get p)) (newline)
 (write (Polynomial-evaluate p 1.2)) (newline)

@@ -188,13 +188,13 @@ EXAMPLE1_VERSION = 1.2.3
 ### Python : src/example1.py
 
 ```python
-# Setup DLL search path:                                                       #   1 
+# Setup search path:                                                           #   1 
 import sys ; sys.path.append('target/python')                                  #   2 
                                                                                #   3 
-# Import library bindings:                                                     #   4 
+# Load SWIG bindings:                                                          #   4 
 import example1_swig as example1                                               #   5 
                                                                                #   6 
-# Use imported module:                                                         #   7 
+# Use SWIG bindings:                                                           #   7 
 print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)                       #   8 
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
 ```
@@ -213,13 +213,14 @@ EXAMPLE1_VERSION = 1.2.3
 ### Clojure (Java) : src/example1.clj
 
 ```lisp
-(clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  1 
-                                                                               ;;  2 
+;; Load SWIG bindings:                                                         ;;  1 
+(clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  2 
 (import 'example1_swig)                                                        ;;  3 
                                                                                ;;  4 
-(println (format "EXAMPLE1_VERSION = %s"                                       ;;  5 
-               	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  6 
-(prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  7 
+;; Use SWIG bindings:                                                          ;;  5 
+(println (format "EXAMPLE1_VERSION = %s"                                       ;;  6 
+               	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  7 
+(prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  8 
 ```
 
 
@@ -236,14 +237,17 @@ EXAMPLE1_VERSION = 1.2.3
 ### Ruby : src/example1.rb
 
 ```ruby
-ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   1 
-$:.unshift 'target/ruby'                                                       #   2 
-                                                                               #   3 
-require 'example1_swig'                                                        #   4 
-include Example1_swig                                                          #   5 
-                                                                               #   6 
-puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"                                  #   7 
-puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #   8 
+# Setup search path:                                                           #   1 
+ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   2 
+$:.unshift 'target/ruby'                                                       #   3 
+                                                                               #   4 
+# Load SWIG bindings:                                                          #   5 
+require 'example1_swig'                                                        #   6 
+include Example1_swig                                                          #   7 
+                                                                               #   8 
+# Use SWIG bindings:                                                           #   9 
+puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"                                  #  10 
+puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
 ```
 
 
@@ -260,12 +264,14 @@ EXAMPLE1_VERSION = 1.2.3
 ### Guile : src/example1.scm
 
 ```scheme
-(load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  1 
-                                                                               ;;  2 
-(write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  3 
-(newline)                                                                      ;;  4 
-(write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  5 
+;; Load SWIG bindings:                                                         ;;  1 
+(load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  2 
+                                                                               ;;  3 
+;; Use SWIG bindings:                                                          ;;  4 
+(write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  5 
 (newline)                                                                      ;;  6 
+(write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  7 
+(newline)                                                                      ;;  8 
 ```
 
 
@@ -282,10 +288,12 @@ $ bin/run src/example1.scm
 ### TCL : src/example1.tcl
 
 ```shell
-load target/tcl/example1_swig.so Example1_swig                                 #   1 
-                                                                               #   2 
-puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   3 
-puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   4 
+# Load SWIG bindings:                                                          #   1 
+load target/tcl/example1_swig.so Example1_swig                                 #   2 
+                                                                               #   3 
+# Use SWIG bindings:                                                           #   4 
+puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   5 
+puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   6 
 ```
 
 
@@ -437,19 +445,17 @@ POLYNOMIAL_VERSION 1.2.1
 ### Python : src/polynomial.py
 
 ```python
-# Import library bindings:                                                     #   1 
-from polynomial_swig import *                                                  #   2 
-                                                                               #   3 
-# #define constants:                                                           #   4 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   5 
-                                                                               #   6 
-# Instantiate object:                                                          #   7 
-poly = Polynomial()                                                            #   8 
-poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #   9 
-                                                                               #  10 
-# Invoke methods:                                                              #  11 
-print(list(poly.coeffs))                                                       #  12 
-print(poly.evaluate(1.2))                                                      #  13 
+from polynomial_swig import *                                                  #   1 
+                                                                               #   2 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
+                                                                               #   4 
+# Instantiate object:                                                          #   5 
+poly = Polynomial()                                                            #   6 
+poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #   7 
+                                                                               #   8 
+# Invoke methods:                                                              #   9 
+print(list(poly.coeffs))                                                       #  10 
+print(poly.evaluate(1.2))                                                      #  11 
 ```
 
 
@@ -467,22 +473,18 @@ $ bin/run src/polynomial.py
 ### Clojure (Java) : src/polynomial.clj
 
 ```lisp
-;; Load Java bindings dynamic library:                                         ;;  1 
-(clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  2 
+(clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  1 
+(import 'polynomial_swig)                                                      ;;  2 
                                                                                ;;  3 
-;; Import Java namespace:                                                      ;;  4 
-(import 'polynomial_swig)                                                      ;;  5 
-                                                                               ;;  6 
-;; #define constants:                                                          ;;  7 
-(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  8 
+(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  4 
+                                                                               ;;  5 
+;; Instantiate object:                                                         ;;  6 
+(def p (Polynomial.))                                                          ;;  7 
+(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;;  8 
                                                                                ;;  9 
-;; Instantiate object:                                                         ;; 10 
-(def p (Polynomial.))                                                          ;; 11 
-(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 12 
-                                                                               ;; 13 
-;; Invoke methods:                                                             ;; 14 
-(prn (.getCoeffs p))                                                           ;; 15 
-(prn (.evaluate p 1.2))                                                        ;; 16 
+;; Invoke methods:                                                             ;; 10 
+(prn (.getCoeffs p))                                                           ;; 11 
+(prn (.evaluate p 1.2))                                                        ;; 12 
 ```
 
 
@@ -505,11 +507,13 @@ include Polynomial_swig                                                        #
                                                                                #   3 
 pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   4 
                                                                                #   5 
-p = Polynomial.new                                                             #   6 
-p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #   7 
-                                                                               #   8 
-pp p.coeffs.to_a                                                               #   9 
-pp p.evaluate(1.2)                                                             #  10 
+# Instantiate object:                                                          #   6 
+p = Polynomial.new                                                             #   7 
+p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #   8 
+                                                                               #   9 
+# Invoke methods:                                                              #  10 
+pp p.coeffs.to_a                                                               #  11 
+pp p.evaluate(1.2)                                                             #  12 
 ```
 
 
@@ -531,11 +535,13 @@ $ bin/run src/polynomial.rb
                                                                                ;;  2 
 (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
                                                                                ;;  4 
-(define p (new-Polynomial))                                                    ;;  5 
-(Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;;  6 
-                                                                               ;;  7 
-(write (Polynomial-coeffs-get p)) (newline)                                    ;;  8 
-(write (Polynomial-evaluate p 1.2)) (newline)                                  ;;  9 
+;; Instantiate object:                                                         ;;  5 
+(define p (new-Polynomial))                                                    ;;  6 
+(Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;;  7 
+                                                                               ;;  8 
+;; Invoke methods:                                                             ;;  9 
+(write (Polynomial-coeffs-get p)) (newline)                                    ;; 10 
+(write (Polynomial-evaluate p 1.2)) (newline)                                  ;; 11 
 ```
 
 
@@ -544,7 +550,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14a904080>
+#<swig-pointer std::vector< double > * 120804080>
 17.3020736
 ```
 
@@ -557,12 +563,14 @@ load target/tcl/polynomial_swig.so Polynomial_swig                             #
                                                                                #   2 
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                             #   3 
                                                                                #   4 
-Polynomial poly                                                                #   5 
-VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #   6 
-poly configure -coeffs c                                                       #   7 
-                                                                               #   8 
-puts [poly cget -coeffs]                                                       #   9 
-puts [poly evaluate 1.2]                                                       #  10 
+# Instantiate object:                                                          #   5 
+Polynomial poly                                                                #   6 
+VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #   7 
+poly configure -coeffs c                                                       #   8 
+                                                                               #   9 
+# Invoke methods:                                                              #  10 
+puts [poly cget -coeffs]                                                       #  11 
+puts [poly evaluate 1.2]                                                       #  12 
 ```
 
 
@@ -571,7 +579,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_0053f04801000000_p_std__vectorT_double_t
+_605e703501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -647,7 +655,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14a904080>
+#<swig-pointer std::vector< double > * 120804080>
 17.3020736
 ```
 
@@ -655,7 +663,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_0053f04801000000_p_std__vectorT_double_t
+_605e703501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -810,21 +818,27 @@ template class std::vector<mathlib::rational<int>>;                            /
 ### Python : src/polynomial_v2.py
 
 ```python
-from polynomial_v2_swig import *                                               #   1 
-                                                                               #   2 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
-                                                                               #   4 
-coeffs = [ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ]                                #   5 
-poly         = PolynomialDoubleV2()                                            #   6 
-poly.coeffs  = VectorDoubleV2(coeffs)                                          #   7 
-print(list(poly.coeffs))                                                       #   8 
-print(poly.evaluate(1.2))                                                      #   9 
-                                                                               #  10 
-coeffs = [ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]          #  11 
-poly         = PolynomialRationalV2()                                          #  12 
-poly.coeffs  = VectorRationalV2(coeffs)                                        #  13 
-print(list(poly.coeffs))                                                       #  14 
-print(poly.evaluate(RationalV2(5, 7)))                                         #  15 
+from polynomial_v2_swig import *                                                             #   1 
+                                                                                             #   2 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                            #   3 
+                                                                                             #   4 
+# Instantiate polynomial<double> object:                                                     #   5 
+poly         = PolynomialDoubleV2()                                                          #   6 
+poly.coeffs  = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                        #   7 
+print(list(poly.coeffs))                                                                     #   8 
+print(poly.evaluate(1.2))                                                                    #   9 
+                                                                                             #  10 
+# Instantiate polynomial<int> object:                                                        #  11 
+poly        = PolynomialIntV2()                                                              #  12 
+poly.coeffs = VectorIntV2([ 2, 3, 5, 7, 11, -13 ])                                           #  13 
+print(list(poly.coeffs))                                                                     #  14 
+print(poly.evaluate(-2))                                                                     #  15 
+                                                                                             #  16 
+# Instantiate polynomial<rational<int>> object:                                              #  17 
+poly        = PolynomialRationalV2()                                                         #  18 
+poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]) #  19 
+print(list(poly.coeffs))                                                                     #  20 
+print(poly.evaluate(RationalV2(5, 7)))                                                       #  21 
 ```
 
 
@@ -835,6 +849,8 @@ $ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
+[2, 3, 5, 7, 11, -13]
+552
 [rational(7,11), rational(11,13), rational(13,17)]
 194273/119119
 ```
@@ -845,20 +861,27 @@ $ bin/run src/polynomial_v2.py
 
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                 ;;  1 
-                                                                                                   ;;  2 
-(import 'polynomial_v2_swig)                                                                       ;;  3 
-                                                                                                   ;;  4 
-(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  5 
-                                                                                                   ;;  6 
+(import 'polynomial_v2_swig)                                                                       ;;  2 
+                                                                                                   ;;  3 
+(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  4 
+                                                                                                   ;;  5 
+;; Instantiate polynomial<double> object:                                                          ;;  6 
 (def p1 (PolynomialDoubleV2.))                                                                     ;;  7 
 (.setCoeffs p1 (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))                                ;;  8 
 (prn (.getCoeffs p1))                                                                              ;;  9 
 (prn (.evaluate p1 1.2))                                                                           ;; 10 
                                                                                                    ;; 11 
-(def p2 (PolynomialRationalV2.))                                                                   ;; 12 
-(.setCoeffs p2 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 13 
-(prn (mapv #(.__str__ %) (.getCoeffs p2)))                                                         ;; 14 
-(prn (.__str__ (.evaluate p2 (RationalV2. 5, 7))))                                                 ;; 15 
+;; Instantiate polynomial<int> object:                                                             ;; 12 
+(def p2 (PolynomialIntV2.))                                                                        ;; 13 
+(.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                          ;; 14 
+(prn (.getCoeffs p2))                                                                              ;; 15 
+(prn (.evaluate p2 -2))                                                                            ;; 16 
+                                                                                                   ;; 17 
+;; Instantiate polynomial<rational<int>> object:                                                   ;; 18 
+(def p3 (PolynomialRationalV2.))                                                                   ;; 19 
+(.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 20 
+(prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                         ;; 21 
+(prn (.__str__ (.evaluate p3 (RationalV2. 5, 7))))                                                 ;; 22 
 ```
 
 
@@ -869,8 +892,53 @@ $ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
+[2 3 5 7 11 -13]
+552
 ["7/11" "11/13" "13/17"]
 "194273/119119"
+```
+
+---
+
+### Ruby : src/polynomial_v2.rb
+
+```ruby
+require 'polynomial_v2_swig'                                                                                                     #   1 
+PV2 = Polynomial_v2_swig                                                                                                         #   2 
+                                                                                                                                 #   3 
+pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION                                                                                   #   4 
+                                                                                                                                 #   5 
+# Instantiate polynomial<double> object:                                                                                         #   6 
+poly        = PV2::PolynomialDoubleV2.new                                                                                        #   7 
+poly.coeffs = PV2::VectorDoubleV2.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                                                    #   8 
+pp poly.coeffs.to_a                                                                                                              #   9 
+pp poly.evaluate(1.2)                                                                                                            #  10 
+                                                                                                                                 #  11 
+# Instantiate polynomial<int> object:                                                                                            #  12 
+poly        = PV2::PolynomialDoubleV2.new                                                                                        #  13 
+poly.coeffs = PV2::VectorDoubleV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                   #  14 
+pp poly.coeffs.to_a                                                                                                              #  15 
+pp poly.evaluate(-2)                                                                                                             #  16 
+                                                                                                                                 #  17 
+# Instantiate polynomial<rational<int>> object:                                                                                  #  18 
+poly        = PV2::PolynomialRationalV2.new()                                                                                    #  19 
+poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalV2.new(7, 11), PV2::RationalV2.new(11, 13), PV2::RationalV2.new(13,17) ]) #  20 
+pp poly.coeffs.to_a                                                                                                              #  21 
+pp poly.evaluate(PV2::RationalV2.new(5, 7))                                                                                      #  22 
+```
+
+
+---
+
+```
+$ bin/run src/polynomial_v2.rb
+{:POLYNOMIAL_VERSION=>"2.0.2"}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+552.0
+[rational(7,11), rational(11,13), rational(13,17)]
+rational(194273,119119)
 ```
 
 ---
@@ -893,6 +961,8 @@ $ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
+[2, 3, 5, 7, 11, -13]
+552
 [rational(7,11), rational(11,13), rational(13,17)]
 194273/119119
 ```
@@ -903,8 +973,22 @@ $ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
+[2 3 5 7 11 -13]
+552
 ["7/11" "11/13" "13/17"]
 "194273/119119"
+```
+
+
+```
+$ bin/run src/polynomial_v2.rb
+{:POLYNOMIAL_VERSION=>"2.0.2"}
+[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
+17.3020736
+[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
+552.0
+[rational(7,11), rational(11,13), rational(13,17)]
+rational(194273,119119)
 ```
 
 

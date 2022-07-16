@@ -1,12 +1,8 @@
 ;; -*- clojure -*-
 
-;; Load Java bindings dynamic library:
 (clojure.lang.RT/loadLibrary "polynomial_swig")
-
-;; Import Java namespace:
 (import 'polynomial_swig)
 
-;; #define constants:
 (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
 
 ;; Instantiate object:
