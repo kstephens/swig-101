@@ -57,6 +57,7 @@ prog-path GUILE   guile
 prog-path JAVA    java
 
 export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
+export RUBYLIB="$dir/src:$RUBYLIB"
 export GUILE_AUTO_COMPILE=0
 export PYTHONPATH="$dir/target/python:$PYTHONPATH"
 

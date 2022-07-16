@@ -378,7 +378,8 @@ README.md : tmp/README.md
 tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 	$(MAKE) clean
 	mkdir -p tmp
-	erb doc/README.md.erb > $@
+	erb doc/README.md.erb > $@.tmp
+	mv $@.tmp $@
 	ls -l $@
 
 # README.md.html : README.md

@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 114604080>
+#<swig-pointer std::vector< double > * 12c6041a0>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a04a205701000000_p_std__vectorT_double_t
+_a041a04901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -736,7 +736,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 114604080>
+#<swig-pointer std::vector< double > * 12c6041a0>
 17.3020736
 ```
 
@@ -746,7 +746,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a04a205701000000_p_std__vectorT_double_t
+_a041a04901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1323,86 +1323,20 @@ MP_ITER = -4
 ### Ruby : tommath-2.rb
 
 ```ruby
-require 'pry' # _byebug'                                                       #   1 
-require 'tommath_swig'                                                         #   2 
-                                                                               #   3 
-#########################################################                      #   4 
-# Sugar:                                                                       #   5 
-                                                                               #   6 
-module Tommath_swig                                                            #   7 
-  class Mp_int                                                                 #   8 
-    # Constructor:                                                             #   9 
-    def self.[] val = 0, radix = 10                                            #  10 
-      case val                                                                 #  11 
-      when self                                                                #  12 
-        val                                                                    #  13 
-      when Integer                                                             #  14 
-        inst = new                                                             #  15 
-        Tommath_swig.mp_set(inst, val)                                         #  16 
-        inst                                                                   #  17 
-      when String                                                              #  18 
-        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  19 
-      when nil                                                                 #  20 
-        self[0]                                                                #  21 
-      else                                                                     #  22 
-        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  23 
-      end                                                                      #  24 
-    end                                                                        #  25 
-                                                                               #  26 
-    def to_s radix = 10                                                        #  27 
-      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  28 
-    end                                                                        #  29 
-                                                                               #  30 
-    def inspect                                                                #  31 
-      "MPI[#{to_s.inspect}]"                                                   #  32 
-    end                                                                        #  33 
-                                                                               #  34 
-    def -@                                                                     #  35 
-      result = MPI.new                                                         #  36 
-      Tommath_swig.mp_neg(self, result)                                        #  37 
-      result                                                                   #  38 
-    end                                                                        #  39 
-    def + other                                                                #  40 
-      result = MPI.new                                                         #  41 
-      Tommath_swig.mp_add(self, MPI[other], result)                            #  42 
-      result                                                                   #  43 
-    end                                                                        #  44 
-    def - other                                                                #  45 
-      result = MPI.new                                                         #  46 
-      Tommath_swig.mp_sub(self, MPI[other], result)                            #  47 
-      result                                                                   #  48 
-    end                                                                        #  49 
-    def * other                                                                #  50 
-      result = MPI.new                                                         #  51 
-      Tommath_swig.mp_mul(self, MPI[other], result)                            #  52 
-      result                                                                   #  53 
-    end                                                                        #  54 
-    def / other                                                                #  55 
-      result = MPI.new                                                         #  56 
-      remainder = MPI.new                                                      #  57 
-      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  58 
-      result                                                                   #  59 
-    end                                                                        #  60 
-  end                                                                          #  61 
-  MPI = Mp_int                                                                 #  62 
-end                                                                            #  63 
-MPI = Tommath_swig::MPI                                                        #  64 
-                                                                               #  65 
-#########################################################                      #  66 
-# Better!                                                                      #  67 
-                                                                               #  68 
-a = MPI[2357111317]                                                            #  69 
-b = MPI[1113171923]                                                            #  70 
-c = MPI[]                                                                      #  71 
-d = MPI[]                                                                      #  72 
-e = MPI["12343456", 16]                                                        #  73 
-                                                                               #  74 
-puts({a: a, b: b, c: c, d: d, e: e})                                           #  75 
-                                                                               #  76 
-c = a * b                                                                      #  77 
-d = c * b                                                                      #  78 
-                                                                               #  79 
-puts({a: a, b: b, c: c, d: d, e: e})                                           #  80 
+require 'tommath-mpi'                                                          #   1 
+                                                                               #   2 
+a = MPI[2357111317]                                                            #   3 
+b = MPI[1113171923]                                                            #   4 
+c = MPI[]                                                                      #   5 
+d = MPI[]                                                                      #   6 
+e = MPI["12343456", 16]                                                        #   7 
+                                                                               #   8 
+puts({a: a, b: b, c: c, d: d, e: e})                                           #   9 
+                                                                               #  10 
+c = a * b                                                                      #  11 
+d = c * b                                                                      #  12 
+                                                                               #  13 
+puts({a: a, b: b, c: c, d: d, e: e})                                           #  14 
 ```
 
 
@@ -1415,6 +1349,75 @@ $ bin/run src/tommath-2.rb
 ```
 
 ---
+
+### Ruby : tommath-mpi.rb
+
+```ruby
+require 'tommath_swig'                                                         #   1 
+                                                                               #   2 
+#########################################################                      #   3 
+# Sugar:                                                                       #   4 
+                                                                               #   5 
+module Tommath_swig                                                            #   6 
+  class Mp_int                                                                 #   7 
+    # Constructor:                                                             #   8 
+    def self.[] val = 0, radix = 10                                            #   9 
+      case val                                                                 #  10 
+      when self                                                                #  11 
+        val                                                                    #  12 
+      when Integer                                                             #  13 
+        inst = new                                                             #  14 
+        Tommath_swig.mp_set(inst, val)                                         #  15 
+        inst                                                                   #  16 
+      when String                                                              #  17 
+        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  18 
+      when nil                                                                 #  19 
+        self[0]                                                                #  20 
+      else                                                                     #  21 
+        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  22 
+      end                                                                      #  23 
+    end                                                                        #  24 
+                                                                               #  25 
+    def to_s radix = 10                                                        #  26 
+      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  27 
+    end                                                                        #  28 
+                                                                               #  29 
+    def inspect                                                                #  30 
+      "MPI[#{to_s.inspect}]"                                                   #  31 
+    end                                                                        #  32 
+                                                                               #  33 
+    def -@                                                                     #  34 
+      result = MPI.new                                                         #  35 
+      Tommath_swig.mp_neg(self, result)                                        #  36 
+      result                                                                   #  37 
+    end                                                                        #  38 
+    def + other                                                                #  39 
+      result = MPI.new                                                         #  40 
+      Tommath_swig.mp_add(self, MPI[other], result)                            #  41 
+      result                                                                   #  42 
+    end                                                                        #  43 
+    def - other                                                                #  44 
+      result = MPI.new                                                         #  45 
+      Tommath_swig.mp_sub(self, MPI[other], result)                            #  46 
+      result                                                                   #  47 
+    end                                                                        #  48 
+    def * other                                                                #  49 
+      result = MPI.new                                                         #  50 
+      Tommath_swig.mp_mul(self, MPI[other], result)                            #  51 
+      result                                                                   #  52 
+    end                                                                        #  53 
+    def / other                                                                #  54 
+      result = MPI.new                                                         #  55 
+      remainder = MPI.new                                                      #  56 
+      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  57 
+      result                                                                   #  58 
+    end                                                                        #  59 
+  end                                                                          #  60 
+  MPI = Mp_int                                                                 #  61 
+end                                                                            #  62 
+MPI = Tommath_swig::MPI                                                        #  63 
+```
+
 
 
 
