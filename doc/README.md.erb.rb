@@ -167,25 +167,27 @@ def clean_up_lines lines
   lines.map! do | line |
     line.
     gsub('\0', ''). # mp_fwrite adds NULL?!?
-    gsub('/opt/local/bin/gmake',    'make').
-    gsub('/opt/homebrew/bin/gmake', 'make').
-    gsub('gmake',                   'make').
-    gsub(%r{/\S*/swig}, 'swig').
-    gsub(%r{/\S*/python}, 'python').
+    # Abs paths:
+    gsub(%r{//+}, ' ').
+    gsub('gmake', 'make').
     # OSX:
     gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
     gsub(%r{-framework \S+ }, ' ').
+    # HOME Paths:
     gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
     gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
     gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
     gsub(ENV['JAVA_HOME'],    '$JAVA_HOME').
     gsub(ENV['HOME'],         '$HOME').
     gsub(ENV['ROOT_DIR'],     '.').
+    # Abs paths:
+    gsub(%r{/\S*/(make|gmake|swig|python|ruby|tcl|guile)}, '\1').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
     gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
     # Duplicates:
-    gsub(%r{(-[IL]\S*)\s+\1}, ' ').
+    gsub(%r{\s+(-[IL]\S*)\s+\1}, ' ').
+    gsub(%r{//+}, '/').
     sub(%r{\s+$}, '')
   end
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
