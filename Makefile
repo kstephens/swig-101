@@ -397,7 +397,7 @@ clean-example:
 
 LOCAL:=$(ROOT_DIR)/local
 
-local-tools: swig libtommath
+local-tools: swig libtommath clojure
 
 local-tools-clean:
 	rm -rf '$(LOCAL)'
@@ -435,9 +435,18 @@ $(LOCAL)/lib/libtommath.a : $(LOCAL)/src/libtommath
 	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
 	cd $(LOCAL)/src/libtommath ;\
 	make -f makefile.unix clean ;\
-	make -f makefile.unix -j ;\
+	make -f makefile.unix -j CC='$(CC_SUFFIX.c) -fPIC' ;\
 	cp -p $(LOCAL)/src/libtommath/libtommath.a $@ ;\
 	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
 
 $(LOCAL)/src/libtommath:
 	git clone https://github.com/libtom/libtommath.git $@
+
+#################################
+
+clojure : $(LOCAL)/bin/clojure
+
+$(LOCAL)/bin/clojure :
+	curl -Lk https://download.clojure.org/install/linux-install-1.11.1.1149.sh > tmp/clojure-install.sh
+	bash tmp/clojure-install.sh --prefix $(LOCAL)
+
