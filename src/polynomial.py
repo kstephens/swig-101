@@ -1,8 +1,5 @@
 #!/usr/bin/env python3.10
 
-# Setup DLL search path:
-import sys ; sys.path.append('target/python')
-
 # Import library bindings:
 from polynomial_swig import *
 

@@ -437,22 +437,19 @@ POLYNOMIAL_VERSION 1.2.1
 ### Python : src/polynomial.py
 
 ```python
-# Setup DLL search path:                                                       #   1 
-import sys ; sys.path.append('target/python')                                  #   2 
+# Import library bindings:                                                     #   1 
+from polynomial_swig import *                                                  #   2 
                                                                                #   3 
-# Import library bindings:                                                     #   4 
-from polynomial_swig import *                                                  #   5 
+# #define constants:                                                           #   4 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   5 
                                                                                #   6 
-# #define constants:                                                           #   7 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   8 
-                                                                               #   9 
-# Instantiate object:                                                          #  10 
-poly = Polynomial()                                                            #  11 
-poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #  12 
-                                                                               #  13 
-# Invoke methods:                                                              #  14 
-print(list(poly.coeffs))                                                       #  15 
-print(poly.evaluate(1.2))                                                      #  16 
+# Instantiate object:                                                          #   7 
+poly = Polynomial()                                                            #   8 
+poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #   9 
+                                                                               #  10 
+# Invoke methods:                                                              #  11 
+print(list(poly.coeffs))                                                       #  12 
+print(poly.evaluate(1.2))                                                      #  13 
 ```
 
 
@@ -503,19 +500,16 @@ $ bin/run src/polynomial.clj
 ### Ruby : src/polynomial.rb
 
 ```ruby
-ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   1 
-$:.unshift 'target/ruby'                                                       #   2 
+require 'polynomial_swig'                                                      #   1 
+include Polynomial_swig                                                        #   2 
                                                                                #   3 
-require 'polynomial_swig'                                                      #   4 
-include Polynomial_swig                                                        #   5 
-                                                                               #   6 
-pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   7 
+pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   4 
+                                                                               #   5 
+p = Polynomial.new                                                             #   6 
+p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #   7 
                                                                                #   8 
-p = Polynomial.new                                                             #   9 
-p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #  10 
-                                                                               #  11 
-pp p.coeffs.to_a                                                               #  12 
-pp p.evaluate(1.2)                                                             #  13 
+pp p.coeffs.to_a                                                               #   9 
+pp p.evaluate(1.2)                                                             #  10 
 ```
 
 
@@ -550,7 +544,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1236041a0>
+#<swig-pointer std::vector< double > * 14a904080>
 17.3020736
 ```
 
@@ -577,7 +571,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_5045904501000000_p_std__vectorT_double_t
+_0053f04801000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -586,19 +580,17 @@ _5045904501000000_p_std__vectorT_double_t
 ### Python Tests : src/polynomial-test.py
 
 ```python
-import sys ; sys.path.append('target/python')                                  #   1 
-                                                                               #   2 
-from polynomial_swig import *                                                  #   3 
-import pytest                                                                  #   4 
-                                                                               #   5 
-def test_empty_coeffs():                                                       #   6 
-    p = Polynomial()                                                           #   7 
-    assert p.evaluate(1.2) == 0.0                                              #   8 
-def test_one_coeff():                                                          #   9 
-    p = Polynomial()                                                           #  10 
-    p.coeffs = VectorDouble([ 2.3 ])                                           #  11 
-    assert p.evaluate(1.2) == 2.3                                              #  12 
-    assert p.evaluate(999) == 2.3                                              #  13 
+from polynomial_swig import *                                                  #   1 
+import pytest                                                                  #   2 
+                                                                               #   3 
+def test_empty_coeffs():                                                       #   4 
+    p = Polynomial()                                                           #   5 
+    assert p.evaluate(1.2) == 0.0                                              #   6 
+def test_one_coeff():                                                          #   7 
+    p = Polynomial()                                                           #   8 
+    p.coeffs = VectorDouble([ 2.3 ])                                           #   9 
+    assert p.evaluate(1.2) == 2.3                                              #  10 
+    assert p.evaluate(999) == 2.3                                              #  11 
 ```
 
 
@@ -655,7 +647,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1236041a0>
+#<swig-pointer std::vector< double > * 14a904080>
 17.3020736
 ```
 
@@ -663,7 +655,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_5045904501000000_p_std__vectorT_double_t
+_0053f04801000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -818,23 +810,21 @@ template class std::vector<mathlib::rational<int>>;                            /
 ### Python : src/polynomial_v2.py
 
 ```python
-import sys ; sys.path.append('target/python')                                  #   1 
+from polynomial_v2_swig import *                                               #   1 
                                                                                #   2 
-from polynomial_v2_swig import *                                               #   3 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
                                                                                #   4 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   5 
-                                                                               #   6 
-coeffs = [ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ]                                #   7 
-poly         = PolynomialDoubleV2()                                            #   8 
-poly.coeffs  = VectorDoubleV2(coeffs)                                          #   9 
-print(list(poly.coeffs))                                                       #  10 
-print(poly.evaluate(1.2))                                                      #  11 
-                                                                               #  12 
-coeffs = [ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]          #  13 
-poly         = PolynomialRationalV2()                                          #  14 
-poly.coeffs  = VectorRationalV2(coeffs)                                        #  15 
-print(list(poly.coeffs))                                                       #  16 
-print(poly.evaluate(RationalV2(5, 7)))                                         #  17 
+coeffs = [ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ]                                #   5 
+poly         = PolynomialDoubleV2()                                            #   6 
+poly.coeffs  = VectorDoubleV2(coeffs)                                          #   7 
+print(list(poly.coeffs))                                                       #   8 
+print(poly.evaluate(1.2))                                                      #   9 
+                                                                               #  10 
+coeffs = [ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]          #  11 
+poly         = PolynomialRationalV2()                                          #  12 
+poly.coeffs  = VectorRationalV2(coeffs)                                        #  13 
+print(list(poly.coeffs))                                                       #  14 
+print(poly.evaluate(RationalV2(5, 7)))                                         #  15 
 ```
 
 

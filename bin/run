@@ -62,6 +62,14 @@ export PYTHONPATH="$dir/target/python:$PYTHONPATH"
 
 case "${cmd[0]}"
 in
+  *.rb)
+    target_dir="$dir/target/ruby"
+    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
+  ;;
+  *.py)
+    target_dir="$dir/target/python"
+    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
+  ;;
   *.clj)
     # set -x
     target_dir="$dir/target/clojure"

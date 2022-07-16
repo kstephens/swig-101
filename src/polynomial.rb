@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-ENV["LD_LIBRARY_PATH"] = 'target/ruby'
-$:.unshift 'target/ruby'
-
 require 'polynomial_swig'
 include Polynomial_swig
 

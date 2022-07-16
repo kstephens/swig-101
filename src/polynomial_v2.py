@@ -1,7 +1,5 @@
 #!/usr/bin/env python3.10
 
-import sys ; sys.path.append('target/python')
-
 from polynomial_v2_swig import *
 
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3.10
 
-import sys ; sys.path.append('target/python')
-
 from polynomial_swig import *
 import pytest
 
