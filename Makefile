@@ -2,7 +2,7 @@
 
 ############################
 
-EXAMPLES         = tommath.c polynomial.cc polynomial_v2.cc example1.c
+EXAMPLES         = example1.c polynomial.cc polynomial_v2.cc tommath.c 
 SWIG_TARGETS     = python  clojure  ruby  tcl  guile
 TARGET_SUFFIXES  = py      clj      rb    tcl  scm
 LIBS += -ltommath

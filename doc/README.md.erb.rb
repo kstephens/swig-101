@@ -72,32 +72,50 @@ def dedup_empty_lines(lines)
   result
 end
 
-def line_numbers! lines, lang
-  com_beg, com_end = comment_for_lang(lang)
-  max_width = [lines.map(&:size).max, 70].max
-  fmt = "%%-%ds  %s %%2d %s" % [max_width, com_beg, com_end]
-  lines.map!.with_index(1) {|line, i| fmt % [line, i] }
+def line_numbers! lines, lang, swig_interface = nil
+  comment_to_EOL, comment_line_rx = comment_for_lang(swig_interface || lang)
+  pad_lines!(lines)
+  lines.map!.with_index(1) do |line, i|
+    case line
+    when %r{^\s*$}
+      line
+    when comment_line_rx
+      line
+    else
+      ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
+      #  .gsub(' ', "\u00A0")
+    end
+  end
 end
 
 def comment_for_lang lang
   case lang.to_s.downcase
-  when /^c/
-    %w(//) # %w(/* */)
+  when /^c|java/i
+    [ '//', %r{^\s*(//|/\*)} ]
+  when /^swig/i
+    [ '//', %r{^\s*//[^%]} ]
   when /lisp|scheme|scm|clojure|clj/i
-    %w(;;)
+    [ ';;', %r{^\s*;;} ]
   when /py|tcl|shell|sh|ruby|rb/i
-    %w(#)
+    [ '#' , %r{^\s*\#} ]
   else
-    %w(#)
+    [ '#' , %r{^\s*\#} ]
   end
 end
 
-def code_lines s, lang
+def code_lines s, lang, swig_interface = nil
   lines = string_to_lines(s)
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
-  line_numbers!(lines, lang)
+  line_numbers!(lines, lang, swig_interface)
   lines_to_string(lines)
+end
+
+def pad_lines! lines, min_width = 78
+  lines.each{|line| line.sub!(/\s+$/, '')}
+  max_length = [ lines.map(&:size).max, min_width ].max
+  fmt = "%-#{max_length}s"
+  lines.map!{|line| fmt % [ line ]}
 end
 
 def wrap_line str, width = 78, newline =  "  \\\n", indent = '  '
@@ -111,17 +129,12 @@ def wrap_line str, width = 78, newline =  "  \\\n", indent = '  '
   end
   lines << line
   lines.each{|line| line.sub!(/\s+$/, '')}
-  max_length = [(lines.map(&:size).max), width].min
-  lines.map!{|line| "%-#{max_length}s" % [ line ]}
+  pad_lines!(lines, width)
   lines * newline
 end
 
 def markdeep str
-  if ENV['MARKDEEP']
-    str
-  else
-    markdeep_to_markdown(str)
-  end
+  ENV['MARKDEEP'] ? str : markdeep_to_markdown(str)
 end
 
 def markdeep_to_markdown str
@@ -246,10 +259,11 @@ END
       t = [:type, :file, :cmd, :lang].zip(l).to_h
       $context = t
       t[:name] = t[:file]
+      t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig' 
       t[:lang] ||= t[:type].split(/\s+/).first
       t[:code_style] ||= t[:lang].downcase
       t[:file] = "src/#{t[:file]}"
-      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]), t[:lang])
+      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]), t[:lang], t[:swig_interface])
       case t[:cmd]
       when '-'
       when nil

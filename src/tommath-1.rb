@@ -5,7 +5,7 @@ include Tommath_swig
 
 puts "MP_ITER = #{MP_ITER}"
 
-a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkard!
+a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!
 b = Mp_int.new(1113171923)                 # <-- better!
 c = Mp_int.new()
 d = Mp_int.new()

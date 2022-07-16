@@ -131,19 +131,17 @@ The examples below target:
 ```
 
 <%     if t[:run] %>
-----
+---
 
 ```
 $ <%= t[:run] %>
 <%= t[:run_output] %>
 ```
 
-----
+---
 <%     end # if t[:run] %>
 <%   end # targets %>
 
-----
-----
 
 ### Outputs - Recap
 
@@ -153,8 +151,10 @@ $ <%= t[:run] %>
 <%= t[:run_output] %>
 ```
 
-----
 <%   end # targets %>
+
+---
+
 <% end # $examples %>
 
 # Workflow
@@ -165,6 +165,8 @@ $ <%= t[:run] %>
 
 <% $examples.each do | e | %>
 <%= e[:workflow_output] %>
+
+---
 
 <% end %>
 
