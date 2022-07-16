@@ -367,7 +367,7 @@ brew-prereq:
 	bin/run pip install   pytest
 
 debian-prereq:
-	sudo apt-get install  automake libtool autoconf cmake bison tcl-dev  guile-2.2-dev
+	sudo apt-get install  automake libtool autoconf cmake bison byacc tcl-dev  guile-2.2-dev
 
 #################################
 
