@@ -157,10 +157,14 @@ def run_workflow e
   # Linux:
   gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
   gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
-  # macports:
-  gsub(%r{-I */opt/local/[^ ]* +}, ' ').
   # brew:
-  gsub(%r{-I */opt/homebrew/[^ ]* +}, ' ').
+  gsub(%r{-I */opt/homebrew/include +}, ' ').
+  gsub(%r{-L */opt/homebrew/lib +}, ' ').
+  gsub(%r{-I */opt/homebrew/opt/[^/ ]+/include[^ ]* +}, ' ').
+  gsub(%r{-L */opt/homebrew/opt/[^/ ]+/lib[^ ]* +}, ' ').
+  # macports:
+  gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
+  gsub(%r{-L */opt/local/lib[^ ]* +}, ' ').
   # local/:
   gsub(%r{-I *include[^ ]* +}, ' ').
   gsub(%r{-I *local/include[^ ]* +}, ' ').
@@ -181,11 +185,11 @@ def clean_up_lines lines
     gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
     gsub(%r{-framework \S+ }, ' ').
     # HOME Paths:
+    gsub(ENV['ROOT_DIR']+'/local/bin/', '').
     gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
     gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
     gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
     gsub(ENV['JAVA_HOME'],    '$JAVA_HOME').
-    gsub(ENV['HOME'],         '$HOME').
     gsub(ENV['ROOT_DIR'],     '.').
     # Abs paths:
     gsub(%r{/\S*/(make|gmake|swig|python|ruby|tcl|guile)}, '\1').
@@ -194,6 +198,8 @@ def clean_up_lines lines
     gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
     # Duplicates:
     gsub(%r{\s+(-[IL]\S*)\s+\1}, ' ').
+    # WTF?:
+    gsub(' /darwin ', ' ').
     gsub(%r{//+}, '/').
     sub(%r{\s+$}, '')
   end
