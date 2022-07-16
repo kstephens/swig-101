@@ -433,11 +433,10 @@ $(LOCAL)/lib/libtommath.a : $(LOCAL)/src/libtommath
 	cd $(LOCAL)/src/libtommath ;\
 	git checkout 4b473685013 ;\
 	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
-	cd $(LOCAL)/src/libtommath/build ;\
-	cmake .. ;\
-	make clean ;\
-	make -j ;\
-	cp -p $(LOCAL)/src/libtommath/build/libtommath.a $@ ;\
+	cd $(LOCAL)/src/libtommath ;\
+	make -f makefile.unix clean ;\
+	make -f makefile.unix -j ;\
+	cp -p $(LOCAL)/src/libtommath/libtommath.a $@ ;\
 	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
 
 $(LOCAL)/src/libtommath:
