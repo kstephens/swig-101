@@ -182,18 +182,19 @@ CC_SUFFIX.c=clang
 CC_SUFFIX.cc=clang++
 ifeq "$(UNAME_S)" "Linux"
 # WTF: wud: broken clang install??!?!?!
-CC_SUFFIX.c=gcc
-CC_SUFFIX.cc=g++
+CC_SUFFIX.c=clang-13
+CC_SUFFIX.cc=clang++-13
 endif
 
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 #LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
-ifeq "$(UNAME_S)" "Linux"
+ifeq "$(UNAME_S)" "LinuxXXX"
 # WTF: wud: broken clang install??!?!?!
 else
-CFLAGS_SUFFIX.cc=-Wno-c++11-extensions -stdlib=libc++
+CFLAGS_SUFFIX.cc=-Wno-c++11-extensions # -stdlib=libc++
 CFLAGS_SUFFIX.cc+= -std=c++17
+# CFLAGS_SUFFIX.cc+= -lstdc++
 endif
 
 #################################
@@ -368,6 +369,8 @@ brew-prereq:
 
 debian-prereq:
 	sudo apt-get install  automake libtool autoconf cmake bison byacc tcl-dev  guile-2.2-dev
+	@echo "See https://apt.llvm.org/."
+	sudo apt-get install clang-13 clang++-13 libc++-13-dev
 
 #################################
 
@@ -392,6 +395,9 @@ clean:
 
 clean-example:
 	$(SILENT)rm -rf target/*/*$(EXAMPLE_NAME)*
+
+pv:
+	echo $(v)=$($(v))
 
 #################################
 
