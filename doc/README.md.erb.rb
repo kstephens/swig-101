@@ -77,10 +77,9 @@ def line_numbers! lines, lang, swig_interface = nil
   pad_lines!(lines)
   lines.map!.with_index(1) do |line, i|
     case line
-    when %r{^\s*$}
-      line
-    when comment_line_rx
-      line
+    when nil
+    # when %r{^\s*$}, comment_line_rx
+    #  line
     else
       ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
       #  .gsub(' ', "\u00A0")

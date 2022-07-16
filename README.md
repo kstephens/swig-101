@@ -127,7 +127,7 @@ The examples below target:
 
 ```c
 #define EXAMPLE1_VERSION "1.2.3"                                               //  1 
-/* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */                                    
+/* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */                                     //  2 
 double cubic_poly(double x,                                                    //  3 
                   double c0,                                                   //  4 
                   double c1,                                                   //  5 
@@ -155,7 +155,7 @@ double cubic_poly(double x,                                                    /
 ```c
 #include <stdio.h>                                                             //  1 
 #include "example1.h"                                                          //  2 
-                                                                              
+                                                                               //  3 
 int main(int argc, char **argv) {                                              //  4 
   printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
@@ -188,13 +188,13 @@ EXAMPLE1_VERSION = 1.2.3
 ### Python : src/example1.py
 
 ```python
-# Setup DLL search path:                                                      
+# Setup DLL search path:                                                       #   1 
 import sys ; sys.path.append('target/python')                                  #   2 
-                                                                              
-# Import library bindings:                                                    
+                                                                               #   3 
+# Import library bindings:                                                     #   4 
 import example1_swig as example1                                               #   5 
-                                                                              
-# Use imported module:                                                        
+                                                                               #   6 
+# Use imported module:                                                         #   7 
 print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)                       #   8 
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
 ```
@@ -214,9 +214,9 @@ EXAMPLE1_VERSION = 1.2.3
 
 ```lisp
 (clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  1 
-                                                                              
+                                                                               ;;  2 
 (import 'example1_swig)                                                        ;;  3 
-                                                                              
+                                                                               ;;  4 
 (println (format "EXAMPLE1_VERSION = %s"                                       ;;  5 
                	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  6 
 (prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  7 
@@ -238,10 +238,10 @@ EXAMPLE1_VERSION = 1.2.3
 ```ruby
 ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   1 
 $:.unshift 'target/ruby'                                                       #   2 
-                                                                              
+                                                                               #   3 
 require 'example1_swig'                                                        #   4 
 include Example1_swig                                                          #   5 
-                                                                              
+                                                                               #   6 
 puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"                                  #   7 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #   8 
 ```
@@ -261,7 +261,7 @@ EXAMPLE1_VERSION = 1.2.3
 
 ```scheme
 (load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  1 
-                                                                              
+                                                                               ;;  2 
 (write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  3 
 (newline)                                                                      ;;  4 
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  5 
@@ -283,7 +283,7 @@ $ bin/run src/example1.scm
 
 ```shell
 load target/tcl/example1_swig.so Example1_swig                                 #   1 
-                                                                              
+                                                                               #   2 
 puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   3 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   4 
 ```
@@ -356,9 +356,9 @@ EXAMPLE1_VERSION = 1.2.3
 
 ```c++
 #include <vector>                                                              //  1 
-                                                                              
+                                                                               //  2 
 #define POLYNOMIAL_VERSION "1.2.1"                                             //  3 
-                                                                              
+                                                                               //  4 
 class Polynomial {                                                             //  5 
 public:                                                                        //  6 
   std::vector<double> coeffs;                                                  //  7 
@@ -371,7 +371,7 @@ public:                                                                        /
 
 ```c++
 #include "polynomial.h"                                                        //  1 
-                                                                              
+                                                                               //  2 
 double Polynomial::evaluate(double x) const {                                  //  3 
   double result = 0, xx = 1;                                                   //  4 
   for ( auto c : this->coeffs ) {                                              //  5 
@@ -389,14 +389,14 @@ double Polynomial::evaluate(double x) const {                                  /
 #include <iostream>                                                            //  1 
 #include <iomanip>                                                             //  2 
 #include "polynomial.h"                                                        //  3 
-                                                                              
+                                                                               //  4 
 int main(int argc, char **argv) {                                              //  5 
   std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";            //  6 
-                                                                              
+                                                                               //  7 
   Polynomial p;                                                                //  8 
   p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                           //  9 
   std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";                // 10 
-                                                                              
+                                                                               // 11 
   return 0;                                                                    // 12 
 }                                                                              // 13 
 ```
@@ -415,19 +415,19 @@ POLYNOMIAL_VERSION 1.2.1
 ### C++ SWIG Interface : src/polynomial.i
 
 ```c++
-// Name of generated bindings:                                                
+// Name of generated bindings:                                                 //  1 
 %module polynomial_swig                                                        //  2 
-                                                                              
-// Include std::vector<T> support:                                            
+                                                                               //  3 
+// Include std::vector<T> support:                                             //  4 
 %include "std_vector.i"                                                        //  5 
-                                                                              
-// Template instantiation:                                                    
+                                                                               //  6 
+// Template instantiation:                                                     //  7 
 %template(VectorDouble) std::vector<double>;                                   //  8 
-                                                                              
-// Include C++ declarations as SWIG interface definitions:                    
+                                                                               //  9 
+// Include C++ declarations as SWIG interface definitions:                     // 10 
 %include "polynomial.h"                                                        // 11 
-                                                                              
-// Prepend C++ code in generated bindings:                                    
+                                                                               // 12 
+// Prepend C++ code in generated bindings:                                     // 13 
 %{                                                                             // 14 
 #include "polynomial.h"                                                        // 15 
 %}                                                                             // 16 
@@ -437,20 +437,20 @@ POLYNOMIAL_VERSION 1.2.1
 ### Python : src/polynomial.py
 
 ```python
-# Setup DLL search path:                                                      
+# Setup DLL search path:                                                       #   1 
 import sys ; sys.path.append('target/python')                                  #   2 
-                                                                              
-# Import library bindings:                                                    
+                                                                               #   3 
+# Import library bindings:                                                     #   4 
 from polynomial_swig import *                                                  #   5 
-                                                                              
-# #define constants:                                                          
+                                                                               #   6 
+# #define constants:                                                           #   7 
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   8 
-                                                                              
-# Instantiate object:                                                         
+                                                                               #   9 
+# Instantiate object:                                                          #  10 
 poly = Polynomial()                                                            #  11 
 poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #  12 
-                                                                              
-# Invoke methods:                                                             
+                                                                               #  13 
+# Invoke methods:                                                              #  14 
 print(list(poly.coeffs))                                                       #  15 
 print(poly.evaluate(1.2))                                                      #  16 
 ```
@@ -470,20 +470,20 @@ $ bin/run src/polynomial.py
 ### Clojure (Java) : src/polynomial.clj
 
 ```lisp
-;; Load Java bindings dynamic library:                                        
+;; Load Java bindings dynamic library:                                         ;;  1 
 (clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  2 
-                                                                              
-;; Import Java namespace:                                                     
+                                                                               ;;  3 
+;; Import Java namespace:                                                      ;;  4 
 (import 'polynomial_swig)                                                      ;;  5 
-                                                                              
-;; #define constants:                                                         
+                                                                               ;;  6 
+;; #define constants:                                                          ;;  7 
 (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  8 
-                                                                              
-;; Instantiate object:                                                        
+                                                                               ;;  9 
+;; Instantiate object:                                                         ;; 10 
 (def p (Polynomial.))                                                          ;; 11 
 (.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 12 
-                                                                              
-;; Invoke methods:                                                            
+                                                                               ;; 13 
+;; Invoke methods:                                                             ;; 14 
 (prn (.getCoeffs p))                                                           ;; 15 
 (prn (.evaluate p 1.2))                                                        ;; 16 
 ```
@@ -505,15 +505,15 @@ $ bin/run src/polynomial.clj
 ```ruby
 ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   1 
 $:.unshift 'target/ruby'                                                       #   2 
-                                                                              
+                                                                               #   3 
 require 'polynomial_swig'                                                      #   4 
 include Polynomial_swig                                                        #   5 
-                                                                              
+                                                                               #   6 
 pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   7 
-                                                                              
+                                                                               #   8 
 p = Polynomial.new                                                             #   9 
 p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #  10 
-                                                                              
+                                                                               #  11 
 pp p.coeffs.to_a                                                               #  12 
 pp p.evaluate(1.2)                                                             #  13 
 ```
@@ -534,12 +534,12 @@ $ bin/run src/polynomial.rb
 
 ```scheme
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")              ;;  1 
-                                                                              
+                                                                               ;;  2 
 (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
-                                                                              
+                                                                               ;;  4 
 (define p (new-Polynomial))                                                    ;;  5 
 (Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;;  6 
-                                                                              
+                                                                               ;;  7 
 (write (Polynomial-coeffs-get p)) (newline)                                    ;;  8 
 (write (Polynomial-evaluate p 1.2)) (newline)                                  ;;  9 
 ```
@@ -550,7 +550,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 124e04080>
+#<swig-pointer std::vector< double > * 1236041a0>
 17.3020736
 ```
 
@@ -560,13 +560,13 @@ $ bin/run src/polynomial.scm
 
 ```shell
 load target/tcl/polynomial_swig.so Polynomial_swig                             #   1 
-                                                                              
+                                                                               #   2 
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                             #   3 
-                                                                              
+                                                                               #   4 
 Polynomial poly                                                                #   5 
 VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #   6 
 poly configure -coeffs c                                                       #   7 
-                                                                              
+                                                                               #   8 
 puts [poly cget -coeffs]                                                       #   9 
 puts [poly evaluate 1.2]                                                       #  10 
 ```
@@ -577,7 +577,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_0045002701000000_p_std__vectorT_double_t
+_5045904501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -587,10 +587,10 @@ _0045002701000000_p_std__vectorT_double_t
 
 ```python
 import sys ; sys.path.append('target/python')                                  #   1 
-                                                                              
+                                                                               #   2 
 from polynomial_swig import *                                                  #   3 
 import pytest                                                                  #   4 
-                                                                              
+                                                                               #   5 
 def test_empty_coeffs():                                                       #   6 
     p = Polynomial()                                                           #   7 
     assert p.evaluate(1.2) == 0.0                                              #   8 
@@ -655,7 +655,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 124e04080>
+#<swig-pointer std::vector< double > * 1236041a0>
 17.3020736
 ```
 
@@ -663,7 +663,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_0045002701000000_p_std__vectorT_double_t
+_5045904501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -691,9 +691,9 @@ src/polynomial-test.py ..                                                [100%]
 
 ```c++
 #include <vector>                                                              //  1 
-                                                                              
+                                                                               //  2 
 #define POLYNOMIAL_VERSION "2.0.2"                                             //  3 
-                                                                              
+                                                                               //  4 
 namespace mathlib {                                                            //  5 
   template < typename R >                                                      //  6 
   class polynomial {                                                           //  7 
@@ -710,7 +710,7 @@ namespace mathlib {                                                            /
 ```c++
 #include "polynomial_v2.h"                                                     //  1 
 #include "rational.h"                                                          //  2 
-                                                                              
+                                                                               //  3 
 namespace mathlib {                                                            //  4 
   template < typename R >                                                      //  5 
   R polynomial< R >::evaluate(const R &x) const {                              //  6 
@@ -721,8 +721,8 @@ namespace mathlib {                                                            /
     }                                                                          // 11 
     return result;                                                             // 12 
   };                                                                           // 13 
-                                                                              
-  // Instantiate templates:                                                   
+                                                                               // 14 
+  // Instantiate templates:                                                    // 15 
   template class polynomial<int>;                                              // 16 
   template class polynomial<double>;                                           // 17 
   template class polynomial<rational<int>>;                                    // 18 
@@ -737,25 +737,25 @@ namespace mathlib {                                                            /
 #include <iomanip>                                                             //  2 
 #include "polynomial_v2.h"                                                     //  3 
 #include "rational.h"                                                          //  4 
-                                                                              
+                                                                               //  5 
 using namespace mathlib;                                                       //  6 
-                                                                              
+                                                                               //  7 
 int main(int argc, char **argv) {                                              //  8 
   std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";            //  9 
-                                                                              
+                                                                               // 10 
   polynomial<double> pd;                                                       // 11 
   pd.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                          // 12 
   std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";               // 13 
-                                                                              
+                                                                               // 14 
   polynomial<int> pi;                                                          // 15 
   pi.coeffs = { 2, -3, 5 };                                                    // 16 
   std::cout << pi.evaluate(3) << "\n";                                         // 17 
-                                                                              
+                                                                               // 18 
   typedef rational<int> R;                                                     // 19 
   polynomial<R> pr;                                                            // 20 
   pr.coeffs = { R(7,11), R(11,13), R(13,17) };                                 // 21 
   std::cout << pr.evaluate(R(5,7)) << "\n";                                    // 22 
-                                                                              
+                                                                               // 23 
   return 0;                                                                    // 24 
 }                                                                              // 25 
 ```
@@ -776,38 +776,38 @@ POLYNOMIAL_VERSION 2.0.2
 ### C++ SWIG Interface : src/polynomial_v2.i
 
 ```c++
-// Name of generated bindings:                                                
+// Name of generated bindings:                                                 //  1 
 %module polynomial_v2_swig                                                     //  2 
-                                                                              
-// Include C++ declarations as SWIG interface definitions:                    
+                                                                               //  3 
+// Include C++ declarations as SWIG interface definitions:                     //  4 
 %include "polynomial_v2.h"                                                     //  5 
 %include "rational.h"                                                          //  6 
-                                                                              
-// Template instantiation:                                                    
+                                                                               //  7 
+// Template instantiation:                                                     //  8 
 %{                                                                             //  9 
 #include "polynomial_v2.h"                                                     // 10 
 #include "rational.h"                                                          // 11 
-                                                                              
+                                                                               // 12 
 template class mathlib::polynomial<int>;                                       // 13 
 template class mathlib::polynomial<double>;                                    // 14 
 template class mathlib::rational<int>;                                         // 15 
 template class mathlib::polynomial<mathlib::rational<int>>;                    // 16 
 template class std::vector<mathlib::rational<int>>;                            // 17 
 %}                                                                             // 18 
-                                                                              
+                                                                               // 19 
 %include "std_string.i"        // python __str__(), __repr__()                 // 20 
 %template(RationalV2)            mathlib::rational<int>;                       // 21 
-                                                                              
+                                                                               // 22 
 %include "std_vector.i"                                                        // 23 
 %template(VectorDoubleV2)        std::vector<double>;                          // 24 
 %template(VectorIntV2)           std::vector<int>;                             // 25 
 %template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 26 
-                                                                              
+                                                                               // 27 
 %template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 28 
 %template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 29 
 %template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 30 
-                                                                              
-// Prepend C++ code in generated bindings:                                    
+                                                                               // 31 
+// Prepend C++ code in generated bindings:                                     // 32 
 %{                                                                             // 33 
 #include "polynomial_v2.h"                                                     // 34 
 #include "rational.h"                                                          // 35 
@@ -819,17 +819,17 @@ template class std::vector<mathlib::rational<int>>;                            /
 
 ```python
 import sys ; sys.path.append('target/python')                                  #   1 
-                                                                              
+                                                                               #   2 
 from polynomial_v2_swig import *                                               #   3 
-                                                                              
+                                                                               #   4 
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   5 
-                                                                              
+                                                                               #   6 
 coeffs = [ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ]                                #   7 
 poly         = PolynomialDoubleV2()                                            #   8 
 poly.coeffs  = VectorDoubleV2(coeffs)                                          #   9 
 print(list(poly.coeffs))                                                       #  10 
 print(poly.evaluate(1.2))                                                      #  11 
-                                                                              
+                                                                               #  12 
 coeffs = [ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]          #  13 
 poly         = PolynomialRationalV2()                                          #  14 
 poly.coeffs  = VectorRationalV2(coeffs)                                        #  15 
@@ -855,16 +855,16 @@ $ bin/run src/polynomial_v2.py
 
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                 ;;  1 
-                                                                                                  
+                                                                                                   ;;  2 
 (import 'polynomial_v2_swig)                                                                       ;;  3 
-                                                                                                  
+                                                                                                   ;;  4 
 (prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  5 
-                                                                                                  
+                                                                                                   ;;  6 
 (def p1 (PolynomialDoubleV2.))                                                                     ;;  7 
 (.setCoeffs p1 (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))                                ;;  8 
 (prn (.getCoeffs p1))                                                                              ;;  9 
 (prn (.evaluate p1 1.2))                                                                           ;; 10 
-                                                                                                  
+                                                                                                   ;; 11 
 (def p2 (PolynomialRationalV2.))                                                                   ;; 12 
 (.setCoeffs p2 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 13 
 (prn (mapv #(.__str__ %) (.getCoeffs p2)))                                                         ;; 14 
@@ -928,22 +928,22 @@ $ bin/run src/polynomial_v2.clj
 ### C Header : src/tommath.h
 
 ```c
-// swig <-> mp_int helpers                                                    
-                                                                              
+// swig <-> mp_int helpers                                                     //  1 
+                                                                               //  2 
 #include <stddef.h>                                                            //  3 
 #include <stdint.h>                                                            //  4 
 #include "bool.h"                                                              //  5 
 #include "libtommath/tommath.h"                                                //  6 
-                                                                              
-// Convert mp_int <-> string:                                                 
+                                                                               //  7 
+// Convert mp_int <-> string:                                                  //  8 
 char*    swig_mp_int_to_charP(mp_int* self, int radix);                        //  9 
 mp_int*  swig_charP_to_mp_int(const char* str, int radix);                     // 10 
 char*    swig_mp_int_rep(mp_int* self, int radix);                             // 11 
-                                                                              
+                                                                               // 12 
 #if SWIG                                                                       // 13 
-// This extends generated classes with two                                    
-// methods which behave as Python's methods.                                  
-// Also for Ruby and other language targets.                                  
+// This extends generated classes with two                                     // 14 
+// methods which behave as Python's methods.                                   // 15 
+// Also for Ruby and other language targets.                                   // 16 
 %extend mp_int {                                                               // 17 
   char* __str__(int radix = 10) {                                              // 18 
     return swig_mp_int_to_charP(self, radix);                                  // 19 
@@ -953,21 +953,21 @@ char*    swig_mp_int_rep(mp_int* self, int radix);                             /
   }                                                                            // 23 
 }                                                                              // 24 
 #endif                                                                         // 25 
-                                                                              
-// tommath `mp_int` internal memory is managed by:                            
-//                                                                            
-// * mp_init(mp_int*)                                                         
-// * mp_clear(mp_int*)                                                        
-//                                                                            
-// tommath expects these functions to be called                               
-// before and after using a mp_int value, respectively.                       
+                                                                               // 26 
+// tommath `mp_int` internal memory is managed by:                             // 27 
+//                                                                             // 28 
+// * mp_init(mp_int*)                                                          // 29 
+// * mp_clear(mp_int*)                                                         // 30 
+//                                                                             // 31 
+// tommath expects these functions to be called                                // 32 
+// before and after using a mp_int value, respectively.                        // 33 
 mp_int*  swig_mp_int_new(mp_digit n);                                          // 34 
 void     swig_mp_int_delete(mp_int* self);                                     // 35 
-                                                                              
+                                                                               // 36 
 #if SWIG                                                                       // 37 
-// SWIG wraps `struct mp_int` values with pointers                            
-// allocated with `malloc(sizeof(mp_int))`.                                   
-// `%extend mp_int` defines constructors and destructors for `mp_int`.        
+// SWIG wraps `struct mp_int` values with pointers                             // 38 
+// allocated with `malloc(sizeof(mp_int))`.                                    // 39 
+// `%extend mp_int` defines constructors and destructors for `mp_int`.         // 40 
 %extend mp_int {                                                               // 41 
   mp_int(mp_digit n = 0) {                                                     // 42 
     return swig_mp_int_new(n);                                                 // 43 
@@ -988,7 +988,7 @@ void     swig_mp_int_delete(mp_int* self);                                     /
 ```c
 #include "tommath.h"                                                           //  1 
 #include <stdlib.h>                                                            //  2 
-                                                                              
+                                                                               //  3 
 char* swig_mp_int_to_charP(mp_int* self, int radix) {                          //  4 
   size_t size = 0, written = 0;                                                //  5 
   (void) mp_radix_size(self, radix, &size);                                    //  6 
@@ -997,7 +997,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {                          /
   buf[written] = 0;                                                            //  9 
   return buf;                                                                  // 10 
 }                                                                              // 11 
-                                                                              
+                                                                               // 12 
 char* swig_mp_int_rep(mp_int* self, int radix) {                               // 13 
   char *repr = 0, *str = swig_mp_int_to_charP(self, radix);                    // 14 
   if ( radix == 10 )                                                           // 15 
@@ -1006,20 +1006,20 @@ char* swig_mp_int_rep(mp_int* self, int radix) {                               /
     asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);                          // 18 
   return free(str), repr;                                                      // 19 
 }                                                                              // 20 
-                                                                              
+                                                                               // 21 
 mp_int* swig_charP_to_mp_int(const char* str, int radix) {                     // 22 
   mp_int* self = swig_mp_int_new(0);                                           // 23 
   (void) mp_read_radix(self, str, radix);                                      // 24 
   return self;                                                                 // 25 
 }                                                                              // 26 
-                                                                              
+                                                                               // 27 
 mp_int* swig_mp_int_new(mp_digit n) {                                          // 28 
   mp_int* self = malloc(sizeof(*self));                                        // 29 
   (void) mp_init(self);                                                        // 30 
   mp_set(self, n);                                                             // 31 
   return self;                                                                 // 32 
 }                                                                              // 33 
-                                                                              
+                                                                               // 34 
 void swig_mp_int_delete(mp_int* self) {                                        // 35 
   mp_clear(self);                                                              // 36 
   free(self);                                                                  // 37 
@@ -1031,25 +1031,25 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 
 ```c
 #include "libtommath/tommath.h"                                                          //  1 
-                                                                                        
+                                                                                         //  2 
 int main(int argc, char **argv) {                                                        //  3 
   printf("MP_ITER %d", MP_ITER);                                                         //  4 
-                                                                                        
+                                                                                         //  5 
   mp_int a, b, c, d, e;                                                                  //  6 
-                                                                                        
+                                                                                         //  7 
   (void) mp_init_multi(&a, &b, &c, &d, &e, NULL);                                        //  8 
-                                                                                        
+                                                                                         //  9 
   (void) mp_set(&a, 2357111317);                                                         // 10 
   (void) mp_set(&b, 1113171923);                                                         // 11 
   (void) mp_read_radix(&e, "12343456", 16);                                              // 12 
-                                                                                        
+                                                                                         // 13 
   (void) mp_mul(&a, &b, &c);                                                             // 14 
   (void) mp_mul(&c, &b, &d);                                                             // 15 
-                                                                                        
+                                                                                         // 16 
 #define P(N) printf("%s = ", #N); (void) mp_fwrite(&N, 10, stdout); fputc('\n', stdout); // 17 
   P(a); P(b); P(c); P(d); P(e);                                                          // 18 
   mp_clear_multi(&a, &b, &c, &d, &e, NULL);                                              // 19 
-                                                                                        
+                                                                                         // 20 
   return 0;                                                                              // 21 
 }                                                                                        // 22 
 ```
@@ -1073,7 +1073,7 @@ e = 305411158
 ```c
 %module tommath_swig                                                           //  1 
 %include "stdint.i" // mp_digit typedef                                        //  2 
- // "missing sentinel in function call"                                       
+ // "missing sentinel in function call"                                        //  3 
 %varargs(10, mp_int *ip = NULL) mp_init_multi;                                 //  4 
 %varargs(10, mp_int *ip = NULL) mp_clear_multi;                                //  5 
 //%rename(bool)  _bool;                                                        //  6 
@@ -1094,20 +1094,20 @@ e = 305411158
 
 ```python
 from tommath_swig import *                                                     #   1 
-                                                                              
+                                                                               #   2 
 print({"MP_ITER": MP_ITER})                                                    #   3 
-                                                                              
+                                                                               #   4 
 a = mp_int(); mp_set(a, 2357111317)    # <-- awkward!                          #   5 
 b = mp_int(1113171923)                 # <-- better!                           #   6 
 c = mp_int()                                                                   #   7 
 d = mp_int()                                                                   #   8 
 e = mp_int("12343456", 16)             # <-- yey!                              #   9 
-                                                                              
+                                                                               #  10 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  11 
-                                                                              
+                                                                               #  12 
 mp_mul(a, b, c);                                                               #  13 
 mp_mul(c, b, d);                                                               #  14 
-                                                                              
+                                                                               #  15 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  16 
 ```
 
