@@ -8,7 +8,8 @@ TARGET_SUFFIXES  = py      clj      rb    tcl  scm
 LIBS += -ltommath
 
 SWIG_CFLAGS_tommath.c+=-Wno-sentinel
-SWIG_CFLAGS+=-Wno-sentinel
+SWIG_CFLAGS+= -Wno-sentinel
+SWIG_CFLAGS+= -Wno-unused-command-line-argument
 
 ############################
 
@@ -88,7 +89,7 @@ SWIG_OPTS_x += \
 
 SUFFIX_ruby=rb
 SWIG_OPTS_ruby=-ruby
-SWIG_CFLAGS_ruby:=$(shell $(RUBY_EXE) tool/ruby-cflags.rb)
+SWIG_CFLAGS_ruby:=$(shell $(RUBY_EXE) tool/ruby-cflags.rb) -Wno-unknown-attributes -Wno-ignored-attributes
 
 ############################
 
@@ -125,8 +126,14 @@ SUFFIX_clojure=clj
 SWIG_OPTS_clojure=-java
 # SWIG_OPTS_clojure=-package $(EXAMPLE_NAME)
 SWIG_CFLAGS_clojure=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
+ifeq "$(UNAME_S)" "Darwin"
 SWIG_SO_PREFIX_clojure=lib
-SWIG_SO_SUFFIX_clojure=.jnilib # OSX
+SWIG_SO_SUFFIX_clojure=.jnilib
+else
+SWIG_SO_PREFIX_clojure=lib
+SWIG_SO_SUFFIX_clojure=.so
+endif
+
 SWIG_GENERATED_FILES_clojure=target/$(SWIG_TARGET)/$(EXAMPLE_NAME)*.java
 
 ############################
@@ -181,7 +188,6 @@ CC=$(CC_SUFFIX$(EXAMPLE_SUFFIX))
 CC_SUFFIX.c=clang
 CC_SUFFIX.cc=clang++
 ifeq "$(UNAME_S)" "Linux"
-# WTF: wud: broken clang install??!?!?!
 CC_SUFFIX.c=clang-13
 CC_SUFFIX.cc=clang++-13
 endif
@@ -189,23 +195,13 @@ endif
 CFLAGS+=$(CFLAGS_SUFFIX$(EXAMPLE_SUFFIX))
 #LDFLAGS+= ???
 CFLAGS_SUFFIX.c=
-ifeq "$(UNAME_S)" "LinuxXXX"
-# WTF: wud: broken clang install??!?!?!
-else
 CFLAGS_SUFFIX.cc=-Wno-c++11-extensions # -stdlib=libc++
 CFLAGS_SUFFIX.cc+= -std=c++17
-# CFLAGS_SUFFIX.cc+= -lstdc++
-endif
 
 #################################
 
 ifeq "$(EXAMPLE_NAME)" "polynomial"
-ifeq "$(UNAME_S)" "Linux"
-# target/ruby/polynomial.cc: In function ‘void SWIG_RubyInitializeTrackings()’:
-# target/ruby/polynomial.cc:1263:85: error: call of overloaded ‘rb_define_virtual_variable(const char [21], VALUE (&)(...), NULL)’ is ambiguous
-#   rb_define_virtual_variable("SWIG_TRACKINGS_COUNT", swig_ruby_trackings_count, NULL);
-SWIG_TARGETS:=$(filter-out ruby, $(SWIG_TARGETS))
-TARGET_DEPS:=$(filter-out ruby, $(TARGET_DEPS))
+ifeq "$(UNAME_S)" "LinuxXXX"
 # /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
 SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
 TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))

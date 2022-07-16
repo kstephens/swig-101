@@ -11,6 +11,7 @@ bin_dirs=(
   /opt/homebrew/opt/tcl-tk/bin
   /opt/homebrew/opt/openjdk/bin
   /usr/lib/jvm/java-*-openjdk-amd64/bin
+  /usr/lib/jvm/java-11-openjdk-amd64/bin
   "$ROOT_DIR/local/bin"
 )
 
@@ -24,7 +25,7 @@ cmd=("$@")
 dir="$(/bin/pwd)"
 
 -which() {
-  PATH="$PATH_OPT" which "$@" 2>&1 | head -1
+  PATH="$PATH_OPT" which "$@" 2>/dev/null | head -1
 }
 
 prog-path() { # VAR prog
@@ -42,13 +43,20 @@ prog-path() { # VAR prog
   export \
     "${var}_HOME=$prog_home" "${var}_EXE=$prog_exe" "${var}_CMD=$prog_exe" \
     "${var}_INC=$prog_inc" "${var}_LIB=$prog_lib"
-  export PATH="$prog_dir:$PATH"
-  # export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
-  # export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
+  if ! [[ "$PATH" == *"$prog_dir"* ]]
+  then
+    export PATH="$prog_dir:$PATH"
+    target_dir="$dir/target/$prog_name"
+    if [[ -d "$target_dir" ]]
+    then
+      export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
+      export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
+    fi
+  fi
 }
 
 PATH="$dir/bin:$dir/local/bin:$PATH"
-for swig_exe in "$SWIG_EXE" "$(which swig)" "$dir/local/bin/swig" "$dir/../swig/swig" "$HOME/local/bin/swig" CANNOT-FIND-SWIG
+for swig_exe in "$SWIG_EXE" "$dir/local/bin/swig" "$dir/../swig/swig" "$HOME/local/bin/swig" $(which swig) CANNOT-FIND-SWIG
 do
   [[ -x "$swig_exe" ]] && break
 done
@@ -66,8 +74,8 @@ prog-path JAVA    java
 prog-path CLOJURE clojure
 
 JAVA_INC="${JAVA_INC//\/jre\//\/}"
-export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
-export RUBYLIB="$dir/src:$RUBYLIB"
+# export RUBYOPT="-I$dir/target/ruby $RUBYOPT"
+export RUBYLIB="$dir/target/ruby:$dir/src:$RUBYLIB"
 export GUILE_AUTO_COMPILE=0
 export PYTHONPATH="$dir/target/python:$PYTHONPATH"
 
