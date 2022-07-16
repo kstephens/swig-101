@@ -12,8 +12,8 @@ pp poly.coeffs.to_a
 pp poly.evaluate(1.2)
 
 # Instantiate polynomial<int> object:
-poly        = PV2::PolynomialDoubleV2.new
-poly.coeffs = PV2::VectorDoubleV2.new([ 2, 3, 5, 7, 11, -13 ])
+poly        = PV2::PolynomialIntV2.new
+poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])
 pp poly.coeffs.to_a
 pp poly.evaluate(-2)
 

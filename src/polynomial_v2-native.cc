@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
   std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";
   
   polynomial<int> pi;
-  pi.coeffs = { 2, -3, 5 };
-  std::cout << pi.evaluate(3) << "\n";
+  pi.coeffs = { 2, 3, 5, 7, 11, -13 };
+  std::cout << pi.evaluate(-2) << "\n";
 
   typedef rational<int> R;
   polynomial<R> pr;

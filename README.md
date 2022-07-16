@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 11ff04080>
+#<swig-pointer std::vector< double > * 13ae08c70>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_e058704a01000000_p_std__vectorT_double_t
+_00c3602601000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -737,7 +737,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 11ff04080>
+#<swig-pointer std::vector< double > * 13ae08c70>
 17.3020736
 ```
 
@@ -747,7 +747,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_e058704a01000000_p_std__vectorT_double_t
+_00c3602601000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -839,8 +839,8 @@ int main(int argc, char **argv) {                                              /
   std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";               // 13 
                                                                                // 14 
   polynomial<int> pi;                                                          // 15 
-  pi.coeffs = { 2, -3, 5 };                                                    // 16 
-  std::cout << pi.evaluate(3) << "\n";                                         // 17 
+  pi.coeffs = { 2, 3, 5, 7, 11, -13 };                                         // 16 
+  std::cout << pi.evaluate(-2) << "\n";                                        // 17 
                                                                                // 18 
   typedef rational<int> R;                                                     // 19 
   polynomial<R> pr;                                                            // 20 
@@ -858,7 +858,7 @@ int main(int argc, char **argv) {                                              /
 $ bin/run target/native/polynomial_v2
 POLYNOMIAL_VERSION 2.0.2
 17.3020736
-38
+552
 194273/119119
 ```
 
@@ -995,8 +995,8 @@ pp poly.coeffs.to_a                                                             
 pp poly.evaluate(1.2)                                                                                                            #  10 
                                                                                                                                  #  11 
 # Instantiate polynomial<int> object:                                                                                            #  12 
-poly        = PV2::PolynomialDoubleV2.new                                                                                        #  13 
-poly.coeffs = PV2::VectorDoubleV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                   #  14 
+poly        = PV2::PolynomialIntV2.new                                                                                           #  13 
+poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                      #  14 
 pp poly.coeffs.to_a                                                                                                              #  15 
 pp poly.evaluate(-2)                                                                                                             #  16 
                                                                                                                                  #  17 
@@ -1015,8 +1015,8 @@ $ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
-[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
-552.0
+[2, 3, 5, 7, 11, -13]
+552
 [rational(7,11), rational(11,13), rational(13,17)]
 rational(194273,119119)
 ```
@@ -1037,7 +1037,7 @@ rational(194273,119119)
 $ bin/run target/native/polynomial_v2
 POLYNOMIAL_VERSION 2.0.2
 17.3020736
-38
+552
 194273/119119
 ```
 
@@ -1065,8 +1065,8 @@ $ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
-[2.0, 3.0, 5.0, 7.0, 11.0, -13.0]
-552.0
+[2, 3, 5, 7, 11, -13]
+552
 [rational(7,11), rational(11,13), rational(13,17)]
 rational(194273,119119)
 ```
