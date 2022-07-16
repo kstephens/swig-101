@@ -123,34 +123,39 @@ The examples below target:
 
 ## <%= e[:name] %>
 
-<%   targets.select{|t| t[:code]}.each do | t | %>
-### <%= t[:type] %> : <%= t[:file] %>
+<%   targets.each do | t | %>
+<%     t[:files].each do | f | %>
+### <%= t[:type] %> : <%= f[:name] %>
 
 ```<%= t[:code_style] %>
-<%= t[:code] %>
+<%= f[:code] %>
 ```
 
-<%     if t[:run] %>
+<%       if f[:cmd] && f[:output] %>
 ---
 
 ```
-$ <%= t[:run] %>
-<%= t[:run_output] %>
+$ <%= f[:cmd] %>
+<%= f[:output] %>
 ```
 
 ---
-<%     end # if t[:run] %>
+<%       end # t[:cmd] %>
+<%     end # t[:files] %>
 <%   end # targets %>
 
 
 ### Outputs - Recap
 
-<%   targets.select{|t| t[:run_output]}.each do | t | %>
+<%   targets.each do | t | %>
+<%     t[:files].select{|f| f[:cmd]}.each do | f | %>
 ```
-$ <%= t[:run] %>
-<%= t[:run_output] %>
+$ <%= f[:cmd] %>
+<%= f[:output] %>
 ```
 
+---
+<%     end # t[:files] %>
 <%   end # targets %>
 
 ---

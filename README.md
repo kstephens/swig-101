@@ -123,7 +123,8 @@ The examples below target:
 ## example1.c
 
 
-### C Header : src/example1.h
+
+### C Header : example1.h
 
 ```c
 #define EXAMPLE1_VERSION "1.2.3"                                               //  1 
@@ -136,7 +137,8 @@ double cubic_poly(double x,                                                    /
 ```
 
 
-### C Library : src/example1.c
+
+### C Library : example1.c
 
 ```c
 #include "example1.h"                                                          //  1 
@@ -150,7 +152,8 @@ double cubic_poly(double x,                                                    /
 ```
 
 
-### C Main : src/example1-native.c
+
+### C Main : example1-native.c
 
 ```c
 #include <stdio.h>                                                             //  1 
@@ -174,7 +177,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 ---
 
-### C SWIG Interface : src/example1.i
+
+### C SWIG Interface : example1.i
 
 ```c
 %module example1_swig                                                          //  1 
@@ -185,7 +189,8 @@ EXAMPLE1_VERSION = 1.2.3
 ```
 
 
-### Python : src/example1.py
+
+### Python : example1.py
 
 ```python
 # Setup search path:                                                           #   1 
@@ -210,7 +215,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 ---
 
-### Clojure (Java) : src/example1.clj
+
+### Clojure (Java) : example1.clj
 
 ```lisp
 ;; Load SWIG bindings:                                                         ;;  1 
@@ -234,7 +240,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 ---
 
-### Ruby : src/example1.rb
+
+### Ruby : example1.rb
 
 ```ruby
 # Setup search path:                                                           #   1 
@@ -261,7 +268,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 ---
 
-### Guile : src/example1.scm
+
+### Guile : example1.scm
 
 ```scheme
 ;; Load SWIG bindings:                                                         ;;  1 
@@ -285,7 +293,8 @@ $ bin/run src/example1.scm
 
 ---
 
-### TCL : src/example1.tcl
+
+### TCL : example1.tcl
 
 ```shell
 # Load SWIG bindings:                                                          #   1 
@@ -308,7 +317,11 @@ EXAMPLE1_VERSION = 1.2.3
 ---
 
 
+
 ### Outputs - Recap
+
+
+
 
 
 ```
@@ -317,12 +330,17 @@ EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
+---
+
+
 
 ```
 $ bin/run src/example1.py
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
+
+---
 
 
 ```
@@ -331,12 +349,16 @@ EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
+---
+
 
 ```
 $ bin/run src/example1.rb
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
+
+---
 
 
 ```
@@ -345,12 +367,16 @@ $ bin/run src/example1.scm
 129.0
 ```
 
+---
+
 
 ```
 $ bin/run src/example1.tcl
 EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
+
+---
 
 
 ---
@@ -360,7 +386,8 @@ EXAMPLE1_VERSION = 1.2.3
 ## polynomial.cc
 
 
-### C++ Header : src/polynomial.h
+
+### C++ Header : polynomial.h
 
 ```c++
 #include <vector>                                                              //  1 
@@ -375,7 +402,8 @@ public:                                                                        /
 ```
 
 
-### C++ Library : src/polynomial.cc
+
+### C++ Library : polynomial.cc
 
 ```c++
 #include "polynomial.h"                                                        //  1 
@@ -391,7 +419,8 @@ double Polynomial::evaluate(double x) const {                                  /
 ```
 
 
-### C++ Main : src/polynomial-native.cc
+
+### C++ Main : polynomial-native.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -420,7 +449,8 @@ POLYNOMIAL_VERSION 1.2.1
 
 ---
 
-### C++ SWIG Interface : src/polynomial.i
+
+### C++ SWIG Interface : polynomial.i
 
 ```c++
 // Name of generated bindings:                                                 //  1 
@@ -442,7 +472,8 @@ POLYNOMIAL_VERSION 1.2.1
 ```
 
 
-### Python : src/polynomial.py
+
+### Python : polynomial.py
 
 ```python
 from polynomial_swig import *                                                  #   1 
@@ -470,7 +501,34 @@ $ bin/run src/polynomial.py
 
 ---
 
-### Clojure (Java) : src/polynomial.clj
+### Python : polynomial-test.py
+
+```python
+from polynomial_swig import *                                                  #   1 
+import pytest                                                                  #   2 
+                                                                               #   3 
+def test_empty_coeffs():                                                       #   4 
+    p = Polynomial()                                                           #   5 
+    assert p.evaluate(1.2) == 0.0                                              #   6 
+def test_one_coeff():                                                          #   7 
+    p = Polynomial()                                                           #   8 
+    p.coeffs = VectorDouble([ 2.3 ])                                           #   9 
+    assert p.evaluate(1.2) == 2.3                                              #  10 
+    assert p.evaluate(999) == 2.3                                              #  11 
+```
+
+
+---
+
+```
+$ bin/run src/polynomial-test.py
+
+```
+
+---
+
+
+### Clojure (Java) : polynomial.clj
 
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  1 
@@ -499,7 +557,8 @@ $ bin/run src/polynomial.clj
 
 ---
 
-### Ruby : src/polynomial.rb
+
+### Ruby : polynomial.rb
 
 ```ruby
 require 'polynomial_swig'                                                      #   1 
@@ -528,7 +587,8 @@ $ bin/run src/polynomial.rb
 
 ---
 
-### Guile : src/polynomial.scm
+
+### Guile : polynomial.scm
 
 ```scheme
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")              ;;  1 
@@ -550,13 +610,14 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 120804080>
+#<swig-pointer std::vector< double > * 114604080>
 17.3020736
 ```
 
 ---
 
-### TCL : src/polynomial.tcl
+
+### TCL : polynomial.tcl
 
 ```shell
 load target/tcl/polynomial_swig.so Polynomial_swig                             #   1 
@@ -579,13 +640,14 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_605e703501000000_p_std__vectorT_double_t
+_a04a205701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
 ---
 
-### Python Tests : src/polynomial-test.py
+
+### Python Tests : polynomial-test.py
 
 ```python
 from polynomial_swig import *                                                  #   1 
@@ -621,11 +683,17 @@ src/polynomial-test.py ..                                                [100%]
 ### Outputs - Recap
 
 
+
+
+
 ```
 $ bin/run target/native/polynomial
 POLYNOMIAL_VERSION 1.2.1
 17.3020736
 ```
+
+---
+
 
 
 ```
@@ -635,6 +703,15 @@ $ bin/run src/polynomial.py
 17.3020736
 ```
 
+---
+
+```
+$ bin/run src/polynomial-test.py
+
+```
+
+---
+
 
 ```
 $ bin/run src/polynomial.clj
@@ -642,6 +719,8 @@ $ bin/run src/polynomial.clj
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
 ```
+
+---
 
 
 ```
@@ -651,21 +730,27 @@ $ bin/run src/polynomial.rb
 17.3020736
 ```
 
+---
+
 
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 120804080>
+#<swig-pointer std::vector< double > * 114604080>
 17.3020736
 ```
+
+---
 
 
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_605e703501000000_p_std__vectorT_double_t
+_a04a205701000000_p_std__vectorT_double_t
 17.3020736
 ```
+
+---
 
 
 ```
@@ -679,6 +764,7 @@ src/polynomial-test.py ..                                                [100%]
 ============================== 2 passed in 0.00s ===============================
 ```
 
+---
 
 ---
 
@@ -687,7 +773,8 @@ src/polynomial-test.py ..                                                [100%]
 ## polynomial_v2.cc
 
 
-### C++ Header : src/polynomial_v2.h
+
+### C++ Header : polynomial_v2.h
 
 ```c++
 #include <vector>                                                              //  1 
@@ -705,7 +792,8 @@ namespace mathlib {                                                            /
 ```
 
 
-### C++ Library : src/polynomial_v2.cc
+
+### C++ Library : polynomial_v2.cc
 
 ```c++
 #include "polynomial_v2.h"                                                     //  1 
@@ -730,7 +818,8 @@ namespace mathlib {                                                            /
 ```
 
 
-### C++ Main : src/polynomial_v2-native.cc
+
+### C++ Main : polynomial_v2-native.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -773,7 +862,8 @@ POLYNOMIAL_VERSION 2.0.2
 
 ---
 
-### C++ SWIG Interface : src/polynomial_v2.i
+
+### C++ SWIG Interface : polynomial_v2.i
 
 ```c++
 // Name of generated bindings:                                                 //  1 
@@ -815,7 +905,8 @@ template class std::vector<mathlib::rational<int>>;                            /
 ```
 
 
-### Python : src/polynomial_v2.py
+
+### Python : polynomial_v2.py
 
 ```python
 from polynomial_v2_swig import *                                                             #   1 
@@ -857,7 +948,8 @@ $ bin/run src/polynomial_v2.py
 
 ---
 
-### Clojure (Java) : src/polynomial_v2.clj
+
+### Clojure (Java) : polynomial_v2.clj
 
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                 ;;  1 
@@ -885,22 +977,8 @@ $ bin/run src/polynomial_v2.py
 ```
 
 
----
 
-```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-[2 3 5 7 11 -13]
-552
-["7/11" "11/13" "13/17"]
-"194273/119119"
-```
-
----
-
-### Ruby : src/polynomial_v2.rb
+### Ruby : polynomial_v2.rb
 
 ```ruby
 require 'polynomial_v2_swig'                                                                                                     #   1 
@@ -944,7 +1022,13 @@ rational(194273,119119)
 ---
 
 
+
+
+
 ### Outputs - Recap
+
+
+
 
 
 ```
@@ -954,6 +1038,9 @@ POLYNOMIAL_VERSION 2.0.2
 38
 194273/119119
 ```
+
+---
+
 
 
 ```
@@ -967,17 +1054,8 @@ $ bin/run src/polynomial_v2.py
 194273/119119
 ```
 
+---
 
-```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
-[2 3 5 7 11 -13]
-552
-["7/11" "11/13" "13/17"]
-"194273/119119"
-```
 
 
 ```
@@ -991,6 +1069,10 @@ $ bin/run src/polynomial_v2.rb
 rational(194273,119119)
 ```
 
+---
+
+
+
 
 ---
 
@@ -999,7 +1081,8 @@ rational(194273,119119)
 ## tommath.c
 
 
-### C Header : src/tommath.h
+
+### C Header : tommath.h
 
 ```c
 // swig <-> mp_int helpers                                                     //  1 
@@ -1057,7 +1140,8 @@ void     swig_mp_int_delete(mp_int* self);                                     /
 ```
 
 
-### C Library : src/tommath.c
+
+### C Library : tommath.c
 
 ```c
 #include "tommath.h"                                                           //  1 
@@ -1101,7 +1185,8 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 ```
 
 
-### C Main : src/tommath-native.c
+
+### C Main : tommath-native.c
 
 ```c
 #include "libtommath/tommath.h"                                                          //  1 
@@ -1142,7 +1227,8 @@ e = 305411158
 
 ---
 
-### C SWIG Interface : src/tommath.i
+
+### C SWIG Interface : tommath.i
 
 ```c
 %module tommath_swig                                                           //  1 
@@ -1164,7 +1250,8 @@ e = 305411158
 ```
 
 
-### Python : src/tommath.py
+
+### Python : tommath.py
 
 ```python
 from tommath_swig import *                                                     #   1 
@@ -1198,7 +1285,145 @@ $ bin/run src/tommath.py
 ---
 
 
+
+### Ruby : tommath-1.rb
+
+```ruby
+require 'tommath_swig'                                                         #   1 
+include Tommath_swig                                                           #   2 
+                                                                               #   3 
+puts "MP_ITER = #{MP_ITER}"                                                    #   4 
+                                                                               #   5 
+a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   6 
+b = Mp_int.new(1113171923)                 # <-- better!                       #   7 
+c = Mp_int.new()                                                               #   8 
+d = Mp_int.new()                                                               #   9 
+e = Mp_int.new("12343456", 16)             # <-- yey!                          #  10 
+                                                                               #  11 
+puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  12 
+                                                                               #  13 
+mp_mul(a, b, c);                                                               #  14 
+mp_mul(c, b, d);                                                               #  15 
+                                                                               #  16 
+puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  17 
+```
+
+
+---
+
+```
+$ bin/run src/tommath-1.rb
+MP_ITER = -4
+{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
+{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+```
+
+---
+
+### Ruby : tommath-2.rb
+
+```ruby
+require 'pry' # _byebug'                                                       #   1 
+require 'tommath_swig'                                                         #   2 
+                                                                               #   3 
+#########################################################                      #   4 
+# Sugar:                                                                       #   5 
+                                                                               #   6 
+module Tommath_swig                                                            #   7 
+  class Mp_int                                                                 #   8 
+    # Constructor:                                                             #   9 
+    def self.[] val = 0, radix = 10                                            #  10 
+      case val                                                                 #  11 
+      when self                                                                #  12 
+        val                                                                    #  13 
+      when Integer                                                             #  14 
+        inst = new                                                             #  15 
+        Tommath_swig.mp_set(inst, val)                                         #  16 
+        inst                                                                   #  17 
+      when String                                                              #  18 
+        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  19 
+      when nil                                                                 #  20 
+        self[0]                                                                #  21 
+      else                                                                     #  22 
+        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  23 
+      end                                                                      #  24 
+    end                                                                        #  25 
+                                                                               #  26 
+    def to_s radix = 10                                                        #  27 
+      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  28 
+    end                                                                        #  29 
+                                                                               #  30 
+    def inspect                                                                #  31 
+      "MPI[#{to_s.inspect}]"                                                   #  32 
+    end                                                                        #  33 
+                                                                               #  34 
+    def -@                                                                     #  35 
+      result = MPI.new                                                         #  36 
+      Tommath_swig.mp_neg(self, result)                                        #  37 
+      result                                                                   #  38 
+    end                                                                        #  39 
+    def + other                                                                #  40 
+      result = MPI.new                                                         #  41 
+      Tommath_swig.mp_add(self, MPI[other], result)                            #  42 
+      result                                                                   #  43 
+    end                                                                        #  44 
+    def - other                                                                #  45 
+      result = MPI.new                                                         #  46 
+      Tommath_swig.mp_sub(self, MPI[other], result)                            #  47 
+      result                                                                   #  48 
+    end                                                                        #  49 
+    def * other                                                                #  50 
+      result = MPI.new                                                         #  51 
+      Tommath_swig.mp_mul(self, MPI[other], result)                            #  52 
+      result                                                                   #  53 
+    end                                                                        #  54 
+    def / other                                                                #  55 
+      result = MPI.new                                                         #  56 
+      remainder = MPI.new                                                      #  57 
+      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  58 
+      result                                                                   #  59 
+    end                                                                        #  60 
+  end                                                                          #  61 
+  MPI = Mp_int                                                                 #  62 
+end                                                                            #  63 
+MPI = Tommath_swig::MPI                                                        #  64 
+                                                                               #  65 
+#########################################################                      #  66 
+# Better!                                                                      #  67 
+                                                                               #  68 
+a = MPI[2357111317]                                                            #  69 
+b = MPI[1113171923]                                                            #  70 
+c = MPI[]                                                                      #  71 
+d = MPI[]                                                                      #  72 
+e = MPI["12343456", 16]                                                        #  73 
+                                                                               #  74 
+puts({a: a, b: b, c: c, d: d, e: e})                                           #  75 
+                                                                               #  76 
+c = a * b                                                                      #  77 
+d = c * b                                                                      #  78 
+                                                                               #  79 
+puts({a: a, b: b, c: c, d: d, e: e})                                           #  80 
+```
+
+
+---
+
+```
+$ bin/run src/tommath-2.rb
+{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
+{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+```
+
+---
+
+
+
+
+
 ### Outputs - Recap
+
+
+
 
 
 ```
@@ -1210,6 +1435,9 @@ d = 2920818566629701480442302493
 e = 305411158
 ```
 
+---
+
+
 
 ```
 $ bin/run src/tommath.py
@@ -1217,6 +1445,29 @@ $ bin/run src/tommath.py
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
 ```
+
+---
+
+
+
+```
+$ bin/run src/tommath-1.rb
+MP_ITER = -4
+{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
+{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+```
+
+---
+
+```
+$ bin/run src/tommath-2.rb
+{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
+{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+```
+
+---
+
+
 
 
 ---

@@ -34,9 +34,9 @@ def cmd cmd
   log "cmd : #{cmd} : ..."
   system "#{cmd} >tmp/cmd.out 2>&1"
   result = $?
-  out = File.read("tmp/cmd.out").gsub("\0", '')
-  out = lines_to_string(string_to_lines(out))
-  log "cmd : #{cmd} : DONE #{result.exitstatus}"
+  out_raw = File.read("tmp/cmd.out").gsub("\0", '')
+  out = lines_to_string(string_to_lines(out_raw))
+  log "cmd : #{cmd} : DONE : #{result.exitstatus} : #{out_raw.size} bytes"
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
@@ -239,7 +239,6 @@ example_names.each do | name |
 
   msg "  {{{ Workflow : #{e[:name]}"
   e[:workflow_output] = run_workflow(e)
-  msg e[:workflow_output]
   msg "  }}} Workflow : #{e[:name]}"
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
@@ -263,17 +262,44 @@ END
       t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig' 
       t[:lang] ||= t[:type].split(/\s+/).first
       t[:code_style] ||= t[:lang].downcase
-      t[:file] = "src/#{t[:file]}"
-      t[:code] = File.exist?(t[:file]) && code_lines(File.read(t[:file]), t[:lang], t[:swig_interface])
-      case t[:cmd]
+      t[:suffix] = t[:file].sub(%r{^.*(\.[^./]+)$}, '\1')
+
+      # Determine a list of files/commands for this target:
+      files = case t[:cmd]
       when '-'
+        # No command:
+        [
+          {
+            file: "src/#{t[:file]}",
+          }
+        ]
       when nil
-        t[:run] = "bin/run #{t[:file]}"
+        # Files maybe executables:
+        ([ "src/#{t[:file]}" ] +
+          Dir["src/#{e[:basename]}-*#{t[:suffix]}"].sort
+        ).map do | f |
+            {
+              file: f,
+              cmd: File.executable?(f) && "bin/run #{f}",
+            }
+          end
       else
-        t[:run] = "bin/run #{t[:cmd]}"
-      end if t[:code]
-      t[:run_output] = t[:run] && lines_to_string(trim_empty_lines!(clean_up_lines(string_to_lines(cmd(t[:run])))))
-      msg t[:run_output]
+        # Just a command:
+        [
+          {
+            file: "src/#{t[:file]}",
+            cmd: "bin/run #{t[:cmd]}",
+          }
+        ]
+      end
+      files.select!{|f| File.exist?(f[:file])}
+      files.each do | f |
+        f[:name] = File.basename(f[:file])
+        f[:code] = code_lines(File.read(f[:file]), t[:lang], t[:swig_interface])
+        f[:output] = f[:cmd] && lines_to_string(trim_empty_lines!(clean_up_lines(string_to_lines(cmd(f[:cmd])))))
+      end
+      t[:files] = files
+      msg t[:files]
       t
     end
   pe(e: e)

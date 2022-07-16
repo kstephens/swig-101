@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'pry' # _byebug'
 require 'tommath_swig'
 
 #########################################################
