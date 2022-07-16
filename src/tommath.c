@@ -6,7 +6,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {
   (void) mp_radix_size(self, radix, &size);
   char* buf = malloc(size + 1);
   (void) mp_to_radix(self, buf, size, &written, radix);
-  buf[written] = 0;
+  buf[written - 1] = 0;
   return buf;
 }
 

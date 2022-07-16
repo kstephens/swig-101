@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 12c6041a0>
+#<swig-pointer std::vector< double > * 13cf04080>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a041a04901000000_p_std__vectorT_double_t
+_9071f04001000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -736,7 +736,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 12c6041a0>
+#<swig-pointer std::vector< double > * 13cf04080>
 17.3020736
 ```
 
@@ -746,7 +746,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a041a04901000000_p_std__vectorT_double_t
+_9071f04001000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1152,7 +1152,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {                          /
   (void) mp_radix_size(self, radix, &size);                                    //  6 
   char* buf = malloc(size + 1);                                                //  7 
   (void) mp_to_radix(self, buf, size, &written, radix);                        //  8 
-  buf[written] = 0;                                                            //  9 
+  buf[written - 1] = 0;                                                        //  9 
   return buf;                                                                  // 10 
 }                                                                              // 11 
                                                                                // 12 
