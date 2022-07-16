@@ -125,11 +125,14 @@ SWIG_SO_PREFIX_guile:=lib
 SUFFIX_clojure=clj
 SWIG_OPTS_clojure=-java
 # SWIG_OPTS_clojure=-package $(EXAMPLE_NAME)
-SWIG_CFLAGS_clojure=-I$(JAVA_INC) -I$(JAVA_INC)/linux -I$(JAVA_INC)/darwin
+SWIG_CFLAGS_clojure=-I$(JAVA_INC)
 ifeq "$(UNAME_S)" "Darwin"
+SWIG_CFLAGS_clojure+= -I$(JAVA_INC)/darwin
 SWIG_SO_PREFIX_clojure=lib
 SWIG_SO_SUFFIX_clojure=.jnilib
-else
+endif
+ifeq "$(UNAME_S)" "Linux"
+SWIG_CFLAGS_clojure+= -I$(JAVA_INC)/linux
 SWIG_SO_PREFIX_clojure=lib
 SWIG_SO_SUFFIX_clojure=.so
 endif
@@ -347,7 +350,7 @@ demo-run:
 	   do \
 	     for prog in src/"$$example"*."$$suffix" ;\
 	     do \
-	       [ -f "$$prog" ] && (echo ''; set -x; $(RUN) "$$prog") ;\
+	       [ -x "$$prog" ] && (echo ''; set -x; $(RUN) "$$prog") ;\
 	     done \
 	   done \
 	done ;\
@@ -367,6 +370,10 @@ debian-prereq:
 	sudo apt-get install  automake libtool autoconf cmake bison byacc tcl-dev  guile-2.2-dev
 	@echo "See https://apt.llvm.org/."
 	sudo apt-get install clang-13 clang++-13 libc++-13-dev
+	@echo "See: https://computingforgeeks.com/how-to-install-python-on-ubuntu-linux-system/ to install python 3.10."
+	sudo apt-get install   python3.10-dev python3.10-venv
+	curl -sS https://bootstrap.pypa.io/get-pip.py | bin/run python3.10
+	bin/run python3.10 -m pip install pytest
 
 #################################
 

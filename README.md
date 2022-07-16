@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13cf04080>
+#<swig-pointer std::vector< double > * 130704080>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_9071f04001000000_p_std__vectorT_double_t
+_f060704301000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -736,7 +736,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13cf04080>
+#<swig-pointer std::vector< double > * 130704080>
 17.3020736
 ```
 
@@ -746,7 +746,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_9071f04001000000_p_std__vectorT_double_t
+_f060704301000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1145,43 +1145,44 @@ void     swig_mp_int_delete(mp_int* self);                                     /
 
 ```c
 #include "tommath.h"                                                           //  1 
-#include <stdlib.h>                                                            //  2 
-                                                                               //  3 
-char* swig_mp_int_to_charP(mp_int* self, int radix) {                          //  4 
-  size_t size = 0, written = 0;                                                //  5 
-  (void) mp_radix_size(self, radix, &size);                                    //  6 
-  char* buf = malloc(size + 1);                                                //  7 
-  (void) mp_to_radix(self, buf, size, &written, radix);                        //  8 
-  buf[written - 1] = 0;                                                        //  9 
-  return buf;                                                                  // 10 
-}                                                                              // 11 
-                                                                               // 12 
-char* swig_mp_int_rep(mp_int* self, int radix) {                               // 13 
-  char *repr = 0, *str = swig_mp_int_to_charP(self, radix);                    // 14 
-  if ( radix == 10 )                                                           // 15 
-    asprintf(&repr, "mp_int(\"%s\")", str);                                    // 16 
-  else                                                                         // 17 
-    asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);                          // 18 
-  return free(str), repr;                                                      // 19 
-}                                                                              // 20 
-                                                                               // 21 
-mp_int* swig_charP_to_mp_int(const char* str, int radix) {                     // 22 
-  mp_int* self = swig_mp_int_new(0);                                           // 23 
-  (void) mp_read_radix(self, str, radix);                                      // 24 
-  return self;                                                                 // 25 
-}                                                                              // 26 
-                                                                               // 27 
-mp_int* swig_mp_int_new(mp_digit n) {                                          // 28 
-  mp_int* self = malloc(sizeof(*self));                                        // 29 
-  (void) mp_init(self);                                                        // 30 
-  mp_set(self, n);                                                             // 31 
-  return self;                                                                 // 32 
-}                                                                              // 33 
-                                                                               // 34 
-void swig_mp_int_delete(mp_int* self) {                                        // 35 
-  mp_clear(self);                                                              // 36 
-  free(self);                                                                  // 37 
-}                                                                              // 38 
+#define _GNU_SOURCE                                                            //  2 
+#include <stdlib.h>                                                            //  3 
+                                                                               //  4 
+char* swig_mp_int_to_charP(mp_int* self, int radix) {                          //  5 
+  size_t size = 0, written = 0;                                                //  6 
+  (void) mp_radix_size(self, radix, &size);                                    //  7 
+  char* buf = malloc(size + 1);                                                //  8 
+  (void) mp_to_radix(self, buf, size, &written, radix);                        //  9 
+  buf[written - 1] = 0;                                                        // 10 
+  return buf;                                                                  // 11 
+}                                                                              // 12 
+                                                                               // 13 
+char* swig_mp_int_rep(mp_int* self, int radix) {                               // 14 
+  char *repr = 0, *str = swig_mp_int_to_charP(self, radix);                    // 15 
+  if ( radix == 10 )                                                           // 16 
+    asprintf(&repr, "mp_int(\"%s\")", str);                                    // 17 
+  else                                                                         // 18 
+    asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);                          // 19 
+  return free(str), repr;                                                      // 20 
+}                                                                              // 21 
+                                                                               // 22 
+mp_int* swig_charP_to_mp_int(const char* str, int radix) {                     // 23 
+  mp_int* self = swig_mp_int_new(0);                                           // 24 
+  (void) mp_read_radix(self, str, radix);                                      // 25 
+  return self;                                                                 // 26 
+}                                                                              // 27 
+                                                                               // 28 
+mp_int* swig_mp_int_new(mp_digit n) {                                          // 29 
+  mp_int* self = malloc(sizeof(*self));                                        // 30 
+  (void) mp_init(self);                                                        // 31 
+  mp_set(self, n);                                                             // 32 
+  return self;                                                                 // 33 
+}                                                                              // 34 
+                                                                               // 35 
+void swig_mp_int_delete(mp_int* self) {                                        // 36 
+  mp_clear(self);                                                              // 37 
+  free(self);                                                                  // 38 
+}                                                                              // 39 
 ```
 
 
@@ -1553,7 +1554,7 @@ clang -g -Isrc -c -o target/native/example1.o src/example1.c
                                                                               
 # Compile and link native program:                                            
 clang -g -Isrc -o target/native/example1 src/example1-native.c                  \
-  target/native/example1.o -ltommath                                          
+  target/native/example1.o -L/opt/homebrew/lib -ltommath                      
                                                                               
 ```                                                                           
                                                                               
@@ -1585,7 +1586,8 @@ clang -g -Isrc -Wno-sentinel -Wno-unused-result -Wsign-compare                  
 # Link python dynamic library:                                                
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/python/_example1_swig.so target/native/example1.o                      \
-  target/python/example1_swig.c.o -ldl -ltommath                              
+  target/python/example1_swig.c.o -Lpython3.10/config-3.10-darwin -ldl          \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1617,7 +1619,7 @@ clang -g -Isrc -Wno-sentinel -c -o target/clojure/example1_swig.c.o             
 # Link clojure dynamic library:                                               
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/clojure/libexample1_swig.jnilib target/native/example1.o               \
-  target/clojure/example1_swig.c.o -ltommath                                  
+  target/clojure/example1_swig.c.o -L/opt/homebrew/lib -ltommath              
                                                                               
 ```                                                                           
                                                                               
@@ -1645,7 +1647,7 @@ clang -g -Isrc -Wno-sentinel /arm64-darwin21 -c -o                              
 # Link ruby dynamic library:                                                  
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/ruby/example1_swig.bundle target/native/example1.o                     \
-  target/ruby/example1_swig.c.o -ltommath                                     
+  target/ruby/example1_swig.c.o -L/opt/homebrew/lib -ltommath                 
                                                                               
 ```                                                                           
                                                                               
@@ -1673,7 +1675,7 @@ clang -g -Isrc -Wno-sentinel -Itcl -c -o target/tcl/example1_swig.c.o           
 # Link tcl dynamic library:                                                   
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/tcl/example1_swig.so target/native/example1.o                          \
-  target/tcl/example1_swig.c.o -ltommath                                      
+  target/tcl/example1_swig.c.o -L/opt/homebrew/lib -ltommath                  
                                                                               
 ```                                                                           
                                                                               
@@ -1695,14 +1697,15 @@ wc -l target/guile/example1_swig.c
 1605 target/guile/example1_swig.c                                             
                                                                               
 # Compile guile bindings:                                                     
-clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o        \
+clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -c -o                               \
   target/guile/example1_swig.c.o target/guile/example1_swig.c                 
                                                                               
 # Link guile dynamic library:                                                 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/guile/libexample1_swig.so target/native/example1.o                     \
-  target/guile/example1_swig.c.o -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc  \
-  -lpthread -ltommath                                                         
+  target/guile/example1_swig.c.o -L$GUILE_HOME/lib                              \
+  -L/opt/homebrew/opt/bdw-gc/lib -lguile-3.0 -lgc -lpthread                     \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1717,12 +1720,12 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
                                                                               
 ```                                                                           
 # Compile native library:                                                     
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -c -o          \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -c -o                         \
   target/native/polynomial.o src/polynomial.cc                                
                                                                               
 # Compile and link native program:                                            
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o             \
-  target/native/polynomial src/polynomial-native.cc target/native/polynomial.o  \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -o target/native/polynomial   \
+  src/polynomial-native.cc target/native/polynomial.o -L/opt/homebrew/lib       \
   -ltommath                                                                   
                                                                               
 ```                                                                           
@@ -1747,15 +1750,16 @@ wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py
 8649 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic     \
   -DNDEBUG -g -fwrapv -O3 -Wall -Wno-deprecated-declarations -c -o              \
   target/python/polynomial_swig.cc.o target/python/polynomial_swig.cc         
                                                                               
 # Link python dynamic library:                                                
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/python/_polynomial_swig.so            \
-  target/native/polynomial.o target/python/polynomial_swig.cc.o -ldl -ltommath
+  target/native/polynomial.o target/python/polynomial_swig.cc.o                 \
+  -Lpython3.10/config-3.10-darwin -ldl -L/opt/homebrew/lib -ltommath          
                                                                               
 ```                                                                           
                                                                               
@@ -1781,13 +1785,14 @@ wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java
 715 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -c -o target/clojure/polynomial_swig.cc.o target/clojure/polynomial_swig.cc 
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -c -o           \
+  target/clojure/polynomial_swig.cc.o target/clojure/polynomial_swig.cc       
                                                                               
 # Link clojure dynamic library:                                               
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/clojure/libpolynomial_swig.jnilib     \
-  target/native/polynomial.o target/clojure/polynomial_swig.cc.o -ltommath    
+  target/native/polynomial.o target/clojure/polynomial_swig.cc.o                \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1809,14 +1814,15 @@ wc -l target/ruby/polynomial_swig.cc
 8528 target/ruby/polynomial_swig.cc                                           
                                                                               
 # Compile ruby bindings:                                                      
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   /arm64-darwin21 -c -o target/ruby/polynomial_swig.cc.o                        \
   target/ruby/polynomial_swig.cc                                              
                                                                               
 # Link ruby dynamic library:                                                  
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/ruby/polynomial_swig.bundle           \
-  target/native/polynomial.o target/ruby/polynomial_swig.cc.o -ltommath       
+  target/native/polynomial.o target/ruby/polynomial_swig.cc.o                   \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1838,13 +1844,14 @@ wc -l target/tcl/polynomial_swig.cc
 2951 target/tcl/polynomial_swig.cc                                            
                                                                               
 # Compile tcl bindings:                                                       
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -Itcl -c -o target/tcl/polynomial_swig.cc.o target/tcl/polynomial_swig.cc   
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -Itcl -c -o     \
+  target/tcl/polynomial_swig.cc.o target/tcl/polynomial_swig.cc               
                                                                               
 # Link tcl dynamic library:                                                   
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/tcl/polynomial_swig.so                \
-  target/native/polynomial.o target/tcl/polynomial_swig.cc.o -ltommath        
+  target/native/polynomial.o target/tcl/polynomial_swig.cc.o                    \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1866,15 +1873,15 @@ wc -l target/guile/polynomial_swig.cc
 2267 target/guile/polynomial_swig.cc                                          
                                                                               
 # Compile guile bindings:                                                     
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o                                   \
-  target/guile/polynomial_swig.cc.o target/guile/polynomial_swig.cc           
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -D_THREAD_SAFE  \
+  -c -o target/guile/polynomial_swig.cc.o target/guile/polynomial_swig.cc     
                                                                               
 # Link guile dynamic library:                                                 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_swig.so           \
   target/native/polynomial.o target/guile/polynomial_swig.cc.o                  \
-  -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc -lpthread -ltommath           
+  -L$GUILE_HOME/lib -L/opt/homebrew/opt/bdw-gc/lib -lguile-3.0 -lgc -lpthread   \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1889,13 +1896,13 @@ clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    
                                                                               
 ```                                                                           
 # Compile native library:                                                     
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -c -o          \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -c -o                         \
   target/native/polynomial_v2.o src/polynomial_v2.cc                          
                                                                               
 # Compile and link native program:                                            
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -o             \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -o                            \
   target/native/polynomial_v2 src/polynomial_v2-native.cc                       \
-  target/native/polynomial_v2.o -ltommath                                     
+  target/native/polynomial_v2.o -L/opt/homebrew/lib -ltommath                 
                                                                               
 ```                                                                           
                                                                               
@@ -1919,16 +1926,16 @@ wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py
 13689 total                                                                   
                                                                               
 # Compile python bindings:                                                    
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic     \
   -DNDEBUG -g -fwrapv -O3 -Wall -Wno-deprecated-declarations -c -o              \
   target/python/polynomial_v2_swig.cc.o target/python/polynomial_v2_swig.cc   
                                                                               
 # Link python dynamic library:                                                
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/python/_polynomial_v2_swig.so         \
-  target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o -ldl      \
-  -ltommath                                                                   
+  target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o           \
+  -Lpython3.10/config-3.10-darwin -ldl -L/opt/homebrew/lib -ltommath          
                                                                               
 ```                                                                           
                                                                               
@@ -1960,15 +1967,14 @@ wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java
 1760 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -c -o target/clojure/polynomial_v2_swig.cc.o                                  \
-  target/clojure/polynomial_v2_swig.cc                                        
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -c -o           \
+  target/clojure/polynomial_v2_swig.cc.o target/clojure/polynomial_v2_swig.cc 
                                                                               
 # Link clojure dynamic library:                                               
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/clojure/libpolynomial_v2_swig.jnilib  \
   target/native/polynomial_v2.o target/clojure/polynomial_v2_swig.cc.o          \
-  -ltommath                                                                   
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -1990,14 +1996,15 @@ wc -l target/ruby/polynomial_v2_swig.cc
 14480 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   /arm64-darwin21 -c -o target/ruby/polynomial_v2_swig.cc.o                     \
   target/ruby/polynomial_v2_swig.cc                                           
                                                                               
 # Link ruby dynamic library:                                                  
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/ruby/polynomial_v2_swig.bundle        \
-  target/native/polynomial_v2.o target/ruby/polynomial_v2_swig.cc.o -ltommath 
+  target/native/polynomial_v2.o target/ruby/polynomial_v2_swig.cc.o             \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -2021,14 +2028,14 @@ wc -l target/tcl/polynomial_v2_swig.cc
 4669 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -Itcl -c -o target/tcl/polynomial_v2_swig.cc.o                                \
-  target/tcl/polynomial_v2_swig.cc                                            
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -Itcl -c -o     \
+  target/tcl/polynomial_v2_swig.cc.o target/tcl/polynomial_v2_swig.cc         
                                                                               
 # Link tcl dynamic library:                                                   
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/tcl/polynomial_v2_swig.so             \
-  target/native/polynomial_v2.o target/tcl/polynomial_v2_swig.cc.o -ltommath  
+  target/native/polynomial_v2.o target/tcl/polynomial_v2_swig.cc.o              \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -2056,15 +2063,16 @@ wc -l target/guile/polynomial_v2_swig.cc
 3961 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -Wno-sentinel  \
-  -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o                                   \
-  target/guile/polynomial_v2_swig.cc.o target/guile/polynomial_v2_swig.cc     
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -D_THREAD_SAFE  \
+  -c -o target/guile/polynomial_v2_swig.cc.o                                    \
+  target/guile/polynomial_v2_swig.cc                                          
                                                                               
 # Link guile dynamic library:                                                 
-clang++ -g -Isrc -Wno-c++11-extensions -stdlib=libc++ -std=c++17 -dynamiclib    \
+clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_v2_swig.so        \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
-  -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc -lpthread -ltommath           
+  -L$GUILE_HOME/lib -L/opt/homebrew/opt/bdw-gc/lib -lguile-3.0 -lgc -lpthread   \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -2083,7 +2091,7 @@ clang -g -Isrc -c -o target/native/tommath.o src/tommath.c
                                                                               
 # Compile and link native program:                                            
 clang -g -Isrc -o target/native/tommath src/tommath-native.c                    \
-  target/native/tommath.o -ltommath                                           
+  target/native/tommath.o -L/opt/homebrew/lib -ltommath                       
                                                                               
 ```                                                                           
                                                                               
@@ -2115,7 +2123,8 @@ clang -g -Isrc -Wno-sentinel -Wno-unused-result -Wsign-compare                  
 # Link python dynamic library:                                                
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/python/_tommath_swig.so target/native/tommath.o                        \
-  target/python/tommath_swig.c.o -ldl -ltommath                               
+  target/python/tommath_swig.c.o -Lpython3.10/config-3.10-darwin -ldl           \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               
@@ -2147,7 +2156,7 @@ clang -g -Isrc -Wno-sentinel -c -o target/clojure/tommath_swig.c.o              
 # Link clojure dynamic library:                                               
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/clojure/libtommath_swig.jnilib target/native/tommath.o                 \
-  target/clojure/tommath_swig.c.o -ltommath                                   
+  target/clojure/tommath_swig.c.o -L/opt/homebrew/lib -ltommath               
                                                                               
 ```                                                                           
                                                                               
@@ -2179,7 +2188,7 @@ clang -g -Isrc -Wno-sentinel /arm64-darwin21 -c -o                              
 # Link ruby dynamic library:                                                  
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/ruby/tommath_swig.bundle target/native/tommath.o                       \
-  target/ruby/tommath_swig.c.o -ltommath                                      
+  target/ruby/tommath_swig.c.o -L/opt/homebrew/lib -ltommath                  
                                                                               
 ```                                                                           
                                                                               
@@ -2201,14 +2210,15 @@ wc -l target/guile/tommath_swig.c
 6397 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
-clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -I$GUILE_HOMEguile/3.0 -c -o        \
+clang -g -Isrc -Wno-sentinel -D_THREAD_SAFE -c -o                               \
   target/guile/tommath_swig.c.o target/guile/tommath_swig.c                   
                                                                               
 # Link guile dynamic library:                                                 
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/guile/libtommath_swig.so target/native/tommath.o                       \
-  target/guile/tommath_swig.c.o -L$GUILE_HOMEguile/3.0.8/lib -lguile-3.0 -lgc   \
-  -lpthread -ltommath                                                         
+  target/guile/tommath_swig.c.o -L$GUILE_HOME/lib                               \
+  -L/opt/homebrew/opt/bdw-gc/lib -lguile-3.0 -lgc -lpthread                     \
+  -L/opt/homebrew/lib -ltommath                                               
                                                                               
 ```                                                                           
                                                                               

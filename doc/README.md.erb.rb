@@ -156,20 +156,15 @@ def run_workflow e
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
   # Linux:
   gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
+  gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
   # macports:
-  gsub(%r{-I */opt/local/include[^ ]* *}, ' ').
-  gsub(%r{-L */opt/local/lib[^ ]* *}, ' ').
+  gsub(%r{-I */opt/local/[^ ]* +}, ' ').
   # brew:
-  gsub(%r{-I */opt/homebrew/include[^ ]* *}, ' ').
-  gsub(%r{-L */opt/homebrew/lib[^ ]* *}, ' ').
-  gsub(%r{-I *\S+/opt/\S*include[^ ]* *}, ' ').
-  gsub(%r{-L *\S+/opt/\S*lib[^ ]* *}, ' ').
-  gsub(%r{-I *\S+/opt/\S+ *}, ' ').
-  gsub(%r{-L *\S+/opt/\S+ *}, ' ').
+  gsub(%r{-I */opt/homebrew/[^ ]* +}, ' ').
   # local/:
-  gsub(%r{-I *include[^ ]* *}, ' ').
-  gsub(%r{-I *local/include[^ ]* *}, ' ').
-  gsub(%r{-L *local/lib[^ ]* *}, ' ').
+  gsub(%r{-I *include[^ ]* +}, ' ').
+  gsub(%r{-I *local/include[^ ]* +}, ' ').
+  gsub(%r{-L *local/lib[^ ]* +}, ' ').
   gsub(%r{  +}, ' ')
   lines = clean_up_lines(dedup_empty_lines(string_to_lines(out)))
   lines_to_string(lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))})
