@@ -61,13 +61,17 @@ def trim_empty_lines!(lines)
 end
 
 def dedup_empty_lines(lines)
+  dedup_adjacent(lines, "")
+end
+
+def dedup_adjacent(enum, pat)
   result = [ ]
-  last = nil
-  while line = lines.shift
-    unless last == "" && line == ""
-      result << line
+  emitted = nil
+  enum.each do | elem |
+    unless emitted && (pat === elem && pat === result[-1])
+      result << elem
+      emitted = true
     end
-    last = line
   end
   result
 end
@@ -213,7 +217,7 @@ end
 
 #####################################
 
-msg "Start"
+log "Start"
 
 cmd "bin/build clean"
 
@@ -235,12 +239,13 @@ example_names.each do | name |
     lang:     lang,
   })
 
-  msg "{{{ Example : #{e[:name]}"
+  log "{{{ Example : #{e[:name]}"
   pe(e: e)
 
-  msg "  {{{ Workflow : #{e[:name]}"
+  log "  {{{ Workflow : #{e[:name]}"
   e[:workflow_output] = run_workflow(e)
-  msg "  }}} Workflow : #{e[:name]}"
+  msg e[:workflow_output]
+  log "  }}} Workflow : #{e[:name]}"
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
 #{lang} Header          | #{basename}.h        | - |
@@ -306,7 +311,7 @@ END
   pe(e: e)
   # PP.pp(targets: targets, $stderr)
   # pe(targets: targets)
-  msg "}}} Example : #{e[:name]}"
+  log "}}} Example : #{e[:name]}"
 end
 
-msg 'DONE'
+log 'DONE'

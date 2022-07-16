@@ -289,23 +289,21 @@ build-native-end:
 
 #################################
 
-build-targets:
+build-targets: early
 	$(SILENT)set -e ;\
 	for t in $(SWIG_TARGETS) ;\
 	do \
 	  $(MAKE) build-target EXAMPLE=$(EXAMPLE) SWIG_TARGET=$$t ;\
 	done
 
-build-target: early build-target-begin target-deps build-target-end
-
-build-target-begin:
-	$(SILENT)echo "### Build $(SWIG_TARGET) Bindings"
-	$(SILENT)echo ""
-	$(SILENT)echo "\`\`\`"
-
-build-target-end:
-	$(SILENT)echo "\`\`\`"
-	$(SILENT)echo ""
+build-target: early
+	$(SILENT) \
+	echo "### Build $(SWIG_TARGET) Bindings" ;\
+	echo "" ;\
+	echo "\`\`\`" ;\
+	$(MAKE) target-deps EXAMPLE=$(EXAMPLE) SWIG_TARGET=$(SWIG_TARGET) ;\
+	echo "\`\`\`" ;\
+	echo ""
 
 .PHONY: build-targets build-target build-target-begin build-target-end
 
