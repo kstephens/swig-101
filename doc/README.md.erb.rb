@@ -158,10 +158,12 @@ def run_workflow e
   gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
   gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
   # brew:
+  gsub(%r{-Wno-deprecated-declarations +}, ' ').
   gsub(%r{-I */opt/homebrew/include +}, ' ').
   gsub(%r{-L */opt/homebrew/lib +}, ' ').
   gsub(%r{-I */opt/homebrew/opt/[^/ ]+/include[^ ]* +}, ' ').
   gsub(%r{-L */opt/homebrew/opt/[^/ ]+/lib[^ ]* +}, ' ').
+  gsub(%r{ld: warning: -undefined dynamic_lookup may not work with chained fixups}, ' ').
   # macports:
   gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
   gsub(%r{-L */opt/local/lib[^ ]* +}, ' ').
@@ -260,7 +262,7 @@ END
       t = [:type, :file, :cmd, :lang].zip(l).to_h
       $context = t
       t[:name] = t[:file]
-      t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig' 
+      t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig'
       t[:lang] ||= t[:type].split(/\s+/).first
       t[:code_style] ||= t[:lang].downcase
       t[:suffix] = t[:file].sub(%r{^.*(\.[^./]+)$}, '\1')

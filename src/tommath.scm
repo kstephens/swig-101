@@ -13,9 +13,9 @@
 (define e (new-mp-int "12343456" 16));             # <-- yey!
 
 (define (show!)
-(let ((r mp-int---str--))
-  (write `(a ,(r a) b ,(r b) c ,(r c) d ,(r d) e ,(r e)))
-  (newline)))
+  (let ((r mp-int---str--))
+    (write `(a ,(r a) b ,(r b) c ,(r c) d ,(r d) e ,(r e)))
+    (newline)))
 
 (show!)
 

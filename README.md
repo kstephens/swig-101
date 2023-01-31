@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13ae08c70>
+#<swig-pointer std::vector< double > * 129104980>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_00c3602601000000_p_std__vectorT_double_t
+_a041802b01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -669,8 +669,9 @@ def test_one_coeff():                                                          #
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.5, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.9, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
+plugins: cov-4.0.0
 collected 2 items
 
 src/polynomial-test.py ..                                                [100%]
@@ -737,7 +738,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13ae08c70>
+#<swig-pointer std::vector< double > * 129104980>
 17.3020736
 ```
 
@@ -747,7 +748,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_00c3602601000000_p_std__vectorT_double_t
+_a041802b01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -757,8 +758,9 @@ _00c3602601000000_p_std__vectorT_double_t
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.5, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.9, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
+plugins: cov-4.0.0
 collected 2 items
 
 src/polynomial-test.py ..                                                [100%]
@@ -1195,7 +1197,7 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 #include "libtommath/tommath.h"                                                          //  1 
                                                                                          //  2 
 int main(int argc, char **argv) {                                                        //  3 
-  printf("MP_ITER %d", MP_ITER);                                                         //  4 
+  printf("MP_ITER %d\n", MP_ITER);                                                       //  4 
                                                                                          //  5 
   mp_int a, b, c, d, e;                                                                  //  6 
                                                                                          //  7 
@@ -1221,7 +1223,8 @@ int main(int argc, char **argv) {                                               
 
 ```
 $ bin/run target/native/tommath
-MP_ITER -4a = 2357111317
+MP_ITER -4
+a = 2357111317
 b = 1113171923
 c = 2623870137469952591
 d = 2920818566629701480442302493
@@ -1423,6 +1426,45 @@ MPI = Tommath_swig::MPI                                                        #
 
 
 
+### Guile : tommath.scm
+
+```scheme
+(load-extension "target/guile/libtommath_swig.so" "SWIG_init")                 ;;  1 
+                                                                               ;;  2 
+(write `(MP-ITER ,(MP-ITER))) (newline)                                        ;;  3 
+                                                                               ;;  4 
+(define a (new-mp-int))                                                        ;;  5 
+(mp-set a 2357111317);    # <-- awkward!                                       ;;  6 
+(define b (new-mp-int 1113171923));                 # <-- better!              ;;  7 
+(define c (new-mp-int))                                                        ;;  8 
+(define d (new-mp-int))                                                        ;;  9 
+(define e (new-mp-int "12343456" 16));             # <-- yey!                  ;; 10 
+                                                                               ;; 11 
+(define (show!)                                                                ;; 12 
+(let ((r mp-int---str--))                                                      ;; 13 
+  (write `(a ,(r a) b ,(r b) c ,(r c) d ,(r d) e ,(r e)))                      ;; 14 
+  (newline)))                                                                  ;; 15 
+                                                                               ;; 16 
+(show!)                                                                        ;; 17 
+                                                                               ;; 18 
+(mp-mul a b c)                                                                 ;; 19 
+(mp-mul c b d)                                                                 ;; 20 
+                                                                               ;; 21 
+(show!)                                                                        ;; 22 
+```
+
+
+---
+
+```
+$ bin/run src/tommath.scm
+(MP-ITER -4)
+(a "2357111317" b "1113171923" c "0" d "0" e "305411158")
+(a "2357111317" b "1113171923" c "2623870137469952591" d "2920818566629701480442302493" e "305411158")
+```
+
+---
+
 
 
 
@@ -1434,7 +1476,8 @@ MPI = Tommath_swig::MPI                                                        #
 
 ```
 $ bin/run target/native/tommath
-MP_ITER -4a = 2357111317
+MP_ITER -4
+a = 2357111317
 b = 1113171923
 c = 2623870137469952591
 d = 2920818566629701480442302493
@@ -1473,6 +1516,15 @@ $ bin/run src/tommath-2.rb
 
 ---
 
+
+```
+$ bin/run src/tommath.scm
+(MP-ITER -4)
+(a "2357111317" b "1113171923" c "0" d "0" e "305411158")
+(a "2357111317" b "1113171923" c "2623870137469952591" d "2920818566629701480442302493" e "305411158")
+```
+
+---
 
 
 
@@ -1581,15 +1633,15 @@ wc -l target/python/example1_swig.c target/python/example1_swig.py
                                                                               
 # Compile python bindings:                                                    
 clang -g -Isrc -Wno-sentinel -Wno-unused-result -Wsign-compare                  \
-  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall         \
-  -Wno-deprecated-declarations -c -o target/python/example1_swig.c.o            \
-  target/python/example1_swig.c                                               
+  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -c -o   \
+  target/python/example1_swig.c.o target/python/example1_swig.c               
                                                                               
 # Link python dynamic library:                                                
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/python/_example1_swig.so target/native/example1.o                      \
   target/python/example1_swig.c.o -Lpython3.10/config-3.10-darwin -ldl          \
   -ltommath                                                                   
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1623,6 +1675,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/clojure/libexample1_swig.jnilib target/native/example1.o               \
   target/clojure/example1_swig.c.o -ltommath                                  
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build ruby Bindings                                                       
@@ -1651,6 +1704,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/ruby/example1_swig.bundle target/native/example1.o                     \
   target/ruby/example1_swig.c.o -ltommath                                     
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build tcl Bindings                                                        
@@ -1678,6 +1732,7 @@ clang -g -Isrc -Wno-sentinel -Itcl -c -o target/tcl/example1_swig.c.o           
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/tcl/example1_swig.so target/native/example1.o                          \
   target/tcl/example1_swig.c.o -ltommath                                      
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1708,6 +1763,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/guile/libexample1_swig.so target/native/example1.o                     \
   target/guile/example1_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread   \
   -ltommath                                                                   
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1753,14 +1809,15 @@ wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py
 # Compile python bindings:                                                    
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic     \
-  -DNDEBUG -g -fwrapv -O3 -Wall -Wno-deprecated-declarations -c -o              \
-  target/python/polynomial_swig.cc.o target/python/polynomial_swig.cc         
+  -DNDEBUG -g -fwrapv -O3 -Wall -c -o target/python/polynomial_swig.cc.o        \
+  target/python/polynomial_swig.cc                                            
                                                                               
 # Link python dynamic library:                                                
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/python/_polynomial_swig.so            \
   target/native/polynomial.o target/python/polynomial_swig.cc.o                 \
   -Lpython3.10/config-3.10-darwin -ldl -ltommath                              
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1794,6 +1851,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   
   -Wl,-undefined,dynamic_lookup -o target/clojure/libpolynomial_swig.jnilib     \
   target/native/polynomial.o target/clojure/polynomial_swig.cc.o -ltommath    
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build ruby Bindings                                                       
@@ -1823,6 +1881,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   
   -Wl,-undefined,dynamic_lookup -o target/ruby/polynomial_swig.bundle           \
   target/native/polynomial.o target/ruby/polynomial_swig.cc.o -ltommath       
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build tcl Bindings                                                        
@@ -1850,6 +1909,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -Itcl -c -o     
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/tcl/polynomial_swig.so                \
   target/native/polynomial.o target/tcl/polynomial_swig.cc.o -ltommath        
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1880,6 +1940,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_swig.so           \
   target/native/polynomial.o target/guile/polynomial_swig.cc.o                  \
   -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread -ltommath                      
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1926,14 +1987,15 @@ wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py
 # Compile python bindings:                                                    
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 \
   -Wno-unused-result -Wsign-compare -Wunreachable-code -fno-common -dynamic     \
-  -DNDEBUG -g -fwrapv -O3 -Wall -Wno-deprecated-declarations -c -o              \
-  target/python/polynomial_v2_swig.cc.o target/python/polynomial_v2_swig.cc   
+  -DNDEBUG -g -fwrapv -O3 -Wall -c -o target/python/polynomial_v2_swig.cc.o     \
+  target/python/polynomial_v2_swig.cc                                         
                                                                               
 # Link python dynamic library:                                                
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/python/_polynomial_v2_swig.so         \
   target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o           \
   -Lpython3.10/config-3.10-darwin -ldl -ltommath                              
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -1974,6 +2036,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   
   target/native/polynomial_v2.o target/clojure/polynomial_v2_swig.cc.o          \
   -ltommath                                                                   
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build ruby Bindings                                                       
@@ -2002,6 +2065,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel                 
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/ruby/polynomial_v2_swig.bundle        \
   target/native/polynomial_v2.o target/ruby/polynomial_v2_swig.cc.o -ltommath 
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -2032,6 +2096,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -Wno-sentinel -Itcl -c -o     
 clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   \
   -Wl,-undefined,dynamic_lookup -o target/tcl/polynomial_v2_swig.so             \
   target/native/polynomial_v2.o target/tcl/polynomial_v2_swig.cc.o -ltommath  
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -2068,6 +2133,7 @@ clang++ -g -Isrc -Wno-c++11-extensions -std=c++17 -dynamiclib                   
   -Wl,-undefined,dynamic_lookup -o target/guile/libpolynomial_v2_swig.so        \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
   -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread -ltommath                      
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -2111,15 +2177,15 @@ wc -l target/python/tommath_swig.c target/python/tommath_swig.py
                                                                               
 # Compile python bindings:                                                    
 clang -g -Isrc -Wno-sentinel -Wno-unused-result -Wsign-compare                  \
-  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall         \
-  -Wno-deprecated-declarations -c -o target/python/tommath_swig.c.o             \
-  target/python/tommath_swig.c                                                
+  -Wunreachable-code -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -c -o   \
+  target/python/tommath_swig.c.o target/python/tommath_swig.c                 
                                                                               
 # Link python dynamic library:                                                
 clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     \
   target/python/_tommath_swig.so target/native/tommath.o                        \
   target/python/tommath_swig.c.o -Lpython3.10/config-3.10-darwin -ldl           \
   -ltommath                                                                   
+                                                                              
                                                                               
 ```                                                                           
                                                                               
@@ -2153,6 +2219,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/clojure/libtommath_swig.jnilib target/native/tommath.o                 \
   target/clojure/tommath_swig.c.o -ltommath                                   
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build ruby Bindings                                                       
@@ -2185,6 +2252,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/ruby/tommath_swig.bundle target/native/tommath.o                       \
   target/ruby/tommath_swig.c.o -ltommath                                      
                                                                               
+                                                                              
 ```                                                                           
                                                                               
 ### Build guile Bindings                                                      
@@ -2214,6 +2282,7 @@ clang -g -Isrc -dynamiclib -Wl,-undefined,dynamic_lookup -o                     
   target/guile/libtommath_swig.so target/native/tommath.o                       \
   target/guile/tommath_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread    \
   -ltommath                                                                   
+                                                                              
                                                                               
 ```                                                                           
                                                                               
