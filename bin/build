@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 dir="$(/bin/pwd)"
 PATH="$dir/bin:$PATH"
+export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
 make="$(which gmake make 2>/dev/null | head -1)"
 exec "$dir/bin/run" "$make" "$@"
