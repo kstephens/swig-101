@@ -5,7 +5,6 @@
 EXAMPLES         = example1.c polynomial.cc polynomial_v2.cc tommath.c
 SWIG_TARGETS     = python  clojure  ruby  tcl  guile
 TARGET_SUFFIXES  = py      clj      rb    tcl  scm
-LIBS += -ltommath
 
 SWIG_CFLAGS_tommath.c+=-Wno-sentinel
 SWIG_CFLAGS+= -Wno-sentinel
@@ -217,6 +216,7 @@ ifeq "$(EXAMPLE_NAME)" "tommath"
 # target/tcl/libtommath_swig.c:2330:19: error: incomplete definition of type 'struct mp_int'
 SWIG_TARGETS:=$(filter-out tcl, $(SWIG_TARGETS))
 TARGET_DEPS:=$(filter-out tcl, $(TARGET_DEPS))
+LIBS += -ltommath
 endif
 
 #################################
