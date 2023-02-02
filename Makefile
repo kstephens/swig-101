@@ -378,14 +378,19 @@ README.md : tmp/README.md
 	cp $< $@
 .PRECIOUS: README.md
 
-tmp/README.md: doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
+README_MD_DEPS=doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
+tmp/README.md: $(README_MD_DEPS)
 	$(MAKE) clean
 	mkdir -p tmp
-	erb doc/README.md.erb > $@.tmp
+	erb doc/README.md.erb | tee $@.tmp | wc -l
 	mv $@.tmp $@
 	ls -l $@
 
-# README.md.html : README.md
+README.md.html : $(README_MD_DEPS)
+	mkdir -p tmp
+	MARKDEEP=1 erb doc/README.md.erb | tee tmp/$@.md | wc -l
+	df-markdown -v -s dark -o $@ tmp/$@.md
+	ls -l $@
 
 #################################
 
@@ -455,4 +460,3 @@ clojure : $(LOCAL)/bin/clojure
 $(LOCAL)/bin/clojure :
 	curl -Lk https://download.clojure.org/install/linux-install-1.11.1.1149.sh > tmp/clojure-install.sh
 	bash tmp/clojure-install.sh --prefix $(LOCAL)
-

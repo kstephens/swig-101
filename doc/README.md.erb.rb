@@ -5,6 +5,7 @@ exit! if ENV['_SWIG_101_README_MD']
 ENV['_SWIG_101_README_MD'] = '1'
 
 require 'pp'
+require 'pry' if ENV['PRY']
 
 $verbose = false
 $pe  = $verbose # || true
@@ -76,10 +77,18 @@ def line_numbers! lines, lang, swig_interface = nil
   comment_to_EOL, comment_line_rx = comment_for_lang(swig_interface || lang)
   pad_lines!(lines)
   lines.map!.with_index(1) do |line, i|
+    # binding.pry if ENV['PRY'] && line =~ /Constructor:/
     case line
     when nil
     # when %r{^\s*$}, comment_line_rx
     #  line
+    when comment_line_rx
+      if ENV['MARKDEEP']
+        # line = $& + $'.gsub(' ', "\u00A0")
+        line
+      else
+        ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
+      end
     else
       ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
       #  .gsub(' ', "\u00A0")
@@ -107,6 +116,13 @@ def code_lines s, lang, swig_interface = nil
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
   line_numbers!(lines, lang, swig_interface)
+  lines.each do | line |
+    if ENV['PRY'] && line =~ /Constructor:/
+      log(line)
+      binding.pry
+    end
+  end
+
   lines_to_string(lines)
 end
 
@@ -154,6 +170,8 @@ def run_workflow e
   out = out.
   gsub(%r{//+}, '/').
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
+  # clojure:
+  gsub(%r{WARNING: When invoking clojure.main, use -M +}, ' ').
   # Linux:
   gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
   gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
