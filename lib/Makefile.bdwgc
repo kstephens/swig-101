@@ -1,0 +1,62 @@
+# -*- makefile -*-
+
+bdwgc_tag         =master #
+libatomic_ops_tag =master #
+
+.PHONY : bdwgc bdwgc-clean
+
+bdwgc : local/lib/libgc.a
+
+bdwgc-distclean : bdwgc-clean
+	rm -rf local/src/bdwgc local/src/libatomic_ops
+
+bdwgc-clean :
+	rm -f local/libgc.a local/src/bdwgc/Makefile local/src/bdwgc/configure
+
+local/src/bdwgc/.git/config :
+	mkdir -p local/src
+	cd local/src;         git clone https://github.com/ivmai/bdwgc.git
+	cd local/src/bdwgc;   git checkout $(bdwgc_tag) ; git pull
+	cd local/src;                git clone https://github.com/ivmai/libatomic_ops.git
+	cd local/src/libatomic_ops;  git checkout $(libatomic_ops_tag) ; git pull
+
+local/src/bdwgc/configure : local/src/bdwgc/.git/config
+	cd local/src; rm -f bdwgc/libatomic_ops; ln -s ../libatomic_ops bdwgc/libatomic_ops
+	set -ex ;\
+	export CC="$(CC)" ;\
+	cd local/src/bdwgc ;\
+	autoreconf -vif ;\
+	automake --add-missing
+	touch -f "$@"
+
+local/src/bdwgc/Makefile : local/src/bdwgc/configure Makefile.bdwgc
+	set -ex ;\
+	export CC="$(CC)" ;\
+	unset CFLAGS CPPFLAGS ;\
+	cd local/src/bdwgc ;\
+	./configure \
+	  --prefix=$(shell cd local && /bin/pwd) \
+	  --enable-handle-fork \
+	  --enable-unmap=32 \
+	  --enable-large-config \
+	  --enable-thread=pthreads \
+          --enable-thread-local-alloc \
+	  --enable-gc-assertions \
+	  --enable-gc-debug \
+          --enable-parallel-mark \
+	  $(__NOTHING__)
+#	  --enable-threads=posix \
+#	  --enable-static \
+#         --disable-thread-local-alloc \
+
+local/lib/libgc.a : local/src/bdwgc/Makefile
+	mkdir -p local/lib
+	set -ex ;\
+	cd local/src/bdwgc ;\
+	$(MAKE) clean ;\
+	$(MAKE) ;\
+	$(MAKE) install
+	mkdir -p local/bin ;\
+	cp -p local/src/bdwgc/libtool local/bin/
+	touch -f $@
+

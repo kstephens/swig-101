@@ -15,7 +15,8 @@ SWIG_CFLAGS+= -Wno-unused-command-line-argument
 MAKE+=--no-print-directory
 MAKEFLAGS+=--no-print-directory
 UNAME_S:=$(shell uname -s)
-#ROOT_DIR:=$(shell /bin/pwd)
+export ROOT_DIR?=$(shell /bin/pwd)
+export LOCAL_DIR:=$(ROOT_DIR)/local
 SILENT=@
 
 ############################
@@ -27,8 +28,8 @@ LDFLAGS   += $(LIB_DIRS) $(LIBS)
 
 INC_DIRS      += -Isrc
 INC_DIRS      += -Iinclude
-INC_DIRS      += -Ilocal/include
-LIB_DIRS      += -Llocal/lib
+INC_DIRS      += -I$(LOCAL_DIR)/include
+LIB_DIRS      += -L$(LOCAL_DIR)/lib
 
 ############################
 
@@ -107,7 +108,7 @@ SWIG_GENERATED_FILES_python=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG).py
 SUFFIX_tcl=tcl
 SWIG_OPTS_tcl=-tcl
 SWIG_CFLAGS_tcl:=-I$(TCL_HOME)/include
-SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
+#SWIG_CFLAGS_tcl:=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 ############################
 
@@ -206,8 +207,8 @@ CFLAGS_SUFFIX.cc+= -std=c++17
 ifeq "$(EXAMPLE_NAME)" "polynomial"
 ifeq "$(UNAME_S)" "LinuxXXX"
 # /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
-SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
-TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
+# SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
+# TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
 endif
 endif
 
@@ -406,57 +407,77 @@ pv:
 
 #################################
 
-LOCAL:=$(ROOT_DIR)/local
-
-local-tools: swig libtommath clojure
+local-tools: swig libtommath clojure # guile
 
 local-tools-clean:
-	rm -rf '$(LOCAL)'
+	rm -rf '$(LOCAL_DIR)'
 
 local-dirs:
-	@mkdir -p $(LOCAL)/src $(LOCAL)/lib $(LOCAL)/include $(LOCAL)/bin
+	@mkdir -p $(LOCAL_DIR)/src $(LOCAL_DIR)/lib $(LOCAL_DIR)/include $(LOCAL_DIR)/bin
 
 #################################
 
-swig : local-dirs $(LOCAL)/bin/swig
+swig : local-dirs $(LOCAL_DIR)/bin/swig
 
-$(LOCAL)/bin/swig : $(LOCAL)/src/swig
+$(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
 	@set -xe ;\
-	cd $(LOCAL)/src/swig ;\
+	cd $(LOCAL_DIR)/src/swig ;\
 	git checkout 6939d91e4c6ea ;\
 	pcre2_version='pcre2-10.39' ;\
 	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$$pcre2_version/$$pcre2_version.tar.gz ;\
 	./Tools/pcre-build.sh ;\
 	./autogen.sh ;\
-	./configure --prefix='$(LOCAL)' ;\
+	./configure --prefix='$(LOCAL_DIR)' ;\
 	make -j ;\
 	make install
 
-$(LOCAL)/src/swig :
+$(LOCAL_DIR)/src/swig :
 	git clone https://github.com/swig/swig.git $@
 
 #################################
 
-libtommath : local-dirs $(LOCAL)/lib/libtommath.a
+libtommath : local-dirs $(LOCAL_DIR)/lib/libtommath.a
 
-$(LOCAL)/lib/libtommath.a : $(LOCAL)/src/libtommath
+$(LOCAL_DIR)/lib/libtommath.a : $(LOCAL_DIR)/src/libtommath
 	@set -xe ;\
-	cd $(LOCAL)/src/libtommath ;\
+	cd $(LOCAL_DIR)/src/libtommath ;\
 	git checkout 4b473685013 ;\
-	mkdir -p $(LOCAL)/src/libtommath/build $(LOCAL)/include/libtommath ;\
-	cd $(LOCAL)/src/libtommath ;\
+	mkdir -p $(LOCAL_DIR)/src/libtommath/build $(LOCAL_DIR)/include/libtommath ;\
+	cd $(LOCAL_DIR)/src/libtommath ;\
 	make -f makefile.unix clean ;\
 	make -f makefile.unix -j CC='$(CC_SUFFIX.c) -fPIC' ;\
-	cp -p $(LOCAL)/src/libtommath/libtommath.a $@ ;\
-	cp -p $(LOCAL)/src/libtommath/*.h $(LOCAL)/include/libtommath/
+	cp -p $(LOCAL_DIR)/src/libtommath/libtommath.a $@ ;\
+	cp -p $(LOCAL_DIR)/src/libtommath/*.h $(LOCAL_DIR)/include/libtommath/
 
-$(LOCAL)/src/libtommath:
+$(LOCAL_DIR)/src/libtommath:
 	git clone https://github.com/libtom/libtommath.git $@
 
 #################################
 
-clojure : $(LOCAL)/bin/clojure
+clojure : local-dirs $(LOCAL_DIR)/bin/clojure
 
-$(LOCAL)/bin/clojure :
+$(LOCAL_DIR)/bin/clojure :
 	curl -Lk https://download.clojure.org/install/linux-install-1.11.1.1149.sh > tmp/clojure-install.sh
-	bash tmp/clojure-install.sh --prefix $(LOCAL)
+	bash tmp/clojure-install.sh --prefix $(LOCAL_DIR)
+
+#################################
+
+include lib/Makefile.bdwgc
+
+#################################
+
+guile : local-dirs bdwgc $(LOCAL_DIR)/bin/guile
+
+$(LOCAL_DIR)/bin/guile : $(LOCAL_DIR)/src/guile
+	@set -xe ;\
+	cd $(LOCAL_DIR)/src/guile ;\
+	git checkout v3.0.9 ;\
+	export CFLAGS='$(CFLAGS)' ;\
+	export LDFLAGS='$(LDFLAGS)' ;\
+	./autogen.sh ;\
+	./configure --prefix='$(LOCAL_DIR)' --enable-mini-gmp ;\
+	make -j ;\
+	make install
+
+$(LOCAL_DIR)/src/guile:
+	git clone https://git.savannah.gnu.org/git/guile.git $@
