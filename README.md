@@ -1027,6 +1027,51 @@ rational(194273,119119)
 
 
 
+### TCL : polynomial_v2.tcl
+
+```shell
+load target/tcl/polynomial_v2_swig.so Polynomial_v2_swig                                      #   1 
+                                                                                              #   2 
+puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                                            #   3 
+                                                                                              #   4 
+# Instantiate polynomial<double> object:                                                      #   5 
+PolynomialDoubleV2 poly                                                                       #   6 
+VectorDoubleV2 c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                                            #   7 
+poly configure -coeffs c                                                                      #   8 
+puts [poly cget -coeffs]                                                                      #   9 
+puts [poly evaluate 1.2]                                                                      #  10 
+                                                                                              #  11 
+# Instantiate polynomial<int> object:                                                         #  12 
+PolynomialIntV2 poly                                                                          #  13 
+VectorIntV2 c { 2 3 5 7 11 -13 }                                                              #  14 
+poly configure -coeffs c                                                                      #  15 
+puts [poly cget -coeffs]                                                                      #  16 
+puts [poly evaluate -2]                                                                       #  17 
+                                                                                              #  18 
+# Instantiate polynomial<rational<int>> object:                                               #  19 
+PolynomialRationalV2 poly                                                                     #  20 
+VectorRationalV2 c [list [new_RationalV2 7 11] [new_RationalV2 11 13] [new_RationalV2 13 17]] #  21 
+poly configure -coeffs c                                                                      #  22 
+puts [poly cget -coeffs]                                                                      #  23 
+puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                              #  24 
+```
+
+
+---
+
+```
+$ bin/run src/polynomial_v2.tcl
+POLYNOMIAL_VERSION 2.0.2
+_8041202b01000000_p_std__vectorT_double_t
+17.3020736
+_0044202b01000000_p_std__vectorT_int_t
+552
+_c042202b01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+rational(194273,119119)
+```
+
+---
+
 
 
 ### Outputs - Recap
@@ -1076,6 +1121,19 @@ rational(194273,119119)
 ---
 
 
+
+```
+$ bin/run src/polynomial_v2.tcl
+POLYNOMIAL_VERSION 2.0.2
+_8041202b01000000_p_std__vectorT_double_t
+17.3020736
+_0044202b01000000_p_std__vectorT_int_t
+552
+_c042202b01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+rational(194273,119119)
+```
+
+---
 
 
 ---
