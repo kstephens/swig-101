@@ -1492,23 +1492,25 @@ MPI = Tommath_swig::MPI                                                        #
 (write `(MP-ITER ,(MP-ITER))) (newline)                                        ;;  3 
                                                                                ;;  4 
 (define a (new-mp-int))                                                        ;;  5 
-(mp-set a 2357111317);    # <-- awkward!                                       ;;  6 
-(define b (new-mp-int 1113171923));                 # <-- better!              ;;  7 
+(mp-set a 2357111317)                   ;; <-- awkward!                        ;;  6 
+(define b (new-mp-int 1113171923))      ;; <-- better!                         ;;  7 
 (define c (new-mp-int))                                                        ;;  8 
 (define d (new-mp-int))                                                        ;;  9 
-(define e (new-mp-int "12343456" 16));             # <-- yey!                  ;; 10 
+(define e (new-mp-int "12343456" 16))   ;; <-- yey!                            ;; 10 
                                                                                ;; 11 
 (define (show!)                                                                ;; 12 
-  (let ((r mp-int---str--))                                                    ;; 13 
-    (write `(a ,(r a) b ,(r b) c ,(r c) d ,(r d) e ,(r e)))                    ;; 14 
-    (newline)))                                                                ;; 15 
-                                                                               ;; 16 
-(show!)                                                                        ;; 17 
+  (newline)                                                                    ;; 13 
+  (let ((r (lambda (n-v)                                                       ;; 14 
+        (write (car n-v)) (display " => ")                                     ;; 15 
+        (display (mp-int---str-- (cadr n-v))) (newline))))                     ;; 16 
+    (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))                       ;; 17 
                                                                                ;; 18 
-(mp-mul a b c)                                                                 ;; 19 
-(mp-mul c b d)                                                                 ;; 20 
-                                                                               ;; 21 
-(show!)                                                                        ;; 22 
+(show!)                                                                        ;; 19 
+                                                                               ;; 20 
+(mp-mul a b c)                                                                 ;; 21 
+(mp-mul c b d)                                                                 ;; 22 
+                                                                               ;; 23 
+(show!)                                                                        ;; 24 
 ```
 
 
@@ -1517,8 +1519,18 @@ MPI = Tommath_swig::MPI                                                        #
 ```
 $ bin/run src/tommath.scm
 (MP-ITER -4)
-(a "2357111317" b "1113171923" c "0" d "0" e "305411158")
-(a "2357111317" b "1113171923" c "2623870137469952591" d "2920818566629701480442302493" e "305411158")
+
+a => 2357111317
+b => 1113171923
+c => 0
+d => 0
+e => 305411158
+
+a => 2357111317
+b => 1113171923
+c => 2623870137469952591
+d => 2920818566629701480442302493
+e => 305411158
 ```
 
 ---
@@ -1578,8 +1590,18 @@ $ bin/run src/tommath-2.rb
 ```
 $ bin/run src/tommath.scm
 (MP-ITER -4)
-(a "2357111317" b "1113171923" c "0" d "0" e "305411158")
-(a "2357111317" b "1113171923" c "2623870137469952591" d "2920818566629701480442302493" e "305411158")
+
+a => 2357111317
+b => 1113171923
+c => 0
+d => 0
+e => 305411158
+
+a => 2357111317
+b => 1113171923
+c => 2623870137469952591
+d => 2920818566629701480442302493
+e => 305411158
 ```
 
 ---
