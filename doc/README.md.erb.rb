@@ -116,13 +116,6 @@ def code_lines s, lang, swig_interface = nil
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
   line_numbers!(lines, lang, swig_interface)
-  lines.each do | line |
-    if ENV['PRY'] && line =~ /Constructor:/
-      log(line)
-      binding.pry
-    end
-  end
-
   lines_to_string(lines)
 end
 
@@ -167,20 +160,27 @@ end
 
 def run_workflow e
   out = cmd "bin/build clean-example build-example EXAMPLE=#{e[:name]}"
-  out = out.
+  if ENV['SWIG_101_VERBOSE']
+    log("run_workflow: #{e[:name]}")
+    # log(out)
+  end
+  lines = string_to_lines(out)
+  lines.map! do | line |
+    idempotently(line) do | line |
+      line.
   gsub(%r{//+}, '/').
+  # OSX:
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
-  # clojure:
-  gsub(%r{WARNING: When invoking clojure.main, use -M +}, ' ').
   # Linux:
   gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
-  gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
+  # Arbitrary compiler flags:
+  gsub(%r{ +(-g|-O\d|-DNDEBUG|-fwrapv|-Wall|-Wno-c\+\+11-extensions|-Wno-sentinel|-Wno-unused-result|-Wsign-compare|-Wunreachable-code|-fno-common|-Wno-unused-command-line-argument|-Wno-unknown-attributes|-Wno-ignored-attributes|-Wno-deprecated-declarations|-Wl,-undefined,dynamic_lookup) +}, ' ').
+  gsub(%r{  +}, ' ').
   # brew:
-  gsub(%r{-Wno-deprecated-declarations +}, ' ').
   gsub(%r{-I */opt/homebrew/include +}, ' ').
   gsub(%r{-L */opt/homebrew/lib +}, ' ').
-  gsub(%r{-I */opt/homebrew/opt/[^/ ]+/include[^ ]* +}, ' ').
-  gsub(%r{-L */opt/homebrew/opt/[^/ ]+/lib[^ ]* +}, ' ').
+  gsub(%r{-I */opt/homebrew/opt/\S+ +}, ' ').
+  gsub(%r{-L */opt/homebrew/opt/\S+ +}, ' ').
   gsub(%r{ld: warning: -undefined dynamic_lookup may not work with chained fixups}, ' ').
   # macports:
   gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
@@ -190,45 +190,87 @@ def run_workflow e
   gsub(%r{-I *local/include[^ ]* +}, ' ').
   gsub(%r{-L *local/lib[^ ]* +}, ' ').
   gsub(%r{  +}, ' ')
-  lines = clean_up_lines(dedup_empty_lines(string_to_lines(out)))
+  end
+end
+  lines = clean_up_lines(dedup_empty_lines(lines))
   lines_to_string(lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))})
 end
 
 def clean_up_lines lines
   lines.map! do | line |
+    idempotently(line) do | line |
     line.
     gsub('\0', ''). # mp_fwrite adds NULL?!?
     # Abs paths:
-    gsub(%r{//+}, ' ').
+    gsub(%r{//+}, '/').
+    # Normalize tool names:
     gsub('gmake', 'make').
+    gsub(%r{\bclang\b}, 'cc').
+    gsub(%r{\bclang\+\+\b}, 'c++').
     # OSX:
-    gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
     gsub(%r{-framework \S+ }, ' ').
     # HOME Paths:
-    gsub(ENV['ROOT_DIR']+'/local/bin/', '').
-    gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
-    gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
-    gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
-    gsub(ENV['JAVA_HOME'],    '$JAVA_HOME').
-    gsub(ENV['ROOT_DIR'],     '.').
+    replace_env('LOCAL_DIR').
+    replace_env('GUILE_HOME').
+    replace_env('TCL_HOME').
+    replace_env('PYTHON_HOME').
+    replace_env('RUBY_HOME').
+    replace_env('JAVA_HOME').
+    replace_env('ROOT_DIR', '.').
     # Abs paths:
-    gsub(%r{/\S*/(make|gmake|swig|python|ruby|tcl|guile)}, '\1').
+    gsub(%r{/\S*/bin/(make|gmake|swig|python|ruby|tcl|tclsh|guile)}, '\1').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
-    gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
-    # Duplicates:
-    gsub(%r{\s+(-[IL]\S*)\s+\1}, ' ').
+    # gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
+    # Java:
+    gsub(%r{-I *\$JAVA_HOME/include/\S+ +}, '-I $JAVA_HOME/include/$JAVA_ARCH ').
+    gsub(%r{-L *\$JAVA_HOME/lib/\S+ +},     '-L $JAVA_HOME/lib/$JAVA_ARCH ').
+    # local/:
+    gsub(%r{-I *include\S* +}, ' ').
+    gsub(%r{\$LOCAL_DIR/bin/}, ' ').
+    gsub(%r{-I *\$LOCAL_DIR/include +}, ' ').
+    gsub(%r{-L *\$LOCAL_DIR/lib +}, ' ').
+    # Formatting:
+    #gsub(%r{-I(\S+)}, %q{-I \1}).
+    #gsub(%r{-L(\S+)}, %q{-L \1}).
+    gsub(%r{-I\s+(\S+)}, %q{-I\1}).
+    gsub(%r{-L\s+(\S+)}, %q{-L\1}).
     # WTF?:
     gsub(' /darwin ', ' ').
+    gsub('/arm64-darwin21', '/$RUBY_ARCH'). # Apple Silicon
     gsub(%r{//+}, '/').
-    sub(%r{\s+$}, '')
+    sub(%r{  +$}, ' ')
+    end
   end
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
+  lines.reject!{|l| l =~ /Warning 801: Wrong class name/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
   lines.reject!{|l| l =~ /WARNING: .*clojure\.main.*use -M/} # clojure
   lines.reject!{|l| l =~ /rootdir: .*swig-101/} # pytest
   lines.reject!{|l| l =~ /ld: warning: directory not found for option/} # ld
   lines
+end
+
+def idempotently x
+  raise unless String === x
+  log("before: {{{{ #{x} }}}}")
+  y = yield x
+  until x == y
+    x = y
+    y = yield x
+  end
+  log("after:  {{{{ #{x} }}}}")
+  y
+end
+
+class ::String
+  def replace_env name, rep = nil
+    if e = ENV[name] and e != ''
+      self.gsub(e, rep || "$#{name}")
+    else
+      self
+    end
+  end
 end
 
 #####################################

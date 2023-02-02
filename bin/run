@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[[ "$1" = '--verbose' ]] && shift && set -x
+
 export ROOT_DIR
 : "${ROOT_DIR:=$(/bin/pwd)}"
 
@@ -33,7 +35,8 @@ prog-path() { # VAR prog
   prog_name="$2" prog_exe= prog_dir= prog_home= prog_inc= prog_lib=
   shift 2
   "$@"
-  : "${prog_exe:=$(-which "$prog_name" || echo "$prog_name")}"
+  : "${prog_exe:=$(-which "$prog_name")}"
+  [[ -z "$prog_exe" ]] && return 1
   prog_exe="$(readlink -f "$prog_exe" 2>/dev/null || echo "$prog_exe")"
   : "${prog_dir:=$(dirname "$prog_exe")}"
   : "${prog_home:=$(cd "$prog_dir/.." && /bin/pwd)}"

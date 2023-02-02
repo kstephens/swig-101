@@ -35,7 +35,7 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # Comprehensive Native Code Support
 
 * C struct and union
-* C/C++ Pointers, references, `const` declarations
+* C/C++ pointers, references, `const` declarations
 * C/C++ function signatures and calls
 * C++ classes
 * C++ methods: static, virtual and operator overrides
@@ -99,7 +99,7 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Case Study
 
-Kind              |  Language     |  Files  |   Lines 
+Kind              |  Language     |  Files  |   Lines
 ------------------|:-------------:|--------:|----------:
 Native Library    | C/C++ Header  |      40 |    3505
 SWIG Interfaces   | SWIG          |       9 |    2667
@@ -189,12 +189,18 @@ $ <%= f[:cmd] %>
 ## Setup
 
 * Install rbenv + ruby-build
-* rbenv install 2.7.6
-* Install JVM 11.0
+* rbenv install 2.7.6 (or later)
+* Install JVM 11.0 (or later)
 * Install Prerequisites below.
-* Build local tools.
+* Build local tools (if needed).
 
 ## Prerequisites
+
+### SWIG
+
+SWIG 4.0 or later is required.
+
+`bin/build swig` will build and install a suitable version into from source `./local/`.
 
 ### Debian (Ubuntu 18.04+)
 
@@ -209,10 +215,21 @@ $ <%= f[:cmd] %>
 
 ### Local tools
 
+This will build and install the following tools into `./local/` from source:
+
+* swigq
+* libtommath
+* clojure
+
 ```Shell
 bin/build local-tools
 ```
 
+### Guile
+
+Guile 3.0 is required.  `bin/build guile` will build and install into `./local/` from source, however this can take **a very long time**.
+
+```Shell
 ## Build
 
 ```Shell
