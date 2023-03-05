@@ -65,6 +65,7 @@ def dedup_empty_lines(lines)
   result = [ ]
   last = nil
   while line = lines.shift
+    line = line.sub(/^\s+$/, '')
     unless last == "" && line == ""
       result << line
     end
@@ -75,15 +76,18 @@ end
 
 def line_numbers! lines, lang, swig_interface = nil
   comment_to_EOL, comment_line_rx = comment_for_lang(swig_interface || lang)
+  # log("line_numbers! : #{lang.inspect} : #{swig_interface.inspect} : #{comment_to_EOL.inspect} : #{comment_line_rx.inspect}")
   pad_lines!(lines)
   lines.map!.with_index(1) do |line, i|
     # binding.pry if ENV['PRY'] && line =~ /Constructor:/
     case line
     when nil
-    # when %r{^\s*$}, comment_line_rx
-    #  line
+    when %r{^\s*$}
+      line
     when comment_line_rx
-      if ENV['MARKDEEP']
+      # Markdeep trims whitespace in comments, thus
+      # the line numbers are not right-justified.
+      if ENV['MARKDEEP'] || true
         # line = $& + $'.gsub(' ', "\u00A0")
         line
       else
@@ -106,12 +110,16 @@ def comment_for_lang lang
     [ ';;', %r{^\s*;;} ]
   when /py|tcl|shell|sh|ruby|rb/i
     [ '#' , %r{^\s*\#} ]
+  when /sql|postgres/i
+    [ '--' , %r{^\s*--} ]
   else
     [ '#' , %r{^\s*\#} ]
   end
 end
 
 def code_lines s, lang, swig_interface = nil
+  s = s.sub(%r{\A.*\n *-- *HEADER-END *-- *\n}m, '')
+  s = s.gsub(/;;\s*$/, ';')
   lines = string_to_lines(s)
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
@@ -172,7 +180,7 @@ def run_workflow e
   # OSX:
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
   # Linux:
-  gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
+  gsub(%r{-I /usr/include/tcl\S* *}, ' ').
   # Arbitrary compiler flags:
   gsub(%r{ +(-g|-O\d|-DNDEBUG|-fwrapv|-Wall|-Wno-c\+\+11-extensions|-Wno-sentinel|-Wno-unused-result|-Wsign-compare|-Wunreachable-code|-fno-common|-Wno-unused-command-line-argument|-Wno-unknown-attributes|-Wno-ignored-attributes|-Wno-deprecated-declarations|-Wl,-undefined,dynamic_lookup) +}, ' ').
   gsub(%r{  +}, ' ').
@@ -183,12 +191,12 @@ def run_workflow e
   gsub(%r{-L */opt/homebrew/opt/\S+ +}, ' ').
   gsub(%r{ld: warning: -undefined dynamic_lookup may not work with chained fixups}, ' ').
   # macports:
-  gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
-  gsub(%r{-L */opt/local/lib[^ ]* +}, ' ').
+  gsub(%r{-I */opt/local/include\S* +}, ' ').
+  gsub(%r{-L */opt/local/lib\S* +}, ' ').
   # local/:
-  gsub(%r{-I *include[^ ]* +}, ' ').
-  gsub(%r{-I *local/include[^ ]* +}, ' ').
-  gsub(%r{-L *local/lib[^ ]* +}, ' ').
+  gsub(%r{-I *include\S* +}, ' ').
+  gsub(%r{-I *local/include\S* +}, ' ').
+  gsub(%r{-L *local/lib\S* +}, ' ').
   gsub(%r{  +}, ' ')
   end
 end
@@ -207,6 +215,12 @@ def clean_up_lines lines
     gsub('gmake', 'make').
     gsub(%r{\bclang\b}, 'cc').
     gsub(%r{\bclang\+\+\b}, 'c++').
+    # Compiler flags:
+    gsub(%r{ -g }, ' ').
+    gsub(%r{ -O\d }, ' ').
+    gsub(%r{ -Wno-c++11-extensions }, ' ').
+    # make options:
+    gsub(%r{--no-print-directory}, ' ').
     # OSX:
     gsub(%r{-framework \S+ }, ' ').
     # HOME Paths:
@@ -217,10 +231,17 @@ def clean_up_lines lines
     replace_env('RUBY_HOME').
     replace_env('JAVA_HOME').
     replace_env('ROOT_DIR', '.').
+    replace_env('POSTGRESQL_INC_DIR').
+    replace_env('POSTGRESQL_LIB_DIR').
+    replace_env('POSTGRESQL_SHARE_DIR').
     # Abs paths:
+    gsub(%r{/usr/bin/install}, 'install').
+    gsub(%r{^/bin/sh +}, '').
     gsub(%r{/\S*/bin/(make|gmake|swig|python|ruby|tcl|tclsh|guile)}, '\1').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
+    gsub(%r{-L */opt/homebrew/lib +}, ' ').
+    gsub(%r{-I */opt/homebrew/include +}, ' ').
     # gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
     # Java:
     gsub(%r{-I *\$JAVA_HOME/include/\S+ +}, '-I $JAVA_HOME/include/$JAVA_ARCH ').
@@ -242,6 +263,7 @@ def clean_up_lines lines
     sub(%r{  +$}, ' ')
     end
   end
+  lines.reject!{|l| l =~ /Experimental target language.*postgresql/}
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Warning 801: Wrong class name/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
@@ -253,13 +275,13 @@ end
 
 def idempotently x
   raise unless String === x
-  log("before: {{{{ #{x} }}}}")
+  # log("before: {{{{ #{x} }}}}")
   y = yield x
   until x == y
     x = y
     y = yield x
   end
-  log("after:  {{{{ #{x} }}}}")
+  # log("after:  {{{{ #{x} }}}}")
   y
 end
 
@@ -314,6 +336,7 @@ Clojure (Java)          | #{basename}.clj      |   | Lisp
 Ruby                    | #{basename}.rb       |   |
 Guile                   | #{basename}.scm      |   | Scheme
 TCL                     | #{basename}.tcl      |   | Shell
+PostgreSQL              | #{basename}.psql     |   | SQL
 Python Tests            | #{basename}-test.py  | python3.10 -m pytest src/#{basename}-test.py |
 END
   e[:targets] =

@@ -1,7 +1,7 @@
 #include "libtommath/tommath.h"
 
 int main(int argc, char **argv) {
-  printf("MP_ITER %d\n", MP_ITER);
+  printf("MP_ITER = %d\n", MP_ITER);
 
   mp_int a, b, c, d, e;
 

@@ -8,7 +8,7 @@
 // Convert mp_int <-> string:
 char*    swig_mp_int_to_charP(mp_int* self, int radix);
 mp_int*  swig_charP_to_mp_int(const char* str, int radix);
-char*    swig_mp_int_rep(mp_int* self, int radix);
+char*    swig_mp_int_repr(mp_int* self, int radix);
 
 #if SWIG
 // This extends generated classes with two
@@ -19,16 +19,16 @@ char*    swig_mp_int_rep(mp_int* self, int radix);
     return swig_mp_int_to_charP(self, radix);
   }
   char* __repr__(int radix = 10) {
-    return swig_mp_int_rep(self, radix);
+    return swig_mp_int_repr(self, radix);
   }
 }
 #endif
 
 // tommath `mp_int` internal memory is managed by:
-// 
+//
 // * mp_init(mp_int*)
 // * mp_clear(mp_int*)
-// 
+//
 // tommath expects these functions to be called
 // before and after using a mp_int value, respectively.
 mp_int*  swig_mp_int_new(mp_digit n);

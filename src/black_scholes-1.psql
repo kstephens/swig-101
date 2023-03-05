@@ -1,0 +1,59 @@
+DROP FUNCTION IF EXISTS random_offset;
+CREATE FUNCTION random_offset(x FLOAT8, scale FLOAT8) RETURNS FLOAT8
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURN x * (1 + scale * (RANDOM() * 2 - 1));
+DROP FUNCTION IF EXISTS truncf;
+CREATE FUNCTION truncf(x FLOAT8, decimals INT DEFAULT 3) RETURNS FLOAT8
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURN trunc(x::numeric, decimals)::float8;
+
+DROP EXTENSION IF EXISTS black_scholes_swig;
+-- SELECT * FROM pg_extension;
+DROP TABLE IF EXISTS bs_data;
+DROP TABLE IF EXISTS bs_eval;
+DROP TABLE IF EXISTS bs_data_hypo;
+
+-- HEADER-END --
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;;
+
+SELECT * FROM bs_eval;;
+
