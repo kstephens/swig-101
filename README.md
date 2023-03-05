@@ -1157,7 +1157,7 @@ rational(194273,119119)
 // Convert mp_int <-> string:                                                  //  8 
 char*    swig_mp_int_to_charP(mp_int* self, int radix);                        //  9 
 mp_int*  swig_charP_to_mp_int(const char* str, int radix);                     // 10 
-char*    swig_mp_int_rep(mp_int* self, int radix);                             // 11 
+char*    swig_mp_int_repr(mp_int* self, int radix);                            // 11 
                                                                                // 12 
 #if SWIG                                                                       // 13 
 // This extends generated classes with two                                     // 14 
@@ -1168,7 +1168,7 @@ char*    swig_mp_int_rep(mp_int* self, int radix);                             /
     return swig_mp_int_to_charP(self, radix);                                  // 19 
   }                                                                            // 20 
   char* __repr__(int radix = 10) {                                             // 21 
-    return swig_mp_int_rep(self, radix);                                       // 22 
+    return swig_mp_int_repr(self, radix);                                      // 22 
   }                                                                            // 23 
 }                                                                              // 24 
 #endif                                                                         // 25 
@@ -1219,7 +1219,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {                          /
   return buf;                                                                  // 11 
 }                                                                              // 12 
                                                                                // 13 
-char* swig_mp_int_rep(mp_int* self, int radix) {                               // 14 
+char* swig_mp_int_repr(mp_int* self, int radix) {                              // 14 
   char *repr = 0, *str = swig_mp_int_to_charP(self, radix);                    // 15 
   if ( radix == 10 )                                                           // 16 
     asprintf(&repr, "mp_int(\"%s\")", str);                                    // 17 

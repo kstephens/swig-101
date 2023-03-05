@@ -11,7 +11,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {
   return buf;
 }
 
-char* swig_mp_int_rep(mp_int* self, int radix) {
+char* swig_mp_int_repr(mp_int* self, int radix) {
   char *repr = 0, *str = swig_mp_int_to_charP(self, radix);
   if ( radix == 10 )
     asprintf(&repr, "mp_int(\"%s\")", str);
