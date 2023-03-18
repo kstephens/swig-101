@@ -610,7 +610,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1229041d0>
+#<swig-pointer std::vector< double > * 10fe04ac0>
 17.3020736
 ```
 
@@ -640,7 +640,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042603601000000_p_std__vectorT_double_t
+_a042e00e01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -738,7 +738,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1229041d0>
+#<swig-pointer std::vector< double > * 10fe04ac0>
 17.3020736
 ```
 
@@ -748,7 +748,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042603601000000_p_std__vectorT_double_t
+_a042e00e01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1062,11 +1062,11 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_5045705001000000_p_std__vectorT_double_t
+_f068702d01000000_p_std__vectorT_double_t
 17.3020736
-_f04b705001000000_p_std__vectorT_int_t
+_e05c702d01000000_p_std__vectorT_int_t
 552
-_f04a705001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_f068702d01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1125,11 +1125,11 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_5045705001000000_p_std__vectorT_double_t
+_f068702d01000000_p_std__vectorT_double_t
 17.3020736
-_f04b705001000000_p_std__vectorT_int_t
+_e05c702d01000000_p_std__vectorT_int_t
 552
-_f04a705001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_f068702d01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1721,9 +1721,9 @@ wc -l src/example1.h src/example1.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/example1_swig.c target/python/example1_swig.py            
-3650 target/python/example1_swig.c                                            
+3662 target/python/example1_swig.c                                            
 65 target/python/example1_swig.py                                             
-3715 total                                                                    
+3727 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/example1_swig.c.o                         \
@@ -1751,11 +1751,11 @@ wc -l src/example1.h src/example1.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/example1_swig.c target/clojure/example1*.java            
-243 target/clojure/example1_swig.c                                            
+239 target/clojure/example1_swig.c                                            
 15 target/clojure/example1_swig.java                                          
 12 target/clojure/example1_swigConstants.java                                 
 13 target/clojure/example1_swigJNI.java                                       
-283 total                                                                     
+279 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -1783,7 +1783,7 @@ wc -l src/example1.h src/example1.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/example1_swig.c                                             
-2257 target/ruby/example1_swig.c                                              
+2282 target/ruby/example1_swig.c                                              
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
@@ -1812,7 +1812,7 @@ wc -l src/example1.h src/example1.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/example1_swig.c                                              
-2149 target/tcl/example1_swig.c                                               
+2178 target/tcl/example1_swig.c                                               
                                                                               
 # Compile tcl bindings:                                                       
 cc -Isrc -I$TCL_HOME/include -c -o target/tcl/example1_swig.c.o                 \
@@ -1840,7 +1840,7 @@ wc -l src/example1.h src/example1.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/example1_swig.c                                            
-1605 target/guile/example1_swig.c                                             
+1631 target/guile/example1_swig.c                                             
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -1850,6 +1850,40 @@ cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   
 cc -Isrc -dynamiclib -o target/guile/libexample1_swig.so                        \
   target/native/example1.o target/guile/example1_swig.c.o -L$GUILE_HOME/lib     \
   -lguile-3.0 -lgc -lpthread                                                  
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build postgresql Bindings                                                 
+                                                                              
+```                                                                           
+# Generate postgresql bindings:                                               
+swig -addextern -I- -Isrc -I/opt/homebrew/include/postgresql@14/server          \
+  -postgresql -extension-version 1.2.3 -outdir target/postgresql/ -o            \
+  target/postgresql/example1_swig.c src/example1.i                            
+SWIG:1: Warning 524: Experimental target language. Target language PostgreSQL   \
+  specified by -postgresql is an experimental language. Please read about SWIG  \
+  experimental languages,                                                       \
+  https:/swig.org/Doc4.0/Introduction.html#Introduction_experimental_status.  
+                                                                              
+# Source code statistics:                                                     
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
+12 total                                                                      
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/postgresql/example1_swig.c                                       
+1489 target/postgresql/example1_swig.c                                        
+                                                                              
+# Compile postgresql bindings:                                                
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -c -o                     \
+  target/postgresql/example1_swig.c.o target/postgresql/example1_swig.c       
+                                                                              
+# Link postgresql dynamic library:                                            
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -dynamiclib -o            \
+  target/postgresql/example1_swig.so target/native/example1.o                   \
+  target/postgresql/example1_swig.c.o                                         
                                                                               
                                                                               
 ```                                                                           
@@ -1888,9 +1922,9 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py       
-8408 target/python/polynomial_swig.cc                                         
+8512 target/python/polynomial_swig.cc                                         
 241 target/python/polynomial_swig.py                                          
-8649 total                                                                    
+8753 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc++ -Isrc -std=c++17 -dynamic -c -o target/python/polynomial_swig.cc.o         \
@@ -1918,11 +1952,11 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java       
-660 target/clojure/polynomial_swig.cc                                         
+680 target/clojure/polynomial_swig.cc                                         
 11 target/clojure/polynomial_swig.java                                        
 12 target/clojure/polynomial_swigConstants.java                               
 32 target/clojure/polynomial_swigJNI.java                                     
-715 total                                                                     
+735 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -Isrc -std=c++17 -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -1950,7 +1984,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_swig.cc                                          
-8528 target/ruby/polynomial_swig.cc                                           
+8577 target/ruby/polynomial_swig.cc                                           
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -Isrc -std=c++17 -I$RUBY_HOME/include/ruby-2.7.0                           \
@@ -1979,7 +2013,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_swig.cc                                           
-2951 target/tcl/polynomial_swig.cc                                            
+3004 target/tcl/polynomial_swig.cc                                            
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -Isrc -std=c++17 -I$TCL_HOME/include -c -o                                 \
@@ -2007,7 +2041,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_swig.cc                                         
-2267 target/guile/polynomial_swig.cc                                          
+2317 target/guile/polynomial_swig.cc                                          
                                                                               
 # Compile guile bindings:                                                     
 cc++ -Isrc -std=c++17 -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -2017,6 +2051,46 @@ cc++ -Isrc -std=c++17 -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      
 cc++ -Isrc -std=c++17 -dynamiclib -o target/guile/libpolynomial_swig.so         \
   target/native/polynomial.o target/guile/polynomial_swig.cc.o                  \
   -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build postgresql Bindings                                                 
+                                                                              
+```                                                                           
+# Generate postgresql bindings:                                               
+swig -addextern -I- -Isrc -I/opt/homebrew/include/postgresql@14/server          \
+  -postgresql -extension-version 1.2.3 -c++ -outdir target/postgresql/ -o       \
+  target/postgresql/polynomial_swig.cc src/polynomial.i                       
+SWIG:1: Warning 524: Experimental target language. Target language PostgreSQL   \
+  specified by -postgresql is an experimental language. Please read about SWIG  \
+  experimental languages,                                                       \
+  https:/swig.org/Doc4.0/Introduction.html#Introduction_experimental_status.  
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+                                                                              
+# Source code statistics:                                                     
+wc -l src/polynomial.h src/polynomial.i                                       
+10 src/polynomial.h                                                           
+16 src/polynomial.i                                                           
+26 total                                                                      
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/postgresql/polynomial_swig.cc                                    
+2256 target/postgresql/polynomial_swig.cc                                     
+                                                                              
+# Compile postgresql bindings:                                                
+cc++ -Isrc -I/opt/homebrew/include/postgresql@14/server -std=c++17 -c -o        \
+  target/postgresql/polynomial_swig.cc.o target/postgresql/polynomial_swig.cc 
+                                                                              
+# Link postgresql dynamic library:                                            
+cc++ -Isrc -I/opt/homebrew/include/postgresql@14/server -std=c++17 -dynamiclib  \
+  -o target/postgresql/polynomial_swig.so target/native/polynomial.o            \
+  target/postgresql/polynomial_swig.cc.o                                      
                                                                               
                                                                               
 ```                                                                           
@@ -2055,9 +2129,9 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-13181 target/python/polynomial_v2_swig.cc                                     
+13398 target/python/polynomial_v2_swig.cc                                     
 508 target/python/polynomial_v2_swig.py                                       
-13689 total                                                                   
+13906 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc++ -Isrc -std=c++17 -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
@@ -2091,11 +2165,11 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1653 target/clojure/polynomial_v2_swig.cc                                     
+1673 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
 84 target/clojure/polynomial_v2_swigJNI.java                                  
-1760 total                                                                    
+1780 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -Isrc -std=c++17 -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -2125,7 +2199,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-14480 target/ruby/polynomial_v2_swig.cc                                       
+14529 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -Isrc -std=c++17 -I$RUBY_HOME/include/ruby-2.7.0                           \
@@ -2156,7 +2230,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-4669 target/tcl/polynomial_v2_swig.cc                                         
+4722 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -Isrc -std=c++17 -I$TCL_HOME/include -c -o                                 \
@@ -2190,7 +2264,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-3961 target/guile/polynomial_v2_swig.cc                                       
+4035 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
 cc++ -Isrc -std=c++17 -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -2200,6 +2274,65 @@ cc++ -Isrc -std=c++17 -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      
 cc++ -Isrc -std=c++17 -dynamiclib -o target/guile/libpolynomial_v2_swig.so      \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
   -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build postgresql Bindings                                                 
+                                                                              
+```                                                                           
+# Generate postgresql bindings:                                               
+swig -addextern -I- -Isrc -I/opt/homebrew/include/postgresql@14/server          \
+  -postgresql -extension-version 1.2.3 -c++ -outdir target/postgresql/ -o       \
+  target/postgresql/polynomial_v2_swig.cc src/polynomial_v2.i                 
+SWIG:1: Warning 524: Experimental target language. Target language PostgreSQL   \
+  specified by -postgresql is an experimental language. Please read about SWIG  \
+  experimental languages,                                                       \
+  https:/swig.org/Doc4.0/Introduction.html#Introduction_experimental_status.  
+include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:26: Warning 503: Can't wrap 'operator *' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+  a valid identifier.                                                         
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:151: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:158: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:165: Warning 468: No        \
+  'throws' typemap defined for exception type 'std::out_of_range'             
+                                                                              
+# Source code statistics:                                                     
+wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
+13 src/polynomial_v2.h                                                        
+36 src/polynomial_v2.i                                                        
+49 total                                                                      
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/postgresql/polynomial_v2_swig.cc                                 
+4191 target/postgresql/polynomial_v2_swig.cc                                  
+                                                                              
+# Compile postgresql bindings:                                                
+cc++ -Isrc -I/opt/homebrew/include/postgresql@14/server -std=c++17 -c -o        \
+  target/postgresql/polynomial_v2_swig.cc.o                                     \
+  target/postgresql/polynomial_v2_swig.cc                                     
+                                                                              
+# Link postgresql dynamic library:                                            
+cc++ -Isrc -I/opt/homebrew/include/postgresql@14/server -std=c++17 -dynamiclib  \
+  -o target/postgresql/polynomial_v2_swig.so target/native/polynomial_v2.o      \
+  target/postgresql/polynomial_v2_swig.cc.o                                   
                                                                               
                                                                               
 ```                                                                           
@@ -2238,9 +2371,9 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/tommath_swig.c target/python/tommath_swig.py              
-9216 target/python/tommath_swig.c                                             
+9365 target/python/tommath_swig.c                                             
 478 target/python/tommath_swig.py                                             
-9694 total                                                                    
+9843 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/tommath_swig.c.o                          \
@@ -2268,11 +2401,11 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/tommath_swig.c target/clojure/tommath*.java              
-3138 target/clojure/tommath_swig.c                                            
+3134 target/clojure/tommath_swig.c                                            
 545 target/clojure/tommath_swig.java                                          
 15 target/clojure/tommath_swigConstants.java                                  
 178 target/clojure/tommath_swigJNI.java                                       
-3876 total                                                                    
+3872 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -2300,7 +2433,7 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/tommath_swig.c                                              
-7867 target/ruby/tommath_swig.c                                               
+7892 target/ruby/tommath_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
@@ -2329,7 +2462,7 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/tommath_swig.c                                             
-6397 target/guile/tommath_swig.c                                              
+6423 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -2339,6 +2472,40 @@ cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   
 cc -Isrc -dynamiclib -o target/guile/libtommath_swig.so                         \
   target/native/tommath.o target/guile/tommath_swig.c.o -L$GUILE_HOME/lib       \
   -lguile-3.0 -lgc -lpthread -ltommath                                        
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build postgresql Bindings                                                 
+                                                                              
+```                                                                           
+# Generate postgresql bindings:                                               
+swig -addextern -I- -Isrc -I/opt/homebrew/include/postgresql@14/server          \
+  -postgresql -extension-version 1.2.3 -outdir target/postgresql/ -o            \
+  target/postgresql/tommath_swig.c src/tommath.i                              
+SWIG:1: Warning 524: Experimental target language. Target language PostgreSQL   \
+  specified by -postgresql is an experimental language. Please read about SWIG  \
+  experimental languages,                                                       \
+  https:/swig.org/Doc4.0/Introduction.html#Introduction_experimental_status.  
+                                                                              
+# Source code statistics:                                                     
+wc -l src/tommath.h src/tommath.i                                             
+52 src/tommath.h                                                              
+16 src/tommath.i                                                              
+68 total                                                                      
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/postgresql/tommath_swig.c                                        
+6865 target/postgresql/tommath_swig.c                                         
+                                                                              
+# Compile postgresql bindings:                                                
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -c -o                     \
+  target/postgresql/tommath_swig.c.o target/postgresql/tommath_swig.c         
+                                                                              
+# Link postgresql dynamic library:                                            
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -dynamiclib -o            \
+  target/postgresql/tommath_swig.so target/native/tommath.o                     \
+  target/postgresql/tommath_swig.c.o -ltommath                                
                                                                               
                                                                               
 ```                                                                           

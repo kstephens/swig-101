@@ -3,8 +3,8 @@
 ############################
 
 EXAMPLES         = example1.c polynomial.cc polynomial_v2.cc tommath.c
-SWIG_TARGETS     = python  clojure  ruby  tcl  guile
-TARGET_SUFFIXES  = py      clj      rb    tcl  scm
+SWIG_TARGETS     = python  clojure  ruby  tcl  guile  postgresql
+TARGET_SUFFIXES  = py      clj      rb    tcl  scm    psql
 
 SWIG_CFLAGS_tommath.c+=-Wno-sentinel
 SWIG_CFLAGS+= -Wno-sentinel
@@ -142,6 +142,17 @@ SWIG_GENERATED_FILES_clojure=target/$(SWIG_TARGET)/$(EXAMPLE_NAME)*.java
 
 ############################
 
+SUFFIX_postgresql=psql
+SWIG_OPTS_postgresql=-postgresql
+# SWIG_OPTS_postgresql+= -debug-top 1,2,3,4
+SWIG_OPTS_postgresql+= -extension-version 1.2.3
+# SWIG_OPTS_postgresql+= -extension-schema  $EXTENSION_NAME
+SWIG_INC_DIRS_postgresql:=-I$(shell pg_config --includedir-server) #
+# SWIG_CXXFLAGS_postgresql:=$(shell pg_config --includedir-server) #
+# SWIG_LDFLAGS_postgresql:=$(shell pkg-config --libdir) #
+
+############################
+
 SWIG_CFLAGS_xml:= #-I$(TCL_HOME)/include
 SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
@@ -149,8 +160,12 @@ SWIG_CFLAGS_xml:= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
 
 SWIG_CFLAGS+=$(SWIG_CFLAGS_$(SWIG_TARGET))
 SWIG_CFLAGS+=$(SWIG_CFLAGS_$(EXAMPLE_NAME))
+SWIG_CXXFLAGS+=$(SWIG_CXXFLAGS_$(SWIG_TARGET))
+SWIG_CXXFLAGS+=$(SWIG_CXXFLAGS_$(EXAMPLE_NAME))
 SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 SWIG_LDFLAGS+=$(SWIG_LDFLAGS_$(EXAMPLE_NAME))
+INC_DIRS+=$(SWIG_INC_DIRS_$(SWIG_TARGET))
+INC_DIRS+=$(SWIG_INC_DIRS_$(EXAMPLE_NAME))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
 
 ############################
