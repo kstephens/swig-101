@@ -49,17 +49,17 @@ prog-path() { # VAR prog
   if ! [[ "$PATH" == *"$prog_dir"* ]]
   then
     export PATH="$prog_dir:$PATH"
-    target_dir="$dir/target/$prog_name"
-    if [[ -d "$target_dir" ]]
+    prog_target_dir="$dir/target/$prog_name"
+    if [[ -d "$prog_target_dir" ]]
     then
-      export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
-      export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
+      export LD_LIBRARY_PATH="$prog_target_dir:$LD_LIBRARY_PATH"
+      export LD_RUN_PATH="$prog_target_dir:$LD_RUN_PATH"
     fi
   fi
 }
 
 PATH="$dir/bin:$dir/local/bin:$PATH"
-for swig_exe in "$SWIG_EXE" "$dir/local/bin/swig" "$dir/../swig/swig" "$HOME/local/bin/swig" $(which swig) CANNOT-FIND-SWIG
+for swig_exe in "$SWIG_EXE" "$dir/local/bin/swig" "$dir/../swig/swig" $(which swig) CANNOT-FIND-SWIG
 do
   [[ -x "$swig_exe" ]] && break
 done
@@ -82,29 +82,33 @@ export RUBYLIB="$dir/target/ruby:$dir/src:$RUBYLIB"
 export GUILE_AUTO_COMPILE=0
 export PYTHONPATH="$dir/target/python:$PYTHONPATH"
 
+target_dir=
 case "${cmd[0]}"
 in
   *.rb)
     target_dir="$dir/target/ruby"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
   ;;
   *.py)
     target_dir="$dir/target/python"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
   ;;
   *.clj)
     # set -x
-    target_dir="$dir/target/clojure"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
-    export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
-    export CLASSPATH="$target_dir:$(clojure -Spath 2>/dev/null):$CLASSPATH"
-    for java in "$target_dir"/*.java
+    java_target_dir="$dir/target/clojure"
+    export CLASSPATH="$java_target_dir:$($CLOJURE_EXE -Spath 2>/dev/null):$CLASSPATH"
+    export LD_LIBRARY_PATH="$java_target_dir:$LD_LIBRARY_PATH"
+    export LD_RUN_PATH="$java_target_dir:$LD_RUN_PATH"
+    for java in "$java_target_dir"/*.java
     do
       class="${java%.java}.class"
       [[ "$java" -nt "$class" ]] && javac "$java" 2>/dev/null
     done
-    cmd=(clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$target_dir" "${cmd[@]}")
+    cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
   ;;
 esac
+if [[ "$target_dir" ]]
+then
+  export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
+  export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
+fi
 
 exec "${cmd[@]}"
