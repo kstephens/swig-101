@@ -422,7 +422,8 @@ swig : local-dirs $(LOCAL_DIR)/bin/swig
 $(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
 	@set -xe ;\
 	cd $(LOCAL_DIR)/src/swig ;\
-	git checkout 6939d91e4c6ea ;\
+	git fetch ;\
+	git checkout postgresql ;\
 	pcre2_version='pcre2-10.39' ;\
 	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$$pcre2_version/$$pcre2_version.tar.gz ;\
 	./Tools/pcre-build.sh ;\
@@ -432,7 +433,7 @@ $(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
 	make install
 
 $(LOCAL_DIR)/src/swig :
-	git clone https://github.com/swig/swig.git $@
+	git clone https://github.com/kstephens/swig.git $@
 
 #################################
 
