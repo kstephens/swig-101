@@ -172,7 +172,7 @@ def run_workflow e
   # OSX:
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
   # Linux:
-  gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
+  gsub(%r{-I /usr/include/tcl\S* *}, ' ').
   # Arbitrary compiler flags:
   gsub(%r{ +(-g|-O\d|-DNDEBUG|-fwrapv|-Wall|-Wno-c\+\+11-extensions|-Wno-sentinel|-Wno-unused-result|-Wsign-compare|-Wunreachable-code|-fno-common|-Wno-unused-command-line-argument|-Wno-unknown-attributes|-Wno-ignored-attributes|-Wno-deprecated-declarations|-Wl,-undefined,dynamic_lookup) +}, ' ').
   gsub(%r{  +}, ' ').
@@ -183,12 +183,12 @@ def run_workflow e
   gsub(%r{-L */opt/homebrew/opt/\S+ +}, ' ').
   gsub(%r{ld: warning: -undefined dynamic_lookup may not work with chained fixups}, ' ').
   # macports:
-  gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
-  gsub(%r{-L */opt/local/lib[^ ]* +}, ' ').
+  gsub(%r{-I */opt/local/include\S* +}, ' ').
+  gsub(%r{-L */opt/local/lib\S* +}, ' ').
   # local/:
-  gsub(%r{-I *include[^ ]* +}, ' ').
-  gsub(%r{-I *local/include[^ ]* +}, ' ').
-  gsub(%r{-L *local/lib[^ ]* +}, ' ').
+  gsub(%r{-I *include\S* +}, ' ').
+  gsub(%r{-I *local/include\S* +}, ' ').
+  gsub(%r{-L *local/lib\S* +}, ' ').
   gsub(%r{  +}, ' ')
   end
 end
