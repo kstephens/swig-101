@@ -2,6 +2,9 @@
 
 [[ "$1" = '--verbose' ]] && shift && set -x
 
+argv=("$@")
+argv_len="${#argv[@]}"
+
 export ROOT_DIR
 : "${ROOT_DIR:=$(/bin/pwd)}"
 
@@ -105,18 +108,19 @@ in
     cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
   ;;
   *.psql)
-    # set -x
-    argv=("$@")
-    argv_len="${#argv[@]}"
-    (( argv_len -- ))
+    set -x
+    # -v ON_ERROR_STOP=1
     cat "${argv[-1]}" |
+    # Pass newlines through --echo-all:
     sed -E -e 's/^\s*$/-- NEWLINE --/' |
-    # cat - |
-    psql --set set=pager=0 --echo-all |
+    psql -v pager=0 --echo-all 2>&1 |
+    # Omit header from output:
     grep -A 9999 -Ee '^-- HEADER-END --' |
-    # cat -
-    sed -E -e 's/;;$/;\n/' |
-    sed -E -e $'/^-- HEADER/d' -e 's/^-- NEWLINE --//'
+    # Remove NOTICE.
+    # ';;' adds a newline.
+    # Restore newlines:
+    sed -E -e '/^NOTICE: /d' -e 's/;;$/;\n/' \
+           -e '/^-- HEADER/d' -e 's/^-- NEWLINE --//'
     exit $?
   ;;
 esac
