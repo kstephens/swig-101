@@ -104,6 +104,21 @@ in
     done
     cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
   ;;
+  *.psql)
+    # set -x
+    argv=("$@")
+    argv_len="${#argv[@]}"
+    (( argv_len -- ))
+    cat "${argv[-1]}" |
+    sed -E -e 's/^\s*$/-- NEWLINE --/' |
+    # cat - |
+    psql --set set=pager=0 --echo-all |
+    grep -A 9999 -Ee '^-- HEADER-END --' |
+    # cat -
+    sed -E -e 's/;;$/;\n/' |
+    sed -E -e $'/^-- HEADER/d' -e 's/^-- NEWLINE --//'
+    exit $?
+  ;;
 esac
 if [[ "$target_dir" ]]
 then

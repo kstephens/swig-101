@@ -2,7 +2,7 @@
 
 ############################
 
-EXAMPLES         = example1.c polynomial.cc polynomial_v2.cc tommath.c
+EXAMPLES         = black_scholes.c example1.c polynomial.cc polynomial_v2.cc tommath.c
 SWIG_TARGETS     = python  clojure  ruby  tcl  guile  postgresql
 TARGET_SUFFIXES  = py      clj      rb    tcl  scm    psql
 
@@ -376,7 +376,7 @@ demo-run:
 #################################
 
 brew-prereq:
-	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk
+	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk postgresql\@14
 	bin/run pip install   pytest
 
 debian-prereq:
@@ -434,13 +434,15 @@ local-dirs:
 
 swig : local-dirs $(LOCAL_DIR)/bin/swig
 
+PCRE2_VERSION=pcre2-10.39
+
 $(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
 	@set -xe ;\
 	cd $(LOCAL_DIR)/src/swig ;\
 	git fetch ;\
 	git checkout postgresql ;\
-	pcre2_version='pcre2-10.39' ;\
-	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$$pcre2_version/$$pcre2_version.tar.gz ;\
+	git pull ;\
+	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$(PCRE_VERSION)/$(PCRE_VERSION).tar.gz ;\
 	./Tools/pcre-build.sh ;\
 	./autogen.sh ;\
 	./configure --prefix='$(LOCAL_DIR)' ;\
