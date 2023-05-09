@@ -18,8 +18,10 @@ DROP TABLE IF EXISTS bs_data_hypo;
 DROP TABLE IF EXISTS bs_hypo_eval;
 
 -- HEADER-END --
+-- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
+-- Create some sample input data:
 CREATE TABLE bs_data (
   id SERIAL PRIMARY KEY,
   strike_price FLOAT8,
@@ -57,7 +59,7 @@ FROM bs_data;;
 
 SELECT * FROM bs_eval;;
 
--- Any profitable ones?
+-- Any profitable calls?
 SELECT * FROM bs_eval
 WHERE call_val > asset_price OR put_val > asset_price;;
 
@@ -84,11 +86,13 @@ SELECT *
   , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
 FROM hd_rand_eval;;
 
+-- Select the most profitable random calls:
 SELECT * FROM bs_hypo_eval
 WHERE call_val > asset_price
 ORDER BY call_profit_pcnt DESC
 LIMIT 10;;
 
+-- Select the most profitable random puts:
 SELECT * FROM bs_hypo_eval
 WHERE put_val > asset_price
 ORDER BY put_profit_pcnt DESC

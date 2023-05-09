@@ -4,6 +4,7 @@
 
 argv=("$@")
 argv_len="${#argv[@]}"
+arg_end=
 
 export ROOT_DIR
 : "${ROOT_DIR:=$(/bin/pwd)}"
@@ -108,7 +109,7 @@ in
     cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
   ;;
   *.psql)
-    set -x
+    # set -x
     # -v ON_ERROR_STOP=1
     cat "${argv[-1]}" |
     # Pass newlines through --echo-all:
