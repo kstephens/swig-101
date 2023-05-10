@@ -1,44 +1,11 @@
 DROP EXTENSION IF EXISTS example1_swig;
-SELECT * FROM pg_extension;
-DROP TABLE IF EXISTS cubics;
-DROP TABLE IF EXISTS cubic_parameters;
-DROP TABLE IF EXISTS coefficients;
-DROP TABLE IF EXISTS parameters;
+-- SELECT * FROM pg_extension;
 -- HEADER-END --
 
 -- Load the extension:
 CREATE EXTENSION example1_swig;;
-SELECT * FROM pg_extension;;
 
 -- Call the functions:
 SELECT EXAMPLE1_VERSION();;
 SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);;
 
--- Create some coefficient and parameter tables:
-CREATE TABLE coefficients (
-  c_id SERIAL PRIMARY KEY,
-  c0 FLOAT8,
-  c1 FLOAT8,
-  c2 FLOAT8,
-  c3 FLOAT8
-);;
-CREATE TABLE parameters (
-  x_id SERIAL PRIMARY KEY,
-  x FLOAT8
-);;
-
--- Create some coefficient and parameter data:
-INSERT INTO coefficients
-  ( c0 ,  c1,    c2, c3   ) VALUES
-  ( 3.0, 5.0,   7.0, 11   ),
-  ( 2.3, 5.7, 11.13, 17.23),
-  (-5.2, 1.2, -99.0, 12.34);;
-INSERT INTO parameters
-  (x) VALUES
-  ( 2),
-  (-3.7),
-  ( 3.1415926);;
-
--- Apply cubic_poly to parameters and coefficients:
-SELECT *, cubic_poly(x, c0, c1, c2, c3)
-FROM   parameters, coefficients;;

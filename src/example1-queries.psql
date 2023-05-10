@@ -1,5 +1,5 @@
 DROP EXTENSION IF EXISTS example1_swig;
-SELECT * FROM pg_extension;
+-- SELECT * FROM pg_extension;
 DROP TABLE IF EXISTS cubics;
 DROP TABLE IF EXISTS cubic_parameters;
 DROP TABLE IF EXISTS coefficients;
@@ -8,10 +8,6 @@ DROP TABLE IF EXISTS parameters;
 
 -- Load the extension:
 CREATE EXTENSION example1_swig;;
-
--- Call the functions:
-SELECT EXAMPLE1_VERSION();;
-SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);;
 
 -- Create some coefficient and parameter tables:
 CREATE TABLE coefficients (

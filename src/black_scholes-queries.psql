@@ -10,7 +10,7 @@ CREATE FUNCTION truncf(x FLOAT8, decimals INT DEFAULT 3) RETURNS FLOAT8
     RETURN trunc(x::numeric, decimals)::float8;
 
 DROP EXTENSION IF EXISTS black_scholes_swig;
-SELECT * FROM pg_extension;
+-- SELECT * FROM pg_extension;
 
 DROP TABLE IF EXISTS bs_data;
 DROP TABLE IF EXISTS bs_eval;

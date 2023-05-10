@@ -120,6 +120,286 @@ The examples below target:
 
 
 
+## black_scholes.c
+
+
+
+### C Header : black_scholes.h
+
+```c
+// black_scholes.c is ~ 100 lines                                                                                                            //  1 
+double black_scholes_normal(double zz);                                                                                                      //  2 
+double black_scholes_call(double strike_price, double asset_price, double standard_deviation, double risk_free_rate, double days_to_expiry); //  3 
+double black_scholes_put(double strike_price, double asset_price, double standard_deviation, double risk_free_rate, double days_to_expiry);  //  4 
+```
+
+
+
+### C Library : black_scholes.c
+
+```c
+// https://gist.github.com/codeslinger/472083/0acc95f745def15a3677b021742b27416a78bcf3 //  1 
+                                                                                       //  2 
+#include <math.h>                                                                      //  3 
+#include <stdio.h>                                                                     //  4 
+#include <stdlib.h>                                                                    //  5 
+                                                                                       //  6 
+double black_scholes_normal(double zz)                                                 //  7 
+{                                                                                      //  8 
+    //cdf of 0 is 0.5                                                                  //  9 
+    if (zz == 0)                                                                       // 10 
+        return 0.5;                                                                    // 11 
+                                                                                       // 12 
+    double z = zz;  //zz is input variable,  use z for calculations                    // 13 
+                                                                                       // 14 
+    if (zz < 0)                                                                        // 15 
+        z = -zz;  //change negative values to positive                                 // 16 
+                                                                                       // 17 
+    //set constants                                                                    // 18 
+    double p = 0.2316419;                                                              // 19 
+    double b1 = 0.31938153;                                                            // 20 
+    double b2 = -0.356563782;                                                          // 21 
+    double b3 = 1.781477937;                                                           // 22 
+    double b4 = -1.821255978;                                                          // 23 
+    double b5 = 1.330274428;                                                           // 24 
+                                                                                       // 25 
+    //CALCULATIONS                                                                     // 26 
+    double f = 1 / sqrt(2 * M_PI);                                                     // 27 
+    double ff = exp(-pow(z, 2) / 2) * f;                                               // 28 
+    double s1 = b1 / (1 + p * z);                                                      // 29 
+    double s2 = b2 / pow((1 + p * z), 2);                                              // 30 
+    double s3 = b3 / pow((1 + p * z), 3);                                              // 31 
+    double s4 = b4 / pow((1 + p * z), 4);                                              // 32 
+    double s5 = b5 / pow((1 + p * z), 5);                                              // 33 
+                                                                                       // 34 
+    //sz is the right-tail approximation                                               // 35 
+    double  sz = ff * (s1 + s2 + s3 + s4 + s5);                                        // 36 
+                                                                                       // 37 
+    double rz;                                                                         // 38 
+    //cdf of negative input is right-tail of input's absolute value                    // 39 
+    if (zz < 0)                                                                        // 40 
+        rz = sz;                                                                       // 41 
+                                                                                       // 42 
+    //cdf of positive input is one minus right-tail                                    // 43 
+    if (zz > 0)                                                                        // 44 
+        rz = (1 - sz);                                                                 // 45 
+                                                                                       // 46 
+    return rz;                                                                         // 47 
+}                                                                                      // 48 
+                                                                                       // 49 
+double black_scholes_call(double strike, double s, double sd, double r, double days)   // 50 
+{                                                                                      // 51 
+     double ls = log(s);                                                               // 52 
+     double lx = log(strike);                                                          // 53 
+     double t = days / 365;                                                            // 54 
+     double sd2 = pow(sd, 2);                                                          // 55 
+     double n = (ls - lx + r * t + sd2 * t / 2);                                       // 56 
+     double sqrtT = sqrt(days / 365);                                                  // 57 
+     double d = sd * sqrtT;                                                            // 58 
+     double d1 = n / d;                                                                // 59 
+     double d2 = d1 - sd * sqrtT;                                                      // 60 
+     double nd1 = black_scholes_normal(d1);                                            // 61 
+     double nd2 = black_scholes_normal(d2);                                            // 62 
+     return s * nd1 - strike * exp(-r * t) * nd2;                                      // 63 
+}                                                                                      // 64 
+                                                                                       // 65 
+double black_scholes_put(double strike, double s, double sd, double r, double days)    // 66 
+{                                                                                      // 67 
+     double ls = log(s);                                                               // 68 
+     double lx = log(strike);                                                          // 69 
+     double t = days / 365;                                                            // 70 
+     double sd2 = pow(sd, 2);                                                          // 71 
+     double n = (ls - lx + r * t + sd2 * t / 2);                                       // 72 
+     double sqrtT = sqrt(days / 365);                                                  // 73 
+     double d = sd * sqrtT;                                                            // 74 
+     double d1 = n / d;                                                                // 75 
+     double d2 = d1 - sd * sqrtT;                                                      // 76 
+     double nd1 = black_scholes_normal(d1);                                            // 77 
+     double nd2 = black_scholes_normal(d2);                                            // 78 
+     return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);                          // 79 
+}                                                                                      // 80 
+```
+
+
+
+### C Main : black_scholes-native.c
+
+```c
+#include <stdio.h>                                                                               //  1 
+#include "black_scholes.h"                                                                       //  2 
+                                                                                                 //  3 
+int main(int argc, char **argv) {                                                                //  4 
+  double data[][5] = {                                                                           //  5 
+    // strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry:           //  6 
+    // vary expiry:                                                                              //  7 
+    { 1.50, 2.00, 0.5,  2.25, 30 },                                                              //  8 
+    { 1.50, 2.00, 0.5,  2.25, 15 },                                                              //  9 
+    { 1.50, 2.00, 0.5,  2.25, 10 },                                                              // 10 
+    { 1.50, 2.00, 0.5,  2.25,  5 },                                                              // 11 
+    { 1.50, 2.00, 0.5,  2.25,  2 },                                                              // 12 
+     // vary strike:                                                                             // 13 
+    { 0.50, 2.00, 0.25, 2.25, 15 },                                                              // 14 
+    { 1.00, 2.00, 0.25, 2.25, 15 },                                                              // 15 
+    { 1.50, 2.00, 0.25, 2.25, 15 },                                                              // 16 
+    { 2.00, 2.00, 0.25, 2.25, 15 },                                                              // 17 
+    { 2.50, 2.00, 0.25, 2.25, 15 },                                                              // 18 
+    { 3.00, 2.00, 0.25, 2.25, 15 },                                                              // 19 
+    { 3.50, 2.00, 0.25, 2.25, 15 },                                                              // 20 
+  };                                                                                             // 21 
+  for ( int i = 0; i < sizeof(data) / sizeof(data[0]); i ++ ) {                                  // 22 
+    double *r = data[i];                                                                         // 23 
+    double c = black_scholes_call (r[0], r[1], r[2], r[3], r[4]);                                // 24 
+    double p = black_scholes_put  (r[0], r[1], r[2], r[3], r[4]);                                // 25 
+    printf("{ 'inputs': [ %6.3f, %6.3f, %6.3f, %6.3f, %6.3f ], 'call': %6.3f, 'put': %6.3f }\n", // 26 
+      r[0], r[1], r[2], r[3], r[4], c, p);                                                       // 27 
+  }                                                                                              // 28 
+  return 0;                                                                                      // 29 
+}                                                                                                // 30 
+```
+
+
+---
+
+```
+$ bin/run target/native/black_scholes
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 30.000 ], 'call':  0.753, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 10.000 ], 'call':  0.590, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  5.000 ], 'call':  0.546, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  2.000 ], 'call':  0.518, 'put':  0.000 }
+{ 'inputs': [  0.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.544, 'put':  0.000 }
+{ 'inputs': [  1.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.088, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
+{ 'inputs': [  2.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.178, 'put':  0.001 }
+{ 'inputs': [  2.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.279 }
+{ 'inputs': [  3.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.735 }
+{ 'inputs': [  3.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  1.191 }
+```
+
+---
+
+
+### C SWIG Interface : black_scholes.i
+
+```c
+%module black_scholes_swig                                                     //  1 
+%include "black_scholes.h"                                                     //  2 
+%{                                                                             //  3 
+#include "black_scholes.h"                                                     //  4 
+%}                                                                             //  5 
+```
+
+
+
+### Python : black_scholes.py
+
+```python
+import sys ; sys.path.append('target/python')                                         #   1 
+import black_scholes_swig as bs                                                       #   2 
+import json                                                                           #   3 
+data = [                                                                              #   4 
+    # strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry: #   5 
+    # vary expiry:                                                                    #   6 
+    [ 1.50, 2.00, 0.5,  2.25, 30 ],                                                   #   7 
+    [ 1.50, 2.00, 0.5,  2.25, 15 ],                                                   #   8 
+    [ 1.50, 2.00, 0.5,  2.25, 10 ],                                                   #   9 
+    [ 1.50, 2.00, 0.5,  2.25,  5 ],                                                   #  10 
+    [ 1.50, 2.00, 0.5,  2.25,  2 ],                                                   #  11 
+    # vary strike:                                                                    #  12 
+    [ 0.50, 2.00, 0.25, 2.25, 15 ],                                                   #  13 
+    [ 1.00, 2.00, 0.25, 2.25, 15 ],                                                   #  14 
+    [ 1.50, 2.00, 0.25, 2.25, 15 ],                                                   #  15 
+    [ 2.00, 2.00, 0.25, 2.25, 15 ],                                                   #  16 
+    [ 2.50, 2.00, 0.25, 2.25, 15 ],                                                   #  17 
+    [ 3.00, 2.00, 0.25, 2.25, 15 ],                                                   #  18 
+    [ 3.50, 2.00, 0.25, 2.25, 15 ],                                                   #  19 
+]                                                                                     #  20 
+for r in data:                                                                        #  21 
+   c = bs.black_scholes_call (r[0], r[1], r[2], r[3], r[4])                           #  22 
+   p = bs.black_scholes_put  (r[0], r[1], r[2], r[3], r[4])                           #  23 
+   print(json.dumps({'input': r, "call": round(c, 3), "put": round(p, 3)}))           #  24 
+```
+
+
+---
+
+```
+$ bin/run src/black_scholes.py
+{"input": [1.5, 2.0, 0.5, 2.25, 30], "call": 0.753, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 15], "call": 0.632, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 10], "call": 0.59, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 5], "call": 0.546, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 2], "call": 0.518, "put": 0.0}
+{"input": [0.5, 2.0, 0.25, 2.25, 15], "call": 1.544, "put": 0.0}
+{"input": [1.0, 2.0, 0.25, 2.25, 15], "call": 1.088, "put": 0.0}
+{"input": [1.5, 2.0, 0.25, 2.25, 15], "call": 0.632, "put": 0.0}
+{"input": [2.0, 2.0, 0.25, 2.25, 15], "call": 0.178, "put": 0.001}
+{"input": [2.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.279}
+{"input": [3.0, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.735}
+{"input": [3.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 1.191}
+```
+
+---
+
+
+
+
+
+
+
+### Outputs - Recap
+
+
+
+
+
+```
+$ bin/run target/native/black_scholes
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 30.000 ], 'call':  0.753, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 10.000 ], 'call':  0.590, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  5.000 ], 'call':  0.546, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  2.000 ], 'call':  0.518, 'put':  0.000 }
+{ 'inputs': [  0.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.544, 'put':  0.000 }
+{ 'inputs': [  1.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.088, 'put':  0.000 }
+{ 'inputs': [  1.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
+{ 'inputs': [  2.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.178, 'put':  0.001 }
+{ 'inputs': [  2.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.279 }
+{ 'inputs': [  3.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.735 }
+{ 'inputs': [  3.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  1.191 }
+```
+
+---
+
+
+
+```
+$ bin/run src/black_scholes.py
+{"input": [1.5, 2.0, 0.5, 2.25, 30], "call": 0.753, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 15], "call": 0.632, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 10], "call": 0.59, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 5], "call": 0.546, "put": 0.0}
+{"input": [1.5, 2.0, 0.5, 2.25, 2], "call": 0.518, "put": 0.0}
+{"input": [0.5, 2.0, 0.25, 2.25, 15], "call": 1.544, "put": 0.0}
+{"input": [1.0, 2.0, 0.25, 2.25, 15], "call": 1.088, "put": 0.0}
+{"input": [1.5, 2.0, 0.25, 2.25, 15], "call": 0.632, "put": 0.0}
+{"input": [2.0, 2.0, 0.25, 2.25, 15], "call": 0.178, "put": 0.001}
+{"input": [2.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.279}
+{"input": [3.0, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.735}
+{"input": [3.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 1.191}
+```
+
+---
+
+
+
+
+
+
+---
+
+
+
 ## example1.c
 
 
@@ -610,7 +890,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 10fe04ac0>
+#<swig-pointer std::vector< double > * 15b609460>
 17.3020736
 ```
 
@@ -640,7 +920,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e00e01000000_p_std__vectorT_double_t
+_a042a02801000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -669,14 +949,14 @@ def test_one_coeff():                                                          #
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.9, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
 plugins: cov-4.0.0
 collected 2 items
 
 src/polynomial-test.py ..                                                [100%]
 
-============================== 2 passed in 0.00s ===============================
+============================== 2 passed in 0.01s ===============================
 ```
 
 ---
@@ -738,7 +1018,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 10fe04ac0>
+#<swig-pointer std::vector< double > * 15b609460>
 17.3020736
 ```
 
@@ -748,7 +1028,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e00e01000000_p_std__vectorT_double_t
+_a042a02801000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -758,14 +1038,14 @@ _a042e00e01000000_p_std__vectorT_double_t
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.9, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
 plugins: cov-4.0.0
 collected 2 items
 
 src/polynomial-test.py ..                                                [100%]
 
-============================== 2 passed in 0.00s ===============================
+============================== 2 passed in 0.01s ===============================
 ```
 
 ---
@@ -1062,11 +1342,11 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_f068702d01000000_p_std__vectorT_double_t
+_004a704201000000_p_std__vectorT_double_t
 17.3020736
-_e05c702d01000000_p_std__vectorT_int_t
+_d06c704201000000_p_std__vectorT_int_t
 552
-_f068702d01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_4071704201000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1125,11 +1405,11 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_f068702d01000000_p_std__vectorT_double_t
+_004a704201000000_p_std__vectorT_double_t
 17.3020736
-_e05c702d01000000_p_std__vectorT_int_t
+_d06c704201000000_p_std__vectorT_int_t
 552
-_f068702d01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_4071704201000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1330,8 +1610,8 @@ e = mp_int("12343456", 16)             # <-- yey!                              #
                                                                                #  10 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  11 
                                                                                #  12 
-mp_mul(a, b, c);                                                               #  13 
-mp_mul(c, b, d);                                                               #  14 
+mp_mul(a, b, c)                                                                #  13 
+mp_mul(c, b, d)                                                                #  14 
                                                                                #  15 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  16 
 ```
@@ -1689,6 +1969,207 @@ e => 305411158
 
 
 # Workflow Examples
+
+
+                                                                              
+## Workflow - black_scholes.c                                                 
+                                                                              
+### Compile Native Code                                                       
+                                                                              
+```                                                                           
+# Compile native library:                                                     
+cc -Isrc -c -o target/native/black_scholes.o src/black_scholes.c              
+                                                                              
+# Compile and link native program:                                            
+cc -Isrc -o target/native/black_scholes src/black_scholes-native.c              \
+  target/native/black_scholes.o                                               
+                                                                              
+```                                                                           
+                                                                              
+### Build python Bindings                                                     
+                                                                              
+```                                                                           
+# Generate python bindings:                                                   
+swig -addextern -I- -Isrc -python -outdir target/python/ -o                     \
+  target/python/black_scholes_swig.c src/black_scholes.i                      
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/python/black_scholes_swig.c target/python/black_scholes_swig.py  
+3697 target/python/black_scholes_swig.c                                       
+70 target/python/black_scholes_swig.py                                        
+3767 total                                                                    
+                                                                              
+# Compile python bindings:                                                    
+cc -Isrc -dynamic -c -o target/python/black_scholes_swig.c.o                    \
+  target/python/black_scholes_swig.c                                          
+                                                                              
+# Link python dynamic library:                                                
+cc -Isrc -dynamiclib -o target/python/_black_scholes_swig.so                    \
+  target/native/black_scholes.o target/python/black_scholes_swig.c.o -ldl     
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build clojure Bindings                                                    
+                                                                              
+```                                                                           
+# Generate clojure bindings:                                                  
+swig -addextern -I- -Isrc -java -outdir target/clojure/ -o                      \
+  target/clojure/black_scholes_swig.c src/black_scholes.i                     
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/clojure/black_scholes_swig.c target/clojure/black_scholes*.java  
+263 target/clojure/black_scholes_swig.c                                       
+23 target/clojure/black_scholes_swig.java                                     
+14 target/clojure/black_scholes_swigJNI.java                                  
+300 total                                                                     
+                                                                              
+# Compile clojure bindings:                                                   
+cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
+  target/clojure/black_scholes_swig.c.o target/clojure/black_scholes_swig.c   
+                                                                              
+# Link clojure dynamic library:                                               
+cc -Isrc -dynamiclib -o target/clojure/libblack_scholes_swig.jnilib             \
+  target/native/black_scholes.o target/clojure/black_scholes_swig.c.o         
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build ruby Bindings                                                       
+                                                                              
+```                                                                           
+# Generate ruby bindings:                                                     
+swig -addextern -I- -Isrc -ruby -outdir target/ruby/ -o                         \
+  target/ruby/black_scholes_swig.c src/black_scholes.i                        
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/ruby/black_scholes_swig.c                                        
+2326 target/ruby/black_scholes_swig.c                                         
+                                                                              
+# Compile ruby bindings:                                                      
+cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+  target/ruby/black_scholes_swig.c.o target/ruby/black_scholes_swig.c         
+                                                                              
+# Link ruby dynamic library:                                                  
+cc -Isrc -dynamiclib -o target/ruby/black_scholes_swig.bundle                   \
+  target/native/black_scholes.o target/ruby/black_scholes_swig.c.o            
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build tcl Bindings                                                        
+                                                                              
+```                                                                           
+# Generate tcl bindings:                                                      
+swig -addextern -I- -Isrc -tcl -outdir target/tcl/ -o                           \
+  target/tcl/black_scholes_swig.c src/black_scholes.i                         
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/tcl/black_scholes_swig.c                                         
+2229 target/tcl/black_scholes_swig.c                                          
+                                                                              
+# Compile tcl bindings:                                                       
+cc -Isrc -I$TCL_HOME/include -c -o target/tcl/black_scholes_swig.c.o            \
+  target/tcl/black_scholes_swig.c                                             
+                                                                              
+# Link tcl dynamic library:                                                   
+cc -Isrc -dynamiclib -o target/tcl/black_scholes_swig.so                        \
+  target/native/black_scholes.o target/tcl/black_scholes_swig.c.o             
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build guile Bindings                                                      
+                                                                              
+```                                                                           
+# Generate guile bindings:                                                    
+swig -addextern -I- -Isrc -guile -outdir target/guile/ -o                       \
+  target/guile/black_scholes_swig.c src/black_scholes.i                       
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/guile/black_scholes_swig.c                                       
+1676 target/guile/black_scholes_swig.c                                        
+                                                                              
+# Compile guile bindings:                                                     
+cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
+  target/guile/black_scholes_swig.c.o target/guile/black_scholes_swig.c       
+                                                                              
+# Link guile dynamic library:                                                 
+cc -Isrc -dynamiclib -o target/guile/libblack_scholes_swig.so                   \
+  target/native/black_scholes.o target/guile/black_scholes_swig.c.o             \
+  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+### Build postgresql Bindings                                                 
+                                                                              
+```                                                                           
+# Generate postgresql bindings:                                               
+swig -addextern -I- -Isrc -I/opt/homebrew/include/postgresql@14/server          \
+  -postgresql -extension-version 1.2.3 -outdir target/postgresql/ -o            \
+  target/postgresql/black_scholes_swig.c src/black_scholes.i                  
+SWIG:1: Warning 524: Experimental target language. Target language PostgreSQL   \
+  specified by -postgresql is an experimental language. Please read about SWIG  \
+  experimental languages,                                                       \
+  https:/swig.org/Doc4.0/Introduction.html#Introduction_experimental_status.  
+                                                                              
+# Source code statistics:                                                     
+wc -l src/black_scholes.h src/black_scholes.i                                 
+4 src/black_scholes.h                                                         
+5 src/black_scholes.i                                                         
+9 total                                                                       
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/postgresql/black_scholes_swig.c                                  
+1552 target/postgresql/black_scholes_swig.c                                   
+                                                                              
+# Compile postgresql bindings:                                                
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -c -o                     \
+  target/postgresql/black_scholes_swig.c.o                                      \
+  target/postgresql/black_scholes_swig.c                                      
+                                                                              
+# Link postgresql dynamic library:                                            
+cc -Isrc -I/opt/homebrew/include/postgresql@14/server -dynamiclib -o            \
+  target/postgresql/black_scholes_swig.so target/native/black_scholes.o         \
+  target/postgresql/black_scholes_swig.c.o                                    
+                                                                              
+                                                                              
+```                                                                           
+                                                                              
+
+---
 
 
                                                                               
@@ -2575,4 +3056,13 @@ Guile 3.0 is required.  `bin/build guile` will build and install into `./local/`
 ```Shell
 rbenv shell 2.7.6
 bin/build clean demo
+```
+
+# Development
+
+## Rebuild README.md
+
+```bash
+$ rm README.md
+$ bin/build README.md
 ```

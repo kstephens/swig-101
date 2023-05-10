@@ -1,8 +1,4 @@
-// https://gist.github.com/codeslinger/472083/0acc95f745def15a3677b021742b27416a78bcf3
-
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 double black_scholes_normal(double zz)
 {

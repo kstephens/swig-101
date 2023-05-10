@@ -10,7 +10,7 @@ CREATE FUNCTION truncf(x FLOAT8, decimals INT DEFAULT 3) RETURNS FLOAT8
     RETURN trunc(x::numeric, decimals)::float8;
 
 DROP EXTENSION IF EXISTS black_scholes_swig;
-SELECT * FROM pg_extension;
+-- SELECT * FROM pg_extension;
 
 DROP TABLE IF EXISTS bs_data;
 DROP TABLE IF EXISTS bs_eval;
@@ -59,41 +59,3 @@ FROM bs_data;;
 
 SELECT * FROM bs_eval;;
 
--- Any profitable calls?
-SELECT * FROM bs_eval
-WHERE call_val > asset_price OR put_val > asset_price;;
-
--- Create some random scenarios:
-CREATE TABLE bs_hypo_eval
-AS
-WITH hd_rand AS (
-  SELECT gs.*, bsd.id
-  , strike_price -- random_offset(strike_price, 0.25) AS strike_price
-  , truncf(random_offset(asset_price, 0.25)) AS asset_price
-  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
-  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
-  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
-  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs
-),
-hd_rand_eval AS (
-SELECT *
-  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
-  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
-FROM hd_rand
-)
-SELECT *
-  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
-  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
-FROM hd_rand_eval;;
-
--- Select the most profitable random calls:
-SELECT * FROM bs_hypo_eval
-WHERE call_val > asset_price
-ORDER BY call_profit_pcnt DESC
-LIMIT 10;;
-
--- Select the most profitable random puts:
-SELECT * FROM bs_hypo_eval
-WHERE put_val > asset_price
-ORDER BY put_profit_pcnt DESC
-LIMIT 10;;
