@@ -2,9 +2,16 @@
 
 ############################
 
-EXAMPLES         = black_scholes.c example1.c polynomial.cc polynomial_v2.cc tommath.c
+default: all
+
+EXAMPLES         = example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c
 SWIG_TARGETS     = python  clojure  ruby  tcl  guile  postgresql
 TARGET_SUFFIXES  = py      clj      rb    tcl  scm    psql
+
+ifeq "$(SWIG_TARGET)" "postgresql"
+  EXAMPLES=example1.c black_scholes.c
+endif
+
 
 SWIG_CFLAGS_tommath.c+=-Wno-sentinel
 SWIG_CFLAGS+= -Wno-sentinel
@@ -150,6 +157,14 @@ SWIG_OPTS_postgresql+= -extension-version 1.2.3
 SWIG_INC_DIRS_postgresql:=-I$(shell pg_config --includedir-server) #
 # SWIG_CXXFLAGS_postgresql:=$(shell pg_config --includedir-server) #
 # SWIG_LDFLAGS_postgresql:=$(shell pkg-config --libdir) #
+TARGET_SWIG_EXTRA_postgresql=postgresql-make-extension
+SWIG_GENERATED_FILES_postgresql=target/$(SWIG_TARGET)/$(EXAMPLE_SWIG)-*.sql target/$(SWIG_TARGET)/$(EXAMPLE_SWIG).control target/$(SWIG_TARGET)/$(EXAMPLE_SWIG).make
+
+postgresql-make-extension:
+	$(SILENT)echo "# Compile and install postgresql extension:"
+	$(MAKE) -C target/postgresql -f $(EXAMPLE_SWIG).make install
+	$(SILENT)echo ""
+.PHONY: postgresql-make-extension
 
 ############################
 
@@ -166,6 +181,7 @@ SWIG_LDFLAGS=$(SWIG_LDFLAGS_$(SWIG_TARGET))
 SWIG_LDFLAGS+=$(SWIG_LDFLAGS_$(EXAMPLE_NAME))
 INC_DIRS+=$(SWIG_INC_DIRS_$(SWIG_TARGET))
 INC_DIRS+=$(SWIG_INC_DIRS_$(EXAMPLE_NAME))
+TARGET_SWIG_EXTRA+=$(TARGET_SWIG_EXTRA_$(SWIG_TARGET))
 #SWIG_CFLAGS += -DSWIGRUNTIME_DEBUG=1
 
 ############################
@@ -251,7 +267,8 @@ TARGET_SWIG_SO=$(dir $(TARGET_SWIG_O))/$(SWIG_SO_PREFIX)$(EXAMPLE_SWIG)$(SWIG_SO
 TARGET_DEPS:= \
 	$(TARGET_SWIG) \
 	$(TARGET_SWIG_O) \
-	$(TARGET_SWIG_SO)
+	$(TARGET_SWIG_SO) \
+	$(TARGET_SWIG_EXTRA)
 
 native-srcs: $(NATIVE_SRCS)
 native-deps: $(NATIVE_DEPS)
