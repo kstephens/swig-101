@@ -318,7 +318,7 @@ EXAMPLE1_VERSION = 1.2.3
 ---
 
 
-### PostgreSQL : example1.psql
+### PostgreSQL : example1-1.psql
 
 ```sql
 -- Load the extension:                                                        
@@ -332,7 +332,7 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ bin/run src/example1.psql
+$ bin/run src/example1-1.psql
  example1_version
 ------------------
  1.2.3
@@ -342,6 +342,60 @@ $ bin/run src/example1.psql
 ------------
         129
 (1 row)
+```
+
+---
+
+### PostgreSQL : example1-2.psql
+
+```sql
+-- Load the extension:                                                        
+CREATE EXTENSION example1_swig;                                                --  2 
+-- Create some coefficient and parameter tables:                              
+CREATE TABLE coefficients (                                                    --  4 
+  c_id SERIAL PRIMARY KEY,                                                     --  5 
+  c0 FLOAT8,                                                                   --  6 
+  c1 FLOAT8,                                                                   --  7 
+  c2 FLOAT8,                                                                   --  8 
+  c3 FLOAT8                                                                    --  9 
+);                                                                             -- 10 
+CREATE TABLE parameters (                                                      -- 11 
+  x_id SERIAL PRIMARY KEY,                                                     -- 12 
+  x FLOAT8                                                                     -- 13 
+);                                                                             -- 14 
+-- Create some coefficient and parameter data:                                
+INSERT INTO coefficients                                                       -- 16 
+  ( c0 ,  c1,    c2, c3   ) VALUES                                             -- 17 
+  ( 3.0, 5.0,   7.0, 11   ),                                                   -- 18 
+  ( 2.3, 5.7, 11.13, 17.23),                                                   -- 19 
+  (-5.2, 1.2, -99.0, 12.34);                                                   -- 20 
+INSERT INTO parameters                                                         -- 21 
+  (x) VALUES                                                                   -- 22 
+  ( 2),                                                                        -- 23 
+  (-3.7),                                                                      -- 24 
+  ( 3.1415926);                                                                -- 25 
+-- Apply cubic_poly to parameters and coefficients:                           
+SELECT *, cubic_poly(x, c0, c1, c2, c3)                                        -- 27 
+FROM   parameters, coefficients;                                               -- 28 
+```
+
+
+---
+
+```
+$ bin/run src/example1-2.psql
+ x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
+------+-----------+------+------+-----+-------+-------+---------------------
+    1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
+    1 |         2 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |              196.06
+    1 |         2 |    3 | -5.2 | 1.2 |   -99 | 12.34 | -300.08000000000004
+    2 |      -3.7 |    1 |    3 |   5 |     7 |    11 | -476.85300000000007
+    2 |      -3.7 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |  -739.1714900000002
+    2 |      -3.7 |    3 | -5.2 | 1.2 |   -99 | 12.34 | -1990.0080200000002
+    3 | 3.1415926 |    1 |    3 |   5 |     7 |    11 |   428.8642174798897
+    3 | 3.1415926 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |   664.2938909186964
+    3 | 3.1415926 |    3 | -5.2 | 1.2 |   -99 | 12.34 |  -595.9034565984515
+(9 rows)
 ```
 
 ---
@@ -410,7 +464,7 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1.psql
+$ bin/run src/example1-1.psql
  example1_version
 ------------------
  1.2.3
@@ -420,6 +474,24 @@ $ bin/run src/example1.psql
 ------------
         129
 (1 row)
+```
+
+---
+
+```
+$ bin/run src/example1-2.psql
+ x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
+------+-----------+------+------+-----+-------+-------+---------------------
+    1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
+    1 |         2 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |              196.06
+    1 |         2 |    3 | -5.2 | 1.2 |   -99 | 12.34 | -300.08000000000004
+    2 |      -3.7 |    1 |    3 |   5 |     7 |    11 | -476.85300000000007
+    2 |      -3.7 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |  -739.1714900000002
+    2 |      -3.7 |    3 | -5.2 | 1.2 |   -99 | 12.34 | -1990.0080200000002
+    3 | 3.1415926 |    1 |    3 |   5 |     7 |    11 |   428.8642174798897
+    3 | 3.1415926 |    2 |  2.3 | 5.7 | 11.13 | 17.23 |   664.2938909186964
+    3 | 3.1415926 |    3 | -5.2 | 1.2 |   -99 | 12.34 |  -595.9034565984515
+(9 rows)
 ```
 
 ---
@@ -656,7 +728,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 145704330>
+#<swig-pointer std::vector< double > * 14c0047d0>
 17.3020736
 ```
 
@@ -686,7 +758,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b0ae603c01000000_p_std__vectorT_double_t
+_b04ae03f01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -785,7 +857,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 145704330>
+#<swig-pointer std::vector< double > * 14c0047d0>
 17.3020736
 ```
 
@@ -795,7 +867,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_b0ae603c01000000_p_std__vectorT_double_t
+_b04ae03f01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1110,11 +1182,11 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_6058f04001000000_p_std__vectorT_double_t
+_706d704401000000_p_std__vectorT_double_t
 17.3020736
-_1044f04001000000_p_std__vectorT_int_t
+_2055704401000000_p_std__vectorT_int_t
 552
-_6058f04001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_706d704401000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1174,11 +1246,11 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_6058f04001000000_p_std__vectorT_double_t
+_706d704401000000_p_std__vectorT_double_t
 17.3020736
-_1044f04001000000_p_std__vectorT_int_t
+_2055704401000000_p_std__vectorT_int_t
 552
-_6058f04001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_706d704401000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1886,7 +1958,7 @@ $ bin/run src/black_scholes.py
 
 
 
-### PostgreSQL : black_scholes.psql
+### PostgreSQL : black_scholes-1.psql
 
 ```sql
 -- Load the extension:                                                                                                   
@@ -1934,7 +2006,7 @@ SELECT * FROM bs_eval;                                                          
 ---
 
 ```
-$ bin/run src/black_scholes.psql
+$ bin/run src/black_scholes-1.psql
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -1950,6 +2022,133 @@ $ bin/run src/black_scholes.psql
  11 |            3 |           2 |               0.25 |           2.25 |             15 |        0 |   0.735
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
+```
+
+---
+
+### PostgreSQL : black_scholes-2.psql
+
+```sql
+-- Load the extension:                                                                                                   
+CREATE EXTENSION black_scholes_swig;                                                                                      --  2 
+                                                                                                                          --  3 
+-- Create some sample input data:                                                                                        
+CREATE TABLE bs_data (                                                                                                    --  5 
+  id SERIAL PRIMARY KEY,                                                                                                  --  6 
+  strike_price FLOAT8,                                                                                                    --  7 
+  asset_price FLOAT8,                                                                                                     --  8 
+  standard_deviation FLOAT8,                                                                                              --  9 
+  risk_free_rate FLOAT8,                                                                                                  -- 10 
+  days_to_expiry FLOAT8                                                                                                   -- 11 
+);                                                                                                                        -- 12 
+                                                                                                                          -- 13 
+INSERT INTO bs_data                                                                                                       -- 14 
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )                                       -- 15 
+VALUES                                                                                                                    -- 16 
+  -- vary expiry:                                                                                                        
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),                                                                                         -- 18 
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),                                                                                         -- 19 
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),                                                                                         -- 20 
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),                                                                                         -- 21 
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),                                                                                         -- 22 
+  --  vary strike:                                                                                                       
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 24 
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 25 
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 26 
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 27 
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 28 
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 29 
+  ( 3.50, 2.00, 0.25, 2.25, 15 );                                                                                         -- 30 
+                                                                                                                          -- 31 
+-- Apply Black-Scholes to data:                                                                                          
+CREATE TABLE bs_eval                                                                                                      -- 33 
+AS                                                                                                                        -- 34 
+SELECT *                                                                                                                  -- 35 
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val -- 36 
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val   -- 37 
+FROM bs_data;                                                                                                             -- 38 
+SELECT * FROM bs_eval;                                                                                                    -- 39 
+-- Any profitable calls?                                                                                                 
+SELECT * FROM bs_eval                                                                                                     -- 41 
+WHERE call_val > asset_price OR put_val > asset_price;                                                                    -- 42 
+-- Create some random scenarios:                                                                                         
+CREATE TABLE bs_hypo_eval                                                                                                 -- 44 
+AS                                                                                                                        -- 45 
+WITH hd_rand AS (                                                                                                         -- 46 
+  SELECT gs.*, bsd.id                                                                                                     -- 47 
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price                                                     -- 48 
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price                                                               -- 49 
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation                                   -- 50 
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate                                               -- 51 
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry                                                             -- 52 
+  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs                                                        -- 53 
+),                                                                                                                        -- 54 
+hd_rand_eval AS (                                                                                                         -- 55 
+SELECT *                                                                                                                  -- 56 
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val -- 57 
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val   -- 58 
+FROM hd_rand                                                                                                              -- 59 
+)                                                                                                                         -- 60 
+SELECT *                                                                                                                  -- 61 
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt                                                     -- 62 
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt                                                      -- 63 
+FROM hd_rand_eval;                                                                                                        -- 64 
+-- Select the most profitable random calls:                                                                              
+SELECT * FROM bs_hypo_eval                                                                                                -- 66 
+WHERE call_val > asset_price                                                                                              -- 67 
+ORDER BY call_profit_pcnt DESC                                                                                            -- 68 
+LIMIT 10;                                                                                                                 -- 69 
+-- Select the most profitable random puts:                                                                               
+SELECT * FROM bs_hypo_eval                                                                                                -- 71 
+WHERE put_val > asset_price                                                                                               -- 72 
+ORDER BY put_profit_pcnt DESC                                                                                             -- 73 
+LIMIT 10;                                                                                                                 -- 74 
+```
+
+
+---
+
+```
+$ bin/run src/black_scholes-2.psql
+ id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
+----+--------------+-------------+--------------------+----------------+----------------+----------+---------
+  1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
+  2 |          1.5 |           2 |                0.5 |           2.25 |             15 |    0.632 |       0
+  3 |          1.5 |           2 |                0.5 |           2.25 |             10 |    0.589 |       0
+  4 |          1.5 |           2 |                0.5 |           2.25 |              5 |    0.545 |       0
+  5 |          1.5 |           2 |                0.5 |           2.25 |              2 |    0.518 |       0
+  6 |          0.5 |           2 |               0.25 |           2.25 |             15 |    1.544 |       0
+  7 |            1 |           2 |               0.25 |           2.25 |             15 |    1.088 |       0
+  8 |          1.5 |           2 |               0.25 |           2.25 |             15 |    0.632 |       0
+  9 |            2 |           2 |               0.25 |           2.25 |             15 |    0.177 |   0.001
+ 10 |          2.5 |           2 |               0.25 |           2.25 |             15 |        0 |   0.279
+ 11 |            3 |           2 |               0.25 |           2.25 |             15 |        0 |   0.735
+ 12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
+(12 rows)
+
+ id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
+----+--------------+-------------+--------------------+----------------+----------------+----------+---------
+(0 rows)
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+   37 |  6 |          0.5 |       1.702 |               0.25 |           2.25 |             18 |    1.911 |       0 |           12.279 |            -100
+   60 |  6 |          0.5 |       1.773 |               0.25 |           2.25 |             12 |    1.954 |       0 |           10.208 |            -100
+    6 |  6 |          0.5 |       1.581 |               0.25 |           2.25 |             14 |    1.739 |       0 |            9.993 |            -100
+   14 |  6 |          0.5 |       1.666 |               0.25 |           2.25 |             17 |     1.83 |       0 |            9.843 |            -100
+   57 |  6 |          0.5 |       1.765 |               0.25 |           2.25 |             14 |    1.888 |       0 |            6.968 |            -100
+   18 |  6 |          0.5 |       1.754 |               0.25 |           2.25 |             12 |    1.875 |       0 |            6.898 |            -100
+   73 |  6 |          0.5 |        1.55 |               0.25 |           2.25 |             12 |    1.637 |       0 |            5.612 |            -100
+   19 |  6 |          0.5 |       1.787 |               0.25 |           2.25 |             11 |    1.877 |       0 |            5.036 |            -100
+   23 |  7 |            1 |       1.514 |               0.25 |           2.25 |             16 |    1.528 |       0 |            0.924 |            -100
+   64 |  6 |          0.5 |       1.878 |               0.25 |           2.25 |             17 |    1.893 |       0 |            0.798 |            -100
+(10 rows)
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+   11 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.552 |             -100 |           3.328
+   19 | 12 |          3.5 |       1.592 |               0.25 |           2.25 |             17 |        0 |   1.601 |             -100 |           0.565
+(2 rows)
 ```
 
 ---
@@ -2006,7 +2205,7 @@ $ bin/run src/black_scholes.py
 
 
 ```
-$ bin/run src/black_scholes.psql
+$ bin/run src/black_scholes-1.psql
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2022,6 +2221,51 @@ $ bin/run src/black_scholes.psql
  11 |            3 |           2 |               0.25 |           2.25 |             15 |        0 |   0.735
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
+```
+
+---
+
+```
+$ bin/run src/black_scholes-2.psql
+ id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
+----+--------------+-------------+--------------------+----------------+----------------+----------+---------
+  1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
+  2 |          1.5 |           2 |                0.5 |           2.25 |             15 |    0.632 |       0
+  3 |          1.5 |           2 |                0.5 |           2.25 |             10 |    0.589 |       0
+  4 |          1.5 |           2 |                0.5 |           2.25 |              5 |    0.545 |       0
+  5 |          1.5 |           2 |                0.5 |           2.25 |              2 |    0.518 |       0
+  6 |          0.5 |           2 |               0.25 |           2.25 |             15 |    1.544 |       0
+  7 |            1 |           2 |               0.25 |           2.25 |             15 |    1.088 |       0
+  8 |          1.5 |           2 |               0.25 |           2.25 |             15 |    0.632 |       0
+  9 |            2 |           2 |               0.25 |           2.25 |             15 |    0.177 |   0.001
+ 10 |          2.5 |           2 |               0.25 |           2.25 |             15 |        0 |   0.279
+ 11 |            3 |           2 |               0.25 |           2.25 |             15 |        0 |   0.735
+ 12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
+(12 rows)
+
+ id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
+----+--------------+-------------+--------------------+----------------+----------------+----------+---------
+(0 rows)
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+   37 |  6 |          0.5 |       1.702 |               0.25 |           2.25 |             18 |    1.911 |       0 |           12.279 |            -100
+   60 |  6 |          0.5 |       1.773 |               0.25 |           2.25 |             12 |    1.954 |       0 |           10.208 |            -100
+    6 |  6 |          0.5 |       1.581 |               0.25 |           2.25 |             14 |    1.739 |       0 |            9.993 |            -100
+   14 |  6 |          0.5 |       1.666 |               0.25 |           2.25 |             17 |     1.83 |       0 |            9.843 |            -100
+   57 |  6 |          0.5 |       1.765 |               0.25 |           2.25 |             14 |    1.888 |       0 |            6.968 |            -100
+   18 |  6 |          0.5 |       1.754 |               0.25 |           2.25 |             12 |    1.875 |       0 |            6.898 |            -100
+   73 |  6 |          0.5 |        1.55 |               0.25 |           2.25 |             12 |    1.637 |       0 |            5.612 |            -100
+   19 |  6 |          0.5 |       1.787 |               0.25 |           2.25 |             11 |    1.877 |       0 |            5.036 |            -100
+   23 |  7 |            1 |       1.514 |               0.25 |           2.25 |             16 |    1.528 |       0 |            0.924 |            -100
+   64 |  6 |          0.5 |       1.878 |               0.25 |           2.25 |             17 |    1.893 |       0 |            0.798 |            -100
+(10 rows)
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+   11 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.552 |             -100 |           3.328
+   19 | 12 |          3.5 |       1.592 |               0.25 |           2.25 |             17 |        0 |   1.601 |             -100 |           0.565
+(2 rows)
 ```
 
 ---
