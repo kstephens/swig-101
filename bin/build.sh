@@ -22,10 +22,6 @@
 }
 ####################################
 
-declare -g -A SWIG_OPTS_ SWIG_CFLAGS_ SWIG_INC_DIRS_ SWIG_LDFLAGS_ SWIG_LIB_DIRS_ SWIG_LIBS_ SWIG_SO_SUFFIX_ SWIG_SO_PREFIX_
-declare -g -A SWIG_GENERATED_FILES_ SWIG_EXTRA_
-declare -g -A CC_ CFLAGS_ INC_DIRS_ LDFLAGS_ LIB_DIRS_ LIBS_ SUFFIX_
-
 -setup-targets() {
   :
 }
@@ -36,161 +32,70 @@ declare -g -A CC_ CFLAGS_ INC_DIRS_ LDFLAGS_ LIB_DIRS_ LIBS_ SUFFIX_
   MAKE=${MAKE:-make}
   export UNAME_S="$(uname -s)"
   export ROOT_DIR="$(/bin/pwd)"
-  export LOCAL_DIR="${ROOT_DIR}/local"
+  export LOCAL_DIR="$ROOT_DIR/local"
   export LC_ALL=C
 
   DEBUG=''
-  CC='' CC_=()
-  CFLAGS='' CFLAGS_=() CFLAGS_SO=''
-  CXXFLAGS=''
+  CC=''
+  CFLAGS='' CFLAGS_SO=''
   INC_DIRS=''
-  LIB_DIRS=''        LIB_DIRS_=()
-  LIBS=''            LIBS_=()
-  LDFLAGS=''         LDFLAGS_=()
-  SWIG_OPTS=''       SWIG_OPTS_=()
-  SWIG_CFLAGS=''     SWIG_CFLAGS_=()
-  SWIG_LDFLAGS=''    SWIG_LDFLAGS_=()
-  SWIG_LIB_DIRS=''   SWIG_LIB_DIRS_=()
-  SWIG_LIBS=''       SWIG_LIBS_=()
-  SWIG_SO_SUFFIX=''  SWIG_SO_SUFFIX_=()
-  SWIG_SO_PREFIX=''  SWIG_SO_PREFIX_=()
-  SWIG_EXTRA=''      SWIG_EXTRA_=()
-  SWIG_GENERATED_FILES='' SWIG_GENERATED_FILES_=()
-
-  SWIG_CFLAGS+=' -Wno-sentinel'
-  SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
+  LDFLAGS='' LIB_DIRS='' LIBS=''
+  SWIG_OPTS=''
+  SWIG_CFLAGS=''
+  SWIG_INC_DIRS=''
+  SWIG_LDFLAGS='' SWIG_LIB_DIRS='' SWIG_LIBS=''
+  SWIG_SO_SUFFIX='' SWIG_SO_PREFIX=''
+  SWIG_EXTRA=''
+  SWIG_GENERATED_FILES='' SWIG_GENERATED_FILES_MORE=''
 
   DEBUG+=' -g'
 
   ############################
 
-  SWIG_CFLAGS_[tommath]='-Wno-sentinel'
-  LIBS_[tommath]='-ltommath'
-
-  SWIG_CFLAGS_[polynomial]+=' -Wno-deprecated-declarations' # sprintf
-  SWIG_CFLAGS_[polynomial_v2]+=' -Wno-deprecated-declarations' # sprintf
-
-  ############################
-
   : "${SWIG_EXE:=$(which swig | head -1)}"
-  SWIG_SO_SUFFIX_DEFAULT=.so
-  SWIG_SO_SUFFIX_+=(
-    [ruby]=.so [guile]=.so [postgresql]=.so
-  )
 
   ############################
 
-  # SUFFIX_ruby=rb
-  SWIG_OPTS_[ruby]=-ruby
-  SWIG_CFLAGS_[ruby]="$(${RUBY_EXE} tool/ruby-cflags.rb) -Wno-unknown-attributes -Wno-ignored-attributes"
-
-  ############################
-
-  PYTHON_VERSION=3.10
-  PYTHON_MAJOR_VERSION="${PYTHON_VERSION%.*}"
-  PYTHON_CONFIG=$(which python${PYTHON_VERSION}-config python${PYTHON_MAJOR_VERSION}-config python-config 2>/dev/null | head -1)
-  PYTHON_EXE=$(which python${PYTHON_VERSION} python${PYTHON_MAJOR_VERSION} python 2>/dev/null | head -1)
-
-  # SUFFIX_[python]=.py
-  SWIG_OPTS_[python]=-python
-  # Has include options:
-  SWIG_CFLAGS_[python]="$(${PYTHON_CONFIG} --cflags) -Wno-deprecated-declarations"
-  # Has libs:
-  SWIG_LDFLAGS_[python]="$(${PYTHON_CONFIG} --ldflags)"
-  # SWIG_LIBS_[python]="$(${PYTHON_CONFIG} --libs)"
-  SWIG_SO_PREFIX_[python]=_
-  SWIG_GENERATED_FILES_[python]=target/${SWIG_TARGET}/${EXAMPLE_SWIG}.py
-
-  ############################
-
-  # SUFFIX_[tcl]=.tcl
-  SWIG_OPTS_[tcl]=-tcl
-  SWIG_CFLAGS_[tcl]="-I${TCL_HOME}/include"
-  #SWIG_CFLAGS_[tcl]=-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
-
-  ############################
-
-  GUILE_VERSION=3.0
-  # SUFFIX_[guile]=.scm
-  SWIG_OPTS_[guile]=-guile
-  #MEH: error: ("/opt/homebrew/opt/pkg-config/bin/pkg-config" "--cflags" "guile-3.0") exited with non-zero error code 127
-  #SWIG_CFLAGS_guile:=$(shell guile-config compile) #
-  #SWIG_LDFLAGS_guile:=$(shell guile-config link) #
-  SWIG_CFLAGS_[guile]="$(pkg-config --cflags guile-$GUILE_VERSION)" #
-  SWIG_LIBS_[guile]="$(pkg-config --libs guile-$GUILE_VERSION)" #
-  SWIG_SO_PREFIX_[guile]=lib
-
-  ############################
-
-  # SUFFIX_[clojure]=.clj
-  SWIG_OPTS_[clojure]=-java
-  # SWIG_OPTS_[clojure]="-package ${EXAMPLE_NAME}"
-  SWIG_CFLAGS_[clojure]="-I${JAVA_INC}"
-  SWIG_SO_PREFIX_[clojure]=lib
-  case "${UNAME_S}"
-  in
-    Darwin)
-      SWIG_CFLAGS_[clojure]+=" -I${JAVA_INC}/darwin"
-      SWIG_SO_SUFFIX_[clojure]=.jnilib
-    ;;
-    Linux)
-      SWIG_CFLAGS_[clojure]+=" -I${JAVA_INC}/linux"
-      SWIG_SO_SUFFIX_[clojure]=.so
-    ;;
-  esac
-  SWIG_GENERATED_FILES_[clojure]="target/${SWIG_TARGET}/${EXAMPLE_NAME}*.java"
-
-  ############################
-
-  # SUFFIX_[postgresql]=.psql
-  SWIG_OPTS_[postgresql]=-postgresql
-  # SWIG_OPTS_[postgresql]+='' -debug-top 1,2,3,4'
-  SWIG_OPTS_[postgresql]+=' -extension-version 1.2.3'
-  # SWIG_OPTS_[postgresql]+="" -extension-schema  $EXTENSION_NAME"
-  SWIG_INC_DIRS_[postgresql]="-I$(pg_config --includedir-server)" #
-  # SWIG_CXXFLAGS_postgresql="$(pg_config --includedir-server)" #
-  # SWIG_LDFLAGS_postgresql="$(pkg-config --libdir)" #
-  SWIG_EXTRA_[postgresql]=postgresql-make-extension
-  SWIG_GENERATED_FILES_[postgresql]="target/${SWIG_TARGET}/${EXAMPLE_SWIG}-*.sql target/${SWIG_TARGET}/${EXAMPLE_SWIG}.control target/${SWIG_TARGET}/${EXAMPLE_SWIG}.make"
-
-  ############################
-
-  SWIG_CFLAGS_[xml]= #-I${TCL_HOME}/include
-  SWIG_CFLAGS_[xml]= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
-
-  ############################
-
-  CC_[.c]=clang
-  CC_[.cc]=clang++
-  case "${UNAME_S}"
-  in
-    Linux)
-      CC_[.c]=clang-13
-      CC_[.cc]=clang++-13
-    ;;
-  esac
-
-  #LDFLAGS+= ???
-  CFLAGS_[.c]=
-  CFLAGS_[.cc]=-Wno-c++11-extensions # -stdlib=libc++
-  CFLAGS_[.cc]+=' -std=c++17'
-
-  CC="${CC_[$EXAMPLE_SUFFIX]}"
-  CFLAGS+=" ${CFLAGS_[$EXAMPLE_SUFFIX]}"
-  CFLAGS+=" ${CFLAGS_[$EXAMPLE_NAME]}"
   CFLAGS+=" ${DEBUG}"
-  CXXFLAGS+=" ${DEBUG}"
   INC_DIRS+=' -Isrc'
   INC_DIRS+=' -Iinclude'
   INC_DIRS+=" -I${LOCAL_DIR}/include"
   LIB_DIRS+=" -L${LOCAL_DIR}/lib"
-  LIBS+=" ${LIBS_[$EXAMPLE_NAME]}"
-  LIBS+=" ${LIBS_[$SWIG_TARGET]}"
-  # declare -p INC_DIRS LIB_DIRS LIBS LDFLAGS
-  # declare -p CFLAGS_ CC CFLAGS CXXFLAGS
 
   ############################
 
+  case "$EXAMPLE_SUFFIX"
+  in
+    .c)
+      CC=clang
+    ;;
+    .cc)
+      CC=clang++
+      CFLAGS+=' -Wno-c++11-extensions' # -stdlib=libc++
+      CFLAGS+=' -std=c++17'
+      SWIG_OPTS+=' -c++'
+    ;;
+  esac
+  [[ "${UNAME_S}" = Linux ]] && CC+=-13
+
+  ############################
+
+  SWIG_SO_SUFFIX=.so
+  case "$EXAMPLE_NAME"
+  in
+    tommath)
+      SWIG_CFLAGS+=' -Wno-sentinel'
+      LIBS+=' -ltommath'
+    ;;
+    polynomial)
+      SWIG_CFLAGS+=' -Wno-deprecated-declarations' # sprintf
+      SWIG_CFLAGS+=' -Wno-deprecated-declarations' # sprintf
+    ;;
+  esac
+
+  ############################
+
+  SWIG_SO_SUFFIX=.so
   case "$UNAME_S"
   in
     CYGWIN_NT*)
@@ -208,20 +113,86 @@ declare -g -A CC_ CFLAGS_ INC_DIRS_ LDFLAGS_ LIB_DIRS_ LIBS_ SUFFIX_
       INC_DIRS+=' -I/opt/homebrew/include'
       LIB_DIRS+=' -L/opt/homebrew/lib'
       CFLAGS_SO+=' -dynamiclib -Wl,-undefined,dynamic_lookup'
-      SWIG_SO_SUFFIX_[ruby]=.bundle
     ;;
   esac
-  # declare -p UNAME_S CFLAGS CFLAGS_SO; exit 9
+
+  case "$SWIG_TARGET"
+  in
+    ruby)
+      SWIG_OPTS+=' -ruby'
+      SWIG_CFLAGS+=" $(${RUBY_EXE} tool/ruby-cflags.rb) -Wno-unknown-attributes -Wno-ignored-attributes"
+      SWIG_CFLAGS+="  -Wno-deprecated-declarations" # sprintf
+      [[ "$UNAME_S" = Darwin ]] && SWIG_SO_SUFFIX=.bundle
+    ;;
+    python)
+      PYTHON_VERSION=3.10
+      PYTHON_MAJOR_VERSION="${PYTHON_VERSION%.*}"
+      PYTHON_CONFIG=$(which python${PYTHON_VERSION}-config python${PYTHON_MAJOR_VERSION}-config python-config 2>/dev/null | head -1)
+      PYTHON_EXE=$(which python${PYTHON_VERSION} python${PYTHON_MAJOR_VERSION} python 2>/dev/null | head -1)
+
+      # SUFFIX_[python]=.py
+      SWIG_OPTS+=' -python'
+      # Has include options:
+      SWIG_CFLAGS+=" $(${PYTHON_CONFIG} --cflags) -Wno-deprecated-declarations"
+      # Has libs:
+      SWIG_LDFLAGS+=" $(${PYTHON_CONFIG} --ldflags)"
+      # SWIG_LIBS+=" $(${PYTHON_CONFIG} --libs)"
+      SWIG_SO_PREFIX=_
+      SWIG_GENERATED_FILES_MORE+=" target/${SWIG_TARGET}/${EXAMPLE_SWIG}.py"
+    ;;
+    tcl)
+      # SUFFIX_[tcl]=.tcl
+      SWIG_OPTS+=' -tcl'
+      SWIG_CFLAGS+=" -I${TCL_HOME}/include"
+      SWIG_CFLAGS+="  -Wno-deprecated-declarations" # sprintf
+    ;;
+    guile)
+      GUILE_VERSION=3.0
+      # SUFFIX_[guile]=.scm
+      SWIG_OPTS+=' -guile'
+      #MEH: error: ("/opt/homebrew/opt/pkg-config/bin/pkg-config" "--cflags" "guile-3.0") exited with non-zero error code 127
+      SWIG_CFLAGS+=" $(pkg-config --cflags guile-$GUILE_VERSION)" #
+      SWIG_LIBS+=" $(pkg-config --libs guile-$GUILE_VERSION)" #
+      SWIG_SO_PREFIX=lib
+    ;;
+    clojure)
+      SWIG_OPTS+=' -java'
+      # SWIG_OPTS+=" -package ${EXAMPLE_NAME}"
+      SWIG_CFLAGS+=" -I${JAVA_INC}"
+      SWIG_SO_PREFIX=lib
+      case "${UNAME_S}"
+      in
+        Darwin)
+          SWIG_CFLAGS+=" -I${JAVA_INC}/darwin"
+          SWIG_SO_SUFFIX=.jnilib
+        ;;
+        Linux)
+          SWIG_CFLAGS+=" -I${JAVA_INC}/linux"
+          SWIG_SO_SUFFIX=.so
+        ;;
+      esac
+      SWIG_GENERATED_FILES_MORE="target/${SWIG_TARGET}/${EXAMPLE_NAME}*.java"
+    ;;
+    postgresql)
+      SWIG_OPTS+=' -postgresql'
+      # SWIG_OPTS+=' -debug-top 1,2,3,4'
+      SWIG_OPTS+=' -extension-version 1.2.3'
+      # SWIG_OPTS+=" -extension-schema $EXTENSION_NAME"
+      SWIG_INC_DIRS+=" -I$(pg_config --includedir-server)" #
+      # SWIG_LDFLAGS+=" $(pkg-config --libdir)" #
+      SWIG_EXTRA+=' postgresql-make-extension'
+      SWIG_GENERATED_FILES_MORE="target/${SWIG_TARGET}/${EXAMPLE_SWIG}-*.sql target/${SWIG_TARGET}/${EXAMPLE_SWIG}.control target/${SWIG_TARGET}/${EXAMPLE_SWIG}.make"
+    ;;
+    xml)
+      SWIG_CFLAGS+= #-I${TCL_HOME}/include
+      SWIG_CFLAGS+= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
+    ;;
+  esac
 
   ############################
-  # set -x
 
-  SWIG_OPTS_[.cc]=-c++
-  SWIG_OPTS+=" ${SWIG_OPTS_[$SWIG_TARGET]}"
-  SWIG_OPTS+=" -I-"
-  SWIG_OPTS+=" ${SWIG_OPTS_[$EXAMPLE_SUFFIX]}"
-  SWIG_OPTS+=" ${SWIG_OPTS_[$EXAMPLE_NAME]}"
   SWIG_OPTS+=" -addextern"
+  SWIG_OPTS+=" -I-"
   SWIG_OPTS_x+=' \
        -debug-module 1,2,3,4 \
        -debug-symtabs  \
@@ -236,23 +207,9 @@ declare -g -A CC_ CFLAGS_ INC_DIRS_ LDFLAGS_ LIB_DIRS_ LIBS_ SUFFIX_
        -debug-tmsearch \
        -debug-tmused
   '
-  SWIG_CFLAGS+=" ${SWIG_CFLAGS_[$SWIG_TARGET]}"
-  SWIG_CFLAGS+=" ${SWIG_CFLAGS_[$EXAMPLE_NAME]}"
-  SWIG_CFLAGS+=" ${SWIG_CFLAGS_[$EXAMPLE_SUFFIX]}"
+  SWIG_CFLAGS+=' -Wno-sentinel'
+  SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
   #SWIG_CFLAGS+='' -DSWIGRUNTIME_DEBUG=1'
-  SWIG_INC_DIRS+=" ${SWIG_INC_DIRS_[$EXAMPLE_NAME]}"
-  SWIG_INC_DIRS+=" ${SWIG_INC_DIRS_[$SWIG_TARGET]}"
-  SWIG_LDFLAGS+=" ${SWIG_LDFLAGS_[$SWIG_TARGET]}"
-  SWIG_LDFLAGS+=" ${SWIG_LDFLAGS_[$EXAMPLE_NAME]}"
-  SWIG_LIB_DIRS+=" ${SWIG_LIB_DIRS_[$SWIG_TARGET]}"
-  SWIG_LIB_DIRS+=" ${SWIG_LIB_DIRS_[$EXAMPLE_NAME]}"
-  SWIG_LIBS+=" ${SWIG_LIBS_[$EXAMPLE_NAME]}"
-  SWIG_LIBS+=" ${SWIG_LIBS_[$SWIG_TARGET]}"
-  SWIG_SO_SUFFIX="${SWIG_SO_SUFFIX_[$SWIG_TARGET]}"
-  SWIG_SO_PREFIX="${SWIG_SO_PREFIX_[$SWIG_TARGET]}"
-  : "${SWIG_SO_PREFIX:=$SWIG_SO_PREFIX_DEFAULT}"
-  : "${SWIG_SO_SUFFIX:=$SWIG_SO_SUFFIX_DEFAULT}"
-  SWIG_EXTRA+=" ${SWIG_EXTRA_[$SWIG_TARGET]}"
 
   # declare -p EXAMPLE EXAMPLE_NAME EXAMPLE_SUFFIX
   # declare -p $(compgen -v SWIG)
@@ -335,10 +292,10 @@ postgresql-make-extension() {
 }
 
 -cmd-build-native() {
-      (
-        SWIG_TARGET=native
-        -setup-vars
-        set -e
+(
+  SWIG_TARGET=native
+  -setup-vars
+  set -e
   mkdir -p target/native
   lib_c=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
   lib_o=target/native/${EXAMPLE_NAME}.o
@@ -349,13 +306,13 @@ postgresql-make-extension() {
 	echo ""
 	echo '```'
 	echo "# Compile native library:"
-	-run ${CC} ${CFLAGS} $INC_DIRS -c -o $lib_o $lib_c
+	-run $CC $CFLAGS $INC_DIRS -c -o $lib_o $lib_c
 	echo ""
 	echo "# Compile and link native program:"
-	-run ${CC} ${CFLAGS} $INC_DIRS -o $main_e $main_c $lib_o $LDFLAGS $LIB_DIRS $LIBS
+	-run $CC $CFLAGS $INC_DIRS -o $main_e $main_c $lib_o $LDFLAGS $LIB_DIRS $LIBS
 	echo ""
 	echo '```'
-      ) || exit $?
+) || exit $?
 }
 
 -cmd-build-example-target() {
@@ -371,9 +328,9 @@ postgresql-make-extension() {
 	echo '```'
 
 	echo "# Generate ${SWIG_TARGET} bindings:"
-  -run ${SWIG_EXE} ${SWIG_OPTS} $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
+  -run $SWIG_EXE $SWIG_OPTS $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
 	echo ""
-  SWIG_GENERATED_FILES="$SWIG_C ${SWIG_GENERATED_FILES_[$SWIG_TARGET]}"
+  SWIG_GENERATED_FILES="$SWIG_C $SWIG_GENERATED_FILES_MORE"
 
 	echo "# Source code statistics:"
 	-run wc -l $EXAMPLE_H $EXAMPLE_I
@@ -383,8 +340,6 @@ postgresql-make-extension() {
 	-run wc -l "$SWIG_GENERATED_FILES"
 	echo ''
 
-	# -run ${SWIG_EXE} ${SWIG_OPTS} -xml -o $SWIG_C $EXAMPLE_I 2>/dev/null || true
-
 	echo "# Compile ${SWIG_TARGET} bindings:"
 	-run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
 	echo ""
@@ -393,7 +348,7 @@ postgresql-make-extension() {
 	-run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
 
   local extra
-  for extra in ${SWIG_EXTRA_[$SWIG_TARGET]} :
+  for extra in $SWIG_EXTRA :
   do
     $extra
   done
@@ -410,11 +365,11 @@ postgresql-make-extension() {
 
 -cmd-demo-run() {
   -filter-example-targets
-  for EXAMPLE in ${EXAMPLES}
+  for EXAMPLE in $EXAMPLES
   do
     (
     -setup-example-vars
-    -run-prog target/native/${EXAMPLE_NAME}
+    -run-prog target/native/$EXAMPLE_NAME
     for suffix in $SWIG_TARGET_SUFFIXES
     do
       for prog in src/"$EXAMPLE_NAME"*"$suffix"
@@ -476,7 +431,7 @@ postgresql-make-extension() {
 
 ############################
 
-declare -A SWIG_TARGET_SUFFIX_=( [py]=.py [clj]=.clj [rb]=.rb [tcl]=.tcl [scm]=.scm [psql]=.sql )
+declare -A SWIG_TARGET_SUFFIX_
 
 -defaults() {
   SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)

@@ -117,6 +117,7 @@ The examples below target:
 * Ruby
 * TCL
 * Guile Scheme
+* PostgreSQL
 
 
 
@@ -655,7 +656,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 12ef04220>
+#<swig-pointer std::vector< double > * 145704330>
 17.3020736
 ```
 
@@ -685,7 +686,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_30b9604001000000_p_std__vectorT_double_t
+_b0ae603c01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -784,7 +785,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 12ef04220>
+#<swig-pointer std::vector< double > * 145704330>
 17.3020736
 ```
 
@@ -794,7 +795,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_30b9604001000000_p_std__vectorT_double_t
+_b0ae603c01000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1109,11 +1110,11 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_0045005401000000_p_std__vectorT_double_t
+_6058f04001000000_p_std__vectorT_double_t
 17.3020736
-_8045005401000000_p_std__vectorT_int_t
+_1044f04001000000_p_std__vectorT_int_t
 552
-_5045005401000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_6058f04001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1173,11 +1174,11 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_0045005401000000_p_std__vectorT_double_t
+_6058f04001000000_p_std__vectorT_double_t
 17.3020736
-_8045005401000000_p_std__vectorT_int_t
+_1044f04001000000_p_std__vectorT_int_t
 552
-_5045005401000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_6058f04001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -2127,7 +2128,7 @@ cc -Isrc -o target/native/example1 src/example1-native.c                        
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -python -I- -addextern -Isrc -outdir target/python/ -o                     \
+swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
   target/python/example1_swig.c src/example1.i                                
                                                                               
 # Source code statistics:                                                     
@@ -2156,7 +2157,7 @@ cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -java -I- -addextern -Isrc -outdir target/clojure/ -o                      \
+swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
   target/clojure/example1_swig.c src/example1.i                               
                                                                               
 # Source code statistics:                                                     
@@ -2188,7 +2189,7 @@ cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -ruby -I- -addextern -Isrc -outdir target/ruby/ -o                         \
+swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
   target/ruby/example1_swig.c src/example1.i                                  
                                                                               
 # Source code statistics:                                                     
@@ -2216,7 +2217,7 @@ cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -tcl -I- -addextern -Isrc -outdir target/tcl/ -o                           \
+swig -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                           \
   target/tcl/example1_swig.c src/example1.i                                   
                                                                               
 # Source code statistics:                                                     
@@ -2243,7 +2244,7 @@ cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -guile -I- -addextern -Isrc -outdir target/guile/ -o                       \
+swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
   target/guile/example1_swig.c src/example1.i                                 
                                                                               
 # Source code statistics:                                                     
@@ -2270,7 +2271,7 @@ cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     
                                                                               
 ```                                                                           
 # Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -I- -addextern -Isrc                  \
+swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
   target/postgresql/example1_swig.c src/example1.i                            
                                                                               
@@ -2332,7 +2333,7 @@ cc++ -std=c++17 -Isrc -o target/native/polynomial src/polynomial-native.cc      
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -python -I- -c++ -addextern -Isrc -outdir target/python/ -o                \
+swig -c++ -python -addextern -I- -Isrc -outdir target/python/ -o                \
   target/python/polynomial_swig.cc src/polynomial.i                           
                                                                               
 # Source code statistics:                                                     
@@ -2362,7 +2363,7 @@ cc++ -dynamiclib -o target/python/_polynomial_swig.so                           
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -java -I- -c++ -addextern -Isrc -outdir target/clojure/ -o                 \
+swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
   target/clojure/polynomial_swig.cc src/polynomial.i                          
                                                                               
 # Source code statistics:                                                     
@@ -2394,7 +2395,7 @@ cc++ -dynamiclib -o target/clojure/libpolynomial_swig.jnilib                    
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -ruby -I- -c++ -addextern -Isrc -outdir target/ruby/ -o                    \
+swig -c++ -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                    \
   target/ruby/polynomial_swig.cc src/polynomial.i                             
                                                                               
 # Source code statistics:                                                     
@@ -2423,7 +2424,7 @@ cc++ -dynamiclib -o target/ruby/polynomial_swig.bundle                          
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -tcl -I- -c++ -addextern -Isrc -outdir target/tcl/ -o                      \
+swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
   target/tcl/polynomial_swig.cc src/polynomial.i                              
                                                                               
 # Source code statistics:                                                     
@@ -2450,7 +2451,7 @@ cc++ -dynamiclib -o target/tcl/polynomial_swig.so target/native/polynomial.o    
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -guile -I- -c++ -addextern -Isrc -outdir target/guile/ -o                  \
+swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
   target/guile/polynomial_swig.cc src/polynomial.i                            
                                                                               
 # Source code statistics:                                                     
@@ -2478,7 +2479,7 @@ cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          
                                                                               
 ```                                                                           
 # Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -I- -c++ -addextern -Isrc             \
+swig -c++ -postgresql -extension-version 1.2.3 -addextern -I- -Isrc             \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
   target/postgresql/polynomial_swig.cc src/polynomial.i                       
 $LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
@@ -2550,7 +2551,7 @@ cc++ -std=c++17 -Isrc -o target/native/polynomial_v2                            
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -python -I- -c++ -addextern -Isrc -outdir target/python/ -o                \
+swig -c++ -python -addextern -I- -Isrc -outdir target/python/ -o                \
   target/python/polynomial_v2_swig.cc src/polynomial_v2.i                     
                                                                               
 # Source code statistics:                                                     
@@ -2580,7 +2581,7 @@ cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                        
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -java -I- -c++ -addextern -Isrc -outdir target/clojure/ -o                 \
+swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
   target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i                    
 include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
@@ -2619,7 +2620,7 @@ cc++ -dynamiclib -o target/clojure/libpolynomial_v2_swig.jnilib                 
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -ruby -I- -c++ -addextern -Isrc -outdir target/ruby/ -o                    \
+swig -c++ -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                    \
   target/ruby/polynomial_v2_swig.cc src/polynomial_v2.i                       
                                                                               
 # Source code statistics:                                                     
@@ -2648,7 +2649,7 @@ cc++ -dynamiclib -o target/ruby/polynomial_v2_swig.bundle                       
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -tcl -I- -c++ -addextern -Isrc -outdir target/tcl/ -o                      \
+swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i                        
 include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
@@ -2678,7 +2679,7 @@ cc++ -dynamiclib -o target/tcl/polynomial_v2_swig.so                            
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -guile -I- -c++ -addextern -Isrc -outdir target/guile/ -o                  \
+swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i                      
 include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
@@ -2712,7 +2713,7 @@ cc++ -dynamiclib -o target/guile/libpolynomial_v2_swig.so                       
                                                                               
 ```                                                                           
 # Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -I- -c++ -addextern -Isrc             \
+swig -c++ -postgresql -extension-version 1.2.3 -addextern -I- -Isrc             \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
   target/postgresql/polynomial_v2_swig.cc src/polynomial_v2.i                 
 include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
@@ -2803,7 +2804,7 @@ cc -Isrc -o target/native/tommath src/tommath-native.c target/native/tommath.o  
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -python -I- -addextern -Isrc -outdir target/python/ -o                     \
+swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
   target/python/tommath_swig.c src/tommath.i                                  
                                                                               
 # Source code statistics:                                                     
@@ -2832,7 +2833,7 @@ cc -dynamiclib -o target/python/_tommath_swig.so target/native/tommath.o        
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -java -I- -addextern -Isrc -outdir target/clojure/ -o                      \
+swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
   target/clojure/tommath_swig.c src/tommath.i                                 
                                                                               
 # Source code statistics:                                                     
@@ -2863,7 +2864,7 @@ cc -dynamiclib -o target/clojure/libtommath_swig.jnilib                         
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -ruby -I- -addextern -Isrc -outdir target/ruby/ -o                         \
+swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
   target/ruby/tommath_swig.c src/tommath.i                                    
                                                                               
 # Source code statistics:                                                     
@@ -2891,7 +2892,7 @@ cc -dynamiclib -o target/ruby/tommath_swig.bundle target/native/tommath.o       
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -guile -I- -addextern -Isrc -outdir target/guile/ -o                       \
+swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
   target/guile/tommath_swig.c src/tommath.i                                   
                                                                               
 # Source code statistics:                                                     
@@ -2919,7 +2920,7 @@ cc -dynamiclib -o target/guile/libtommath_swig.so target/native/tommath.o       
                                                                               
 ```                                                                           
 # Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -I- -addextern -Isrc                  \
+swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
   target/postgresql/tommath_swig.c src/tommath.i                              
                                                                               
@@ -2980,7 +2981,7 @@ cc -Isrc -o target/native/black_scholes src/black_scholes-native.c              
                                                                               
 ```                                                                           
 # Generate python bindings:                                                   
-swig -python -I- -addextern -Isrc -outdir target/python/ -o                     \
+swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
   target/python/black_scholes_swig.c src/black_scholes.i                      
                                                                               
 # Source code statistics:                                                     
@@ -3010,7 +3011,7 @@ cc -dynamiclib -o target/python/_black_scholes_swig.so                          
                                                                               
 ```                                                                           
 # Generate clojure bindings:                                                  
-swig -java -I- -addextern -Isrc -outdir target/clojure/ -o                      \
+swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
   target/clojure/black_scholes_swig.c src/black_scholes.i                     
                                                                               
 # Source code statistics:                                                     
@@ -3041,7 +3042,7 @@ cc -dynamiclib -o target/clojure/libblack_scholes_swig.jnilib                   
                                                                               
 ```                                                                           
 # Generate ruby bindings:                                                     
-swig -ruby -I- -addextern -Isrc -outdir target/ruby/ -o                         \
+swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
   target/ruby/black_scholes_swig.c src/black_scholes.i                        
                                                                               
 # Source code statistics:                                                     
@@ -3070,7 +3071,7 @@ cc -dynamiclib -o target/ruby/black_scholes_swig.bundle                         
                                                                               
 ```                                                                           
 # Generate tcl bindings:                                                      
-swig -tcl -I- -addextern -Isrc -outdir target/tcl/ -o                           \
+swig -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                           \
   target/tcl/black_scholes_swig.c src/black_scholes.i                         
                                                                               
 # Source code statistics:                                                     
@@ -3098,7 +3099,7 @@ cc -dynamiclib -o target/tcl/black_scholes_swig.so                              
                                                                               
 ```                                                                           
 # Generate guile bindings:                                                    
-swig -guile -I- -addextern -Isrc -outdir target/guile/ -o                       \
+swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
   target/guile/black_scholes_swig.c src/black_scholes.i                       
                                                                               
 # Source code statistics:                                                     
@@ -3126,7 +3127,7 @@ cc -dynamiclib -o target/guile/libblack_scholes_swig.so                         
                                                                               
 ```                                                                           
 # Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -I- -addextern -Isrc                  \
+swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
   target/postgresql/black_scholes_swig.c src/black_scholes.i                  
                                                                               
