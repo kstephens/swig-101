@@ -159,9 +159,9 @@ double cubic_poly(double x,                                                    /
 ```c
 #include <stdio.h>                                                             //  1 
 #include "example1.h"                                                          //  2 
-                                                                               //  3 
+                                                                              
 int main(int argc, char **argv) {                                              //  4 
-  printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
+  printf("EXAMPLE1_VERSION = \"%s\"\n", EXAMPLE1_VERSION);                     //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
   return 0;                                                                    //  7 
 }                                                                              //  8 
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {                                              /
 
 ```
 $ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -196,10 +196,10 @@ EXAMPLE1_VERSION = 1.2.3
 ```python
 # Setup search path:                                                          
 import sys ; sys.path.append('target/python')                                  #   2 
-                                                                               #   3 
+                                                                              
 # Load SWIG bindings:                                                         
 import example1_swig as example1                                               #   5 
-                                                                               #   6 
+                                                                              
 # Use SWIG bindings:                                                          
 print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)                       #   8 
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
@@ -223,9 +223,9 @@ EXAMPLE1_VERSION = 1.2.3
 ;; Load SWIG bindings:                                                        
 (clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  2 
 (import 'example1_swig)                                                        ;;  3 
-                                                                               ;;  4 
+                                                                              
 ;; Use SWIG bindings:                                                         
-(println (format "EXAMPLE1_VERSION = %s"                                       ;;  6 
+(println (format "EXAMPLE1_VERSION = \"%s\""                                   ;;  6 
                	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  7 
 (prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  8 
 ```
@@ -235,7 +235,7 @@ EXAMPLE1_VERSION = 1.2.3
 
 ```
 $ bin/run src/example1.clj
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -248,11 +248,11 @@ EXAMPLE1_VERSION = 1.2.3
 # Setup search path:                                                          
 ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #   2 
 $:.unshift 'target/ruby'                                                       #   3 
-                                                                               #   4 
+                                                                              
 # Load SWIG bindings:                                                         
 require 'example1_swig'                                                        #   6 
 include Example1_swig                                                          #   7 
-                                                                               #   8 
+                                                                              
 # Use SWIG bindings:                                                          
 puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"                                  #  10 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
@@ -275,7 +275,7 @@ EXAMPLE1_VERSION = 1.2.3
 ```scheme
 ;; Load SWIG bindings:                                                        
 (load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  2 
-                                                                               ;;  3 
+                                                                              
 ;; Use SWIG bindings:                                                         
 (write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  5 
 (newline)                                                                      ;;  6 
@@ -300,7 +300,7 @@ $ bin/run src/example1.scm
 ```shell
 # Load SWIG bindings:                                                         
 load target/tcl/example1_swig.so Example1_swig                                 #   2 
-                                                                               #   3 
+                                                                              
 # Use SWIG bindings:                                                          
 puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   5 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   6 
@@ -365,10 +365,10 @@ CREATE TABLE parameters (                                                      -
 );                                                                             -- 14 
 -- Create some coefficient and parameter data:                                
 INSERT INTO coefficients                                                       -- 16 
-  ( c0 ,  c1,    c2, c3   ) VALUES                                             -- 17 
-  ( 3.0, 5.0,   7.0, 11   ),                                                   -- 18 
-  ( 2.3, 5.7, 11.13, 17.23),                                                   -- 19 
-  (-5.2, 1.2, -99.0, 12.34);                                                   -- 20 
+  ( c0  ,  c1 ,    c2 ,   c3 ) VALUES                                          -- 17 
+  ( 3.00, 5.00,   7.00, 11.00),                                                -- 18 
+  ( 2.30, 5.70,  11.13, 17.23),                                                -- 19 
+  (-5.20, 1.20, -99.00, 12.34);                                                -- 20 
 INSERT INTO parameters                                                         -- 21 
   (x) VALUES                                                                   -- 22 
   ( 2),                                                                        -- 23 
@@ -410,7 +410,7 @@ $ bin/run src/example1-2.psql
 
 ```
 $ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -429,7 +429,7 @@ EXAMPLE1_VERSION = 1.2.3
 
 ```
 $ bin/run src/example1.clj
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -509,9 +509,9 @@ $ bin/run src/example1-2.psql
 
 ```c++
 #include <vector>                                                              //  1 
-                                                                               //  2 
+                                                                              
 #define POLYNOMIAL_VERSION "1.2.1"                                             //  3 
-                                                                               //  4 
+                                                                              
 class Polynomial {                                                             //  5 
 public:                                                                        //  6 
   std::vector<double> coeffs;                                                  //  7 
@@ -525,7 +525,7 @@ public:                                                                        /
 
 ```c++
 #include "polynomial.h"                                                        //  1 
-                                                                               //  2 
+                                                                              
 double Polynomial::evaluate(double x) const {                                  //  3 
   double result = 0, xx = 1;                                                   //  4 
   for ( auto c : this->coeffs ) {                                              //  5 
@@ -544,14 +544,14 @@ double Polynomial::evaluate(double x) const {                                  /
 #include <iostream>                                                            //  1 
 #include <iomanip>                                                             //  2 
 #include "polynomial.h"                                                        //  3 
-                                                                               //  4 
+                                                                              
 int main(int argc, char **argv) {                                              //  5 
-  std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";            //  6 
-                                                                               //  7 
+  std::cout << "POLYNOMIAL_VERSION = \"" << POLYNOMIAL_VERSION << "\"\n";      //  6 
+                                                                              
   Polynomial p;                                                                //  8 
   p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                           //  9 
   std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";                // 10 
-                                                                               // 11 
+                                                                              
   return 0;                                                                    // 12 
 }                                                                              // 13 
 ```
@@ -561,7 +561,7 @@ int main(int argc, char **argv) {                                              /
 
 ```
 $ bin/run target/native/polynomial
-POLYNOMIAL_VERSION 1.2.1
+POLYNOMIAL_VERSION = "1.2.1"
 17.3020736
 ```
 
@@ -573,16 +573,16 @@ POLYNOMIAL_VERSION 1.2.1
 ```c++
 // Name of generated bindings:                                                
 %module polynomial_swig                                                        //  2 
-                                                                               //  3 
+                                                                              
 // Include std::vector<T> support:                                            
 %include "std_vector.i"                                                        //  5 
-                                                                               //  6 
+                                                                              
 // Template instantiation:                                                    
 %template(VectorDouble) std::vector<double>;                                   //  8 
-                                                                               //  9 
+                                                                              
 // Include C++ declarations as SWIG interface definitions:                    
 %include "polynomial.h"                                                        // 11 
-                                                                               // 12 
+                                                                              
 // Prepend C++ code in generated bindings:                                    
 %{                                                                             // 14 
 #include "polynomial.h"                                                        // 15 
@@ -595,13 +595,13 @@ POLYNOMIAL_VERSION 1.2.1
 
 ```python
 from polynomial_swig import *                                                  #   1 
-                                                                               #   2 
+                                                                              
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
-                                                                               #   4 
+                                                                              
 # Instantiate object:                                                         
 poly = Polynomial()                                                            #   6 
 poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #   7 
-                                                                               #   8 
+                                                                              
 # Invoke methods:                                                             
 print(list(poly.coeffs))                                                       #  10 
 print(poly.evaluate(1.2))                                                      #  11 
@@ -624,7 +624,7 @@ $ bin/run src/polynomial.py
 ```python
 from polynomial_swig import *                                                  #   1 
 import pytest                                                                  #   2 
-                                                                               #   3 
+                                                                              
 def test_empty_coeffs():                                                       #   4 
     p = Polynomial()                                                           #   5 
     assert p.evaluate(1.2) == 0.0                                              #   6 
@@ -651,13 +651,13 @@ $ bin/run src/polynomial-test.py
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  1 
 (import 'polynomial_swig)                                                      ;;  2 
-                                                                               ;;  3 
+                                                                              
 (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  4 
-                                                                               ;;  5 
+                                                                              
 ;; Instantiate object:                                                        
 (def p (Polynomial.))                                                          ;;  7 
 (.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;;  8 
-                                                                               ;;  9 
+                                                                              
 ;; Invoke methods:                                                            
 (prn (.getCoeffs p))                                                           ;; 11 
 (prn (.evaluate p 1.2))                                                        ;; 12 
@@ -681,13 +681,13 @@ $ bin/run src/polynomial.clj
 ```ruby
 require 'polynomial_swig'                                                      #   1 
 include Polynomial_swig                                                        #   2 
-                                                                               #   3 
+                                                                              
 pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   4 
-                                                                               #   5 
+                                                                              
 # Instantiate object:                                                         
 p = Polynomial.new                                                             #   7 
 p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #   8 
-                                                                               #   9 
+                                                                              
 # Invoke methods:                                                             
 pp p.coeffs.to_a                                                               #  11 
 pp p.evaluate(1.2)                                                             #  12 
@@ -710,13 +710,13 @@ $ bin/run src/polynomial.rb
 
 ```scheme
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")              ;;  1 
-                                                                               ;;  2 
+                                                                              
 (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
-                                                                               ;;  4 
+                                                                              
 ;; Instantiate object:                                                        
 (define p (new-Polynomial))                                                    ;;  6 
 (Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;;  7 
-                                                                               ;;  8 
+                                                                              
 ;; Invoke methods:                                                            
 (write (Polynomial-coeffs-get p)) (newline)                                    ;; 10 
 (write (Polynomial-evaluate p 1.2)) (newline)                                  ;; 11 
@@ -728,7 +728,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14cf04af0>
+#<swig-pointer std::vector< double > * 14be08c90>
 17.3020736
 ```
 
@@ -739,14 +739,14 @@ $ bin/run src/polynomial.scm
 
 ```shell
 load target/tcl/polynomial_swig.so Polynomial_swig                             #   1 
-                                                                               #   2 
+                                                                              
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                             #   3 
-                                                                               #   4 
+                                                                              
 # Instantiate object:                                                         
 Polynomial poly                                                                #   6 
 VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #   7 
 poly configure -coeffs c                                                       #   8 
-                                                                               #   9 
+                                                                              
 # Invoke methods:                                                             
 puts [poly cget -coeffs]                                                       #  11 
 puts [poly evaluate 1.2]                                                       #  12 
@@ -758,7 +758,7 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_70c2605401000000_p_std__vectorT_double_t
+_d0f1602901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -771,7 +771,7 @@ _70c2605401000000_p_std__vectorT_double_t
 ```python
 from polynomial_swig import *                                                  #   1 
 import pytest                                                                  #   2 
-                                                                               #   3 
+                                                                              
 def test_empty_coeffs():                                                       #   4 
     p = Polynomial()                                                           #   5 
     assert p.evaluate(1.2) == 0.0                                              #   6 
@@ -809,7 +809,7 @@ src/polynomial-test.py ..                                                [100%]
 
 ```
 $ bin/run target/native/polynomial
-POLYNOMIAL_VERSION 1.2.1
+POLYNOMIAL_VERSION = "1.2.1"
 17.3020736
 ```
 
@@ -857,7 +857,7 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14cf04af0>
+#<swig-pointer std::vector< double > * 14be08c90>
 17.3020736
 ```
 
@@ -867,7 +867,7 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_70c2605401000000_p_std__vectorT_double_t
+_d0f1602901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -902,9 +902,9 @@ src/polynomial-test.py ..                                                [100%]
 
 ```c++
 #include <vector>                                                              //  1 
-                                                                               //  2 
+                                                                              
 #define POLYNOMIAL_VERSION "2.0.2"                                             //  3 
-                                                                               //  4 
+                                                                              
 namespace mathlib {                                                            //  5 
   template < typename R >                                                      //  6 
   class polynomial {                                                           //  7 
@@ -922,7 +922,7 @@ namespace mathlib {                                                            /
 ```c++
 #include "polynomial_v2.h"                                                     //  1 
 #include "rational.h"                                                          //  2 
-                                                                               //  3 
+                                                                              
 namespace mathlib {                                                            //  4 
   template < typename R >                                                      //  5 
   R polynomial< R >::evaluate(const R &x) const {                              //  6 
@@ -933,7 +933,7 @@ namespace mathlib {                                                            /
     }                                                                          // 11 
     return result;                                                             // 12 
   };                                                                           // 13 
-                                                                               // 14 
+                                                                              
   // Instantiate templates:                                                   
   template class polynomial<int>;                                              // 16 
   template class polynomial<double>;                                           // 17 
@@ -950,25 +950,25 @@ namespace mathlib {                                                            /
 #include <iomanip>                                                             //  2 
 #include "polynomial_v2.h"                                                     //  3 
 #include "rational.h"                                                          //  4 
-                                                                               //  5 
+                                                                              
 using namespace mathlib;                                                       //  6 
-                                                                               //  7 
+                                                                              
 int main(int argc, char **argv) {                                              //  8 
-  std::cout << "POLYNOMIAL_VERSION " << POLYNOMIAL_VERSION << "\n";            //  9 
-                                                                               // 10 
+  std::cout << "POLYNOMIAL_VERSION = \"" << POLYNOMIAL_VERSION << "\"\n";      //  9 
+                                                                              
   polynomial<double> pd;                                                       // 11 
   pd.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                          // 12 
   std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";               // 13 
-                                                                               // 14 
+                                                                              
   polynomial<int> pi;                                                          // 15 
   pi.coeffs = { 2, 3, 5, 7, 11, -13 };                                         // 16 
   std::cout << pi.evaluate(-2) << "\n";                                        // 17 
-                                                                               // 18 
+                                                                              
   typedef rational<int> R;                                                     // 19 
   polynomial<R> pr;                                                            // 20 
   pr.coeffs = { R(7,11), R(11,13), R(13,17) };                                 // 21 
   std::cout << pr.evaluate(R(5,7)) << "\n";                                    // 22 
-                                                                               // 23 
+                                                                              
   return 0;                                                                    // 24 
 }                                                                              // 25 
 ```
@@ -978,7 +978,7 @@ int main(int argc, char **argv) {                                              /
 
 ```
 $ bin/run target/native/polynomial_v2
-POLYNOMIAL_VERSION 2.0.2
+POLYNOMIAL_VERSION = "2.0.2"
 17.3020736
 552
 194273/119119
@@ -992,35 +992,35 @@ POLYNOMIAL_VERSION 2.0.2
 ```c++
 // Name of generated bindings:                                                
 %module polynomial_v2_swig                                                     //  2 
-                                                                               //  3 
+                                                                              
 // Include C++ declarations as SWIG interface definitions:                    
 %include "polynomial_v2.h"                                                     //  5 
 %include "rational.h"                                                          //  6 
-                                                                               //  7 
+                                                                              
 // Template instantiation:                                                    
 %{                                                                             //  9 
 #include "polynomial_v2.h"                                                     // 10 
 #include "rational.h"                                                          // 11 
-                                                                               // 12 
+                                                                              
 template class mathlib::polynomial<int>;                                       // 13 
 template class mathlib::polynomial<double>;                                    // 14 
 template class mathlib::rational<int>;                                         // 15 
 template class mathlib::polynomial<mathlib::rational<int>>;                    // 16 
 template class std::vector<mathlib::rational<int>>;                            // 17 
 %}                                                                             // 18 
-                                                                               // 19 
+                                                                              
 %include "std_string.i"        // python __str__(), __repr__()                 // 20 
 %template(RationalV2)            mathlib::rational<int>;                       // 21 
-                                                                               // 22 
+                                                                              
 %include "std_vector.i"                                                        // 23 
 %template(VectorDoubleV2)        std::vector<double>;                          // 24 
 %template(VectorIntV2)           std::vector<int>;                             // 25 
 %template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 26 
-                                                                               // 27 
+                                                                              
 %template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 28 
 %template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 29 
 %template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 30 
-                                                                               // 31 
+                                                                              
 // Prepend C++ code in generated bindings:                                    
 %{                                                                             // 33 
 #include "polynomial_v2.h"                                                     // 34 
@@ -1034,21 +1034,21 @@ template class std::vector<mathlib::rational<int>>;                            /
 
 ```python
 from polynomial_v2_swig import *                                                             #   1 
-                                                                                             #   2 
+                                                                                            
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                            #   3 
-                                                                                             #   4 
+                                                                                            
 # Instantiate polynomial<double> object:                                                    
 poly         = PolynomialDoubleV2()                                                          #   6 
 poly.coeffs  = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                        #   7 
 print(list(poly.coeffs))                                                                     #   8 
 print(poly.evaluate(1.2))                                                                    #   9 
-                                                                                             #  10 
+                                                                                            
 # Instantiate polynomial<int> object:                                                       
 poly        = PolynomialIntV2()                                                              #  12 
 poly.coeffs = VectorIntV2([ 2, 3, 5, 7, 11, -13 ])                                           #  13 
 print(list(poly.coeffs))                                                                     #  14 
 print(poly.evaluate(-2))                                                                     #  15 
-                                                                                             #  16 
+                                                                                            
 # Instantiate polynomial<rational<int>> object:                                             
 poly        = PolynomialRationalV2()                                                         #  18 
 poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]) #  19 
@@ -1078,21 +1078,21 @@ $ bin/run src/polynomial_v2.py
 ```lisp
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                 ;;  1 
 (import 'polynomial_v2_swig)                                                                       ;;  2 
-                                                                                                   ;;  3 
+                                                                                                  
 (prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  4 
-                                                                                                   ;;  5 
+                                                                                                  
 ;; Instantiate polynomial<double> object:                                                         
 (def p1 (PolynomialDoubleV2.))                                                                     ;;  7 
 (.setCoeffs p1 (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))                                ;;  8 
 (prn (.getCoeffs p1))                                                                              ;;  9 
 (prn (.evaluate p1 1.2))                                                                           ;; 10 
-                                                                                                   ;; 11 
+                                                                                                  
 ;; Instantiate polynomial<int> object:                                                            
 (def p2 (PolynomialIntV2.))                                                                        ;; 13 
 (.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                          ;; 14 
 (prn (.getCoeffs p2))                                                                              ;; 15 
 (prn (.evaluate p2 -2))                                                                            ;; 16 
-                                                                                                   ;; 17 
+                                                                                                  
 ;; Instantiate polynomial<rational<int>> object:                                                  
 (def p3 (PolynomialRationalV2.))                                                                   ;; 19 
 (.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 20 
@@ -1122,21 +1122,21 @@ $ bin/run src/polynomial_v2.clj
 ```ruby
 require 'polynomial_v2_swig'                                                                                                     #   1 
 PV2 = Polynomial_v2_swig                                                                                                         #   2 
-                                                                                                                                 #   3 
+                                                                                                                                
 pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION                                                                                   #   4 
-                                                                                                                                 #   5 
+                                                                                                                                
 # Instantiate polynomial<double> object:                                                                                        
 poly        = PV2::PolynomialDoubleV2.new                                                                                        #   7 
 poly.coeffs = PV2::VectorDoubleV2.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                                                    #   8 
 pp poly.coeffs.to_a                                                                                                              #   9 
 pp poly.evaluate(1.2)                                                                                                            #  10 
-                                                                                                                                 #  11 
+                                                                                                                                
 # Instantiate polynomial<int> object:                                                                                           
 poly        = PV2::PolynomialIntV2.new                                                                                           #  13 
 poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                      #  14 
 pp poly.coeffs.to_a                                                                                                              #  15 
 pp poly.evaluate(-2)                                                                                                             #  16 
-                                                                                                                                 #  17 
+                                                                                                                                
 # Instantiate polynomial<rational<int>> object:                                                                                 
 poly        = PV2::PolynomialRationalV2.new()                                                                                    #  19 
 poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalV2.new(7, 11), PV2::RationalV2.new(11, 13), PV2::RationalV2.new(13,17) ]) #  20 
@@ -1166,23 +1166,23 @@ rational(194273,119119)
 
 ```shell
 load target/tcl/polynomial_v2_swig.so Polynomial_v2_swig                                      #   1 
-                                                                                              #   2 
+                                                                                             
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                                            #   3 
-                                                                                              #   4 
+                                                                                             
 # Instantiate polynomial<double> object:                                                     
 PolynomialDoubleV2 poly                                                                       #   6 
 VectorDoubleV2 c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                                            #   7 
 poly configure -coeffs c                                                                      #   8 
 puts [poly cget -coeffs]                                                                      #   9 
 puts [poly evaluate 1.2]                                                                      #  10 
-                                                                                              #  11 
+                                                                                             
 # Instantiate polynomial<int> object:                                                        
 PolynomialIntV2 poly                                                                          #  13 
 VectorIntV2 c { 2 3 5 7 11 -13 }                                                              #  14 
 poly configure -coeffs c                                                                      #  15 
 puts [poly cget -coeffs]                                                                      #  16 
 puts [poly evaluate -2]                                                                       #  17 
-                                                                                              #  18 
+                                                                                             
 # Instantiate polynomial<rational<int>> object:                                              
 PolynomialRationalV2 poly                                                                     #  20 
 VectorRationalV2 c [list [new_RationalV2 7 11] [new_RationalV2 11 13] [new_RationalV2 13 17]] #  21 
@@ -1197,11 +1197,11 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_60ade04901000000_p_std__vectorT_double_t
+_3077703001000000_p_std__vectorT_double_t
 17.3020736
-_508ee04901000000_p_std__vectorT_int_t
+_c07e703001000000_p_std__vectorT_int_t
 552
-_60ade04901000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_5077703001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1218,7 +1218,7 @@ rational(194273,119119)
 
 ```
 $ bin/run target/native/polynomial_v2
-POLYNOMIAL_VERSION 2.0.2
+POLYNOMIAL_VERSION = "2.0.2"
 17.3020736
 552
 194273/119119
@@ -1274,11 +1274,11 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_60ade04901000000_p_std__vectorT_double_t
+_3077703001000000_p_std__vectorT_double_t
 17.3020736
-_508ee04901000000_p_std__vectorT_int_t
+_c07e703001000000_p_std__vectorT_int_t
 552
-_60ade04901000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_5077703001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational(194273,119119)
 ```
 
@@ -1298,17 +1298,17 @@ rational(194273,119119)
 
 ```c
 // swig <-> mp_int helpers                                                    
-                                                                               //  2 
+                                                                              
 #include <stddef.h>                                                            //  3 
 #include <stdint.h>                                                            //  4 
 #include "bool.h"                                                              //  5 
 #include "libtommath/tommath.h"                                                //  6 
-                                                                               //  7 
+                                                                              
 // Convert mp_int <-> string:                                                 
 char*    swig_mp_int_to_charP(mp_int* self, int radix);                        //  9 
 mp_int*  swig_charP_to_mp_int(const char* str, int radix);                     // 10 
 char*    swig_mp_int_repr(mp_int* self, int radix);                            // 11 
-                                                                               // 12 
+                                                                              
 #if SWIG                                                                       // 13 
 // This extends generated classes with two                                    
 // methods which behave as Python's methods.                                  
@@ -1322,7 +1322,7 @@ char*    swig_mp_int_repr(mp_int* self, int radix);                            /
   }                                                                            // 23 
 }                                                                              // 24 
 #endif                                                                         // 25 
-                                                                               // 26 
+                                                                              
 // tommath `mp_int` internal memory is managed by:                            
 //                                                                            
 // * mp_init(mp_int*)                                                         
@@ -1332,7 +1332,7 @@ char*    swig_mp_int_repr(mp_int* self, int radix);                            /
 // before and after using a mp_int value, respectively.                       
 mp_int*  swig_mp_int_new(mp_digit n);                                          // 34 
 void     swig_mp_int_delete(mp_int* self);                                     // 35 
-                                                                               // 36 
+                                                                              
 #if SWIG                                                                       // 37 
 // SWIG wraps `struct mp_int` values with pointers                            
 // allocated with `malloc(sizeof(mp_int))`.                                   
@@ -1359,7 +1359,7 @@ void     swig_mp_int_delete(mp_int* self);                                     /
 #include "tommath.h"                                                           //  1 
 #define _GNU_SOURCE                                                            //  2 
 #include <stdlib.h>                                                            //  3 
-                                                                               //  4 
+                                                                              
 char* swig_mp_int_to_charP(mp_int* self, int radix) {                          //  5 
   size_t size = 0, written = 0;                                                //  6 
   (void) mp_radix_size(self, radix, &size);                                    //  7 
@@ -1368,7 +1368,7 @@ char* swig_mp_int_to_charP(mp_int* self, int radix) {                          /
   buf[written - 1] = 0;                                                        // 10 
   return buf;                                                                  // 11 
 }                                                                              // 12 
-                                                                               // 13 
+                                                                              
 char* swig_mp_int_repr(mp_int* self, int radix) {                              // 14 
   char *repr = 0, *str = swig_mp_int_to_charP(self, radix);                    // 15 
   if ( radix == 10 )                                                           // 16 
@@ -1377,20 +1377,20 @@ char* swig_mp_int_repr(mp_int* self, int radix) {                              /
     asprintf(&repr, "mp_int(\"%s\",%d)", str, radix);                          // 19 
   return free(str), repr;                                                      // 20 
 }                                                                              // 21 
-                                                                               // 22 
+                                                                              
 mp_int* swig_charP_to_mp_int(const char* str, int radix) {                     // 23 
   mp_int* self = swig_mp_int_new(0);                                           // 24 
   (void) mp_read_radix(self, str, radix);                                      // 25 
   return self;                                                                 // 26 
 }                                                                              // 27 
-                                                                               // 28 
+                                                                              
 mp_int* swig_mp_int_new(mp_digit n) {                                          // 29 
   mp_int* self = malloc(sizeof(*self));                                        // 30 
   (void) mp_init(self);                                                        // 31 
   mp_set(self, n);                                                             // 32 
   return self;                                                                 // 33 
 }                                                                              // 34 
-                                                                               // 35 
+                                                                              
 void swig_mp_int_delete(mp_int* self) {                                        // 36 
   mp_clear(self);                                                              // 37 
   free(self);                                                                  // 38 
@@ -1403,25 +1403,25 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 
 ```c
 #include "libtommath/tommath.h"                                                          //  1 
-                                                                                         //  2 
+                                                                                        
 int main(int argc, char **argv) {                                                        //  3 
-  printf("MP_ITER %d\n", MP_ITER);                                                       //  4 
-                                                                                         //  5 
+  printf("MP_ITER = %d\n", MP_ITER);                                                     //  4 
+                                                                                        
   mp_int a, b, c, d, e;                                                                  //  6 
-                                                                                         //  7 
+                                                                                        
   (void) mp_init_multi(&a, &b, &c, &d, &e, NULL);                                        //  8 
-                                                                                         //  9 
+                                                                                        
   (void) mp_set(&a, 2357111317);                                                         // 10 
   (void) mp_set(&b, 1113171923);                                                         // 11 
   (void) mp_read_radix(&e, "12343456", 16);                                              // 12 
-                                                                                         // 13 
+                                                                                        
   (void) mp_mul(&a, &b, &c);                                                             // 14 
   (void) mp_mul(&c, &b, &d);                                                             // 15 
-                                                                                         // 16 
+                                                                                        
 #define P(N) printf("%s = ", #N); (void) mp_fwrite(&N, 10, stdout); fputc('\n', stdout); // 17 
   P(a); P(b); P(c); P(d); P(e);                                                          // 18 
   mp_clear_multi(&a, &b, &c, &d, &e, NULL);                                              // 19 
-                                                                                         // 20 
+                                                                                        
   return 0;                                                                              // 21 
 }                                                                                        // 22 
 ```
@@ -1431,7 +1431,7 @@ int main(int argc, char **argv) {                                               
 
 ```
 $ bin/run target/native/tommath
-MP_ITER -4
+MP_ITER = -4
 a = 2357111317
 b = 1113171923
 c = 2623870137469952591
@@ -1469,20 +1469,20 @@ e = 305411158
 
 ```python
 from tommath_swig import *                                                     #   1 
-                                                                               #   2 
+                                                                              
 print({"MP_ITER": MP_ITER})                                                    #   3 
-                                                                               #   4 
+                                                                              
 a = mp_int(); mp_set(a, 2357111317)    # <-- awkward!                          #   5 
 b = mp_int(1113171923)                 # <-- better!                           #   6 
 c = mp_int()                                                                   #   7 
 d = mp_int()                                                                   #   8 
 e = mp_int("12343456", 16)             # <-- yey!                              #   9 
-                                                                               #  10 
+                                                                              
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  11 
-                                                                               #  12 
+                                                                              
 mp_mul(a, b, c)                                                                #  13 
 mp_mul(c, b, d)                                                                #  14 
-                                                                               #  15 
+                                                                              
 print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #  16 
 ```
 
@@ -1505,20 +1505,20 @@ $ bin/run src/tommath.py
 ```ruby
 require 'tommath_swig'                                                         #   1 
 include Tommath_swig                                                           #   2 
-                                                                               #   3 
+                                                                              
 puts "MP_ITER = #{MP_ITER}"                                                    #   4 
-                                                                               #   5 
+                                                                              
 a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   6 
 b = Mp_int.new(1113171923)                 # <-- better!                       #   7 
 c = Mp_int.new()                                                               #   8 
 d = Mp_int.new()                                                               #   9 
 e = Mp_int.new("12343456", 16)             # <-- yey!                          #  10 
-                                                                               #  11 
+                                                                              
 puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  12 
-                                                                               #  13 
+                                                                              
 mp_mul(a, b, c);                                                               #  14 
 mp_mul(c, b, d);                                                               #  15 
-                                                                               #  16 
+                                                                              
 puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  17 
 ```
 
@@ -1538,18 +1538,18 @@ MP_ITER = -4
 
 ```ruby
 require 'tommath-mpi'                                                          #   1 
-                                                                               #   2 
+                                                                              
 a = MPI[2357111317]                                                            #   3 
 b = MPI[1113171923]                                                            #   4 
 c = MPI[]                                                                      #   5 
 d = MPI[]                                                                      #   6 
 e = MPI["12343456", 16]                                                        #   7 
-                                                                               #   8 
+                                                                              
 puts({a: a, b: b, c: c, d: d, e: e})                                           #   9 
-                                                                               #  10 
+                                                                              
 c = a * b                                                                      #  11 
 d = c * b                                                                      #  12 
-                                                                               #  13 
+                                                                              
 puts({a: a, b: b, c: c, d: d, e: e})                                           #  14 
 ```
 
@@ -1568,10 +1568,10 @@ $ bin/run src/tommath-2.rb
 
 ```ruby
 require 'tommath_swig'                                                         #   1 
-                                                                               #   2 
+                                                                              
 #########################################################                     
 # Sugar:                                                                      
-                                                                               #   5 
+                                                                              
 module Tommath_swig                                                            #   6 
   class Mp_int                                                                 #   7 
     # Constructor:                                                            
@@ -1591,15 +1591,15 @@ module Tommath_swig                                                            #
         raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  22 
       end                                                                      #  23 
     end                                                                        #  24 
-                                                                               #  25 
+                                                                              
     def to_s radix = 10                                                        #  26 
       Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  27 
     end                                                                        #  28 
-                                                                               #  29 
+                                                                              
     def inspect                                                                #  30 
       "MPI[#{to_s.inspect}]"                                                   #  31 
     end                                                                        #  32 
-                                                                               #  33 
+                                                                              
     def -@                                                                     #  34 
       result = MPI.new                                                         #  35 
       Tommath_swig.mp_neg(self, result)                                        #  36 
@@ -1638,28 +1638,28 @@ MPI = Tommath_swig::MPI                                                        #
 
 ```scheme
 (load-extension "target/guile/libtommath_swig.so" "SWIG_init")                 ;;  1 
-                                                                               ;;  2 
+                                                                              
 (write `(MP-ITER ,(MP-ITER))) (newline)                                        ;;  3 
-                                                                               ;;  4 
+                                                                              
 (define a (new-mp-int))                                                        ;;  5 
 (mp-set a 2357111317)                   ;; <-- awkward!                        ;;  6 
 (define b (new-mp-int 1113171923))      ;; <-- better!                         ;;  7 
 (define c (new-mp-int))                                                        ;;  8 
 (define d (new-mp-int))                                                        ;;  9 
 (define e (new-mp-int "12343456" 16))   ;; <-- yey!                            ;; 10 
-                                                                               ;; 11 
+                                                                              
 (define (show!)                                                                ;; 12 
   (newline)                                                                    ;; 13 
   (let ((r (lambda (n-v)                                                       ;; 14 
         (write (car n-v)) (display " => ")                                     ;; 15 
         (display (mp-int---str-- (cadr n-v))) (newline))))                     ;; 16 
     (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))                       ;; 17 
-                                                                               ;; 18 
+                                                                              
 (show!)                                                                        ;; 19 
-                                                                               ;; 20 
+                                                                              
 (mp-mul a b c)                                                                 ;; 21 
 (mp-mul c b d)                                                                 ;; 22 
-                                                                               ;; 23 
+                                                                              
 (show!)                                                                        ;; 24 
 ```
 
@@ -1697,7 +1697,7 @@ e => 305411158
 
 ```
 $ bin/run target/native/tommath
-MP_ITER -4
+MP_ITER = -4
 a = 2357111317
 b = 1113171923
 c = 2623870137469952591
@@ -1782,82 +1782,79 @@ double black_scholes_put(double strike_price, double asset_price, double standar
 ### C Library : black_scholes.c
 
 ```c
-#include <math.h>                                                                    //  1 
-                                                                                     //  2 
-double black_scholes_normal(double zz)                                               //  3 
-{                                                                                    //  4 
-    //cdf of 0 is 0.5                                                               
-    if (zz == 0)                                                                     //  6 
-        return 0.5;                                                                  //  7 
-                                                                                     //  8 
-    double z = zz;  //zz is input variable,  use z for calculations                  //  9 
-                                                                                     // 10 
-    if (zz < 0)                                                                      // 11 
-        z = -zz;  //change negative values to positive                               // 12 
-                                                                                     // 13 
-    //set constants                                                                 
-    double p = 0.2316419;                                                            // 15 
-    double b1 = 0.31938153;                                                          // 16 
-    double b2 = -0.356563782;                                                        // 17 
-    double b3 = 1.781477937;                                                         // 18 
-    double b4 = -1.821255978;                                                        // 19 
-    double b5 = 1.330274428;                                                         // 20 
-                                                                                     // 21 
-    //CALCULATIONS                                                                  
-    double f = 1 / sqrt(2 * M_PI);                                                   // 23 
-    double ff = exp(-pow(z, 2) / 2) * f;                                             // 24 
-    double s1 = b1 / (1 + p * z);                                                    // 25 
-    double s2 = b2 / pow((1 + p * z), 2);                                            // 26 
-    double s3 = b3 / pow((1 + p * z), 3);                                            // 27 
-    double s4 = b4 / pow((1 + p * z), 4);                                            // 28 
-    double s5 = b5 / pow((1 + p * z), 5);                                            // 29 
-                                                                                     // 30 
-    //sz is the right-tail approximation                                            
-    double  sz = ff * (s1 + s2 + s3 + s4 + s5);                                      // 32 
-                                                                                     // 33 
-    double rz;                                                                       // 34 
-    //cdf of negative input is right-tail of input's absolute value                 
-    if (zz < 0)                                                                      // 36 
-        rz = sz;                                                                     // 37 
-                                                                                     // 38 
-    //cdf of positive input is one minus right-tail                                 
-    if (zz > 0)                                                                      // 40 
-        rz = (1 - sz);                                                               // 41 
-                                                                                     // 42 
-    return rz;                                                                       // 43 
-}                                                                                    // 44 
-                                                                                     // 45 
-double black_scholes_call(double strike, double s, double sd, double r, double days) // 46 
-{                                                                                    // 47 
-     double ls = log(s);                                                             // 48 
-     double lx = log(strike);                                                        // 49 
-     double t = days / 365;                                                          // 50 
-     double sd2 = pow(sd, 2);                                                        // 51 
-     double n = (ls - lx + r * t + sd2 * t / 2);                                     // 52 
-     double sqrtT = sqrt(days / 365);                                                // 53 
-     double d = sd * sqrtT;                                                          // 54 
-     double d1 = n / d;                                                              // 55 
-     double d2 = d1 - sd * sqrtT;                                                    // 56 
-     double nd1 = black_scholes_normal(d1);                                          // 57 
-     double nd2 = black_scholes_normal(d2);                                          // 58 
-     return s * nd1 - strike * exp(-r * t) * nd2;                                    // 59 
-}                                                                                    // 60 
-                                                                                     // 61 
-double black_scholes_put(double strike, double s, double sd, double r, double days)  // 62 
-{                                                                                    // 63 
-     double ls = log(s);                                                             // 64 
-     double lx = log(strike);                                                        // 65 
-     double t = days / 365;                                                          // 66 
-     double sd2 = pow(sd, 2);                                                        // 67 
-     double n = (ls - lx + r * t + sd2 * t / 2);                                     // 68 
-     double sqrtT = sqrt(days / 365);                                                // 69 
-     double d = sd * sqrtT;                                                          // 70 
-     double d1 = n / d;                                                              // 71 
-     double d2 = d1 - sd * sqrtT;                                                    // 72 
-     double nd1 = black_scholes_normal(d1);                                          // 73 
-     double nd2 = black_scholes_normal(d2);                                          // 74 
-     return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);                        // 75 
-}                                                                                    // 76 
+#include <math.h>                                                                                            //  1 
+                                                                                                            
+double black_scholes_normal(double zz)                                                                       //  3 
+{                                                                                                            //  4 
+    //cdf of 0 is 0.5                                                                                       
+    if (zz == 0)                                                                                             //  6 
+        return 0.5;                                                                                          //  7 
+                                                                                                            
+    double z = zz;  //zz is input variable,  use z for calculations                                          //  9 
+                                                                                                            
+    if (zz < 0)                                                                                              // 11 
+        z = -zz;  //change negative values to positive                                                       // 12 
+                                                                                                            
+    //set constants                                                                                         
+    double p = 0.2316419;                                                                                    // 15 
+    double b1 = 0.31938153;                                                                                  // 16 
+    double b2 = -0.356563782;                                                                                // 17 
+    double b3 = 1.781477937;                                                                                 // 18 
+    double b4 = -1.821255978;                                                                                // 19 
+    double b5 = 1.330274428;                                                                                 // 20 
+                                                                                                            
+    //CALCULATIONS                                                                                          
+    double f = 1 / sqrt(2 * M_PI);                                                                           // 23 
+    double ff = exp(-pow(z, 2) / 2) * f;                                                                     // 24 
+    double s1 = b1 / (1 + p * z);                                                                            // 25 
+    double s2 = b2 / pow((1 + p * z), 2);                                                                    // 26 
+    double s3 = b3 / pow((1 + p * z), 3);                                                                    // 27 
+    double s4 = b4 / pow((1 + p * z), 4);                                                                    // 28 
+    double s5 = b5 / pow((1 + p * z), 5);                                                                    // 29 
+                                                                                                            
+    //sz is the right-tail approximation                                                                    
+    double  sz = ff * (s1 + s2 + s3 + s4 + s5);                                                              // 32 
+                                                                                                            
+    double rz;                                                                                               // 34 
+    //cdf of negative input is right-tail of input's absolute value                                         
+    if (zz < 0)                                                                                              // 36 
+        rz = sz;                                                                                             // 37 
+                                                                                                            
+    //cdf of positive input is one minus right-tail                                                         
+    if (zz > 0)                                                                                              // 40 
+        rz = (1 - sz);                                                                                       // 41 
+                                                                                                            
+    return rz;                                                                                               // 43 
+}                                                                                                            // 44 
+                                                                                                            
+double black_scholes_call_or_put(double strike, double s, double sd, double r, double days, int call_or_put) // 46 
+{                                                                                                            // 47 
+    double ls = log(s);                                                                                      // 48 
+    double lx = log(strike);                                                                                 // 49 
+    double t = days / 365;                                                                                   // 50 
+    double sd2 = pow(sd, 2);                                                                                 // 51 
+    double n = (ls - lx + r * t + sd2 * t / 2);                                                              // 52 
+    double sqrtT = sqrt(days / 365);                                                                         // 53 
+    double d = sd * sqrtT;                                                                                   // 54 
+    double d1 = n / d;                                                                                       // 55 
+    double d2 = d1 - sd * sqrtT;                                                                             // 56 
+    double nd1 = black_scholes_normal(d1);                                                                   // 57 
+    double nd2 = black_scholes_normal(d2);                                                                   // 58 
+    if ( call_or_put )                                                                                       // 59 
+        return s * nd1 - strike * exp(-r * t) * nd2;                                                         // 60 
+    else                                                                                                     // 61 
+        return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);                                             // 62 
+}                                                                                                            // 63 
+                                                                                                            
+double black_scholes_call(double strike, double s, double sd, double r, double days)                         // 65 
+{                                                                                                            // 66 
+    return black_scholes_call_or_put(strike, s, sd, r, days, 1);                                             // 67 
+}                                                                                                            // 68 
+                                                                                                            
+double black_scholes_put(double strike, double s, double sd, double r, double days)                          // 70 
+{                                                                                                            // 71 
+    return black_scholes_call_or_put(strike, s, sd, r, days, 0);                                             // 72 
+}                                                                                                            // 73 
 ```
 
 
@@ -1865,36 +1862,36 @@ double black_scholes_put(double strike, double s, double sd, double r, double da
 ### C Main : black_scholes-native.c
 
 ```c
-#include <stdio.h>                                                                               //  1 
-#include "black_scholes.h"                                                                       //  2 
-                                                                                                 //  3 
-int main(int argc, char **argv) {                                                                //  4 
-  double data[][5] = {                                                                           //  5 
-    // strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry:          
-    // vary expiry:                                                                             
-    { 1.50, 2.00, 0.5,  2.25, 30 },                                                              //  8 
-    { 1.50, 2.00, 0.5,  2.25, 15 },                                                              //  9 
-    { 1.50, 2.00, 0.5,  2.25, 10 },                                                              // 10 
-    { 1.50, 2.00, 0.5,  2.25,  5 },                                                              // 11 
-    { 1.50, 2.00, 0.5,  2.25,  2 },                                                              // 12 
-     // vary strike:                                                                            
-    { 0.50, 2.00, 0.25, 2.25, 15 },                                                              // 14 
-    { 1.00, 2.00, 0.25, 2.25, 15 },                                                              // 15 
-    { 1.50, 2.00, 0.25, 2.25, 15 },                                                              // 16 
-    { 2.00, 2.00, 0.25, 2.25, 15 },                                                              // 17 
-    { 2.50, 2.00, 0.25, 2.25, 15 },                                                              // 18 
-    { 3.00, 2.00, 0.25, 2.25, 15 },                                                              // 19 
-    { 3.50, 2.00, 0.25, 2.25, 15 },                                                              // 20 
-  };                                                                                             // 21 
-  for ( int i = 0; i < sizeof(data) / sizeof(data[0]); i ++ ) {                                  // 22 
-    double *r = data[i];                                                                         // 23 
-    double c = black_scholes_call (r[0], r[1], r[2], r[3], r[4]);                                // 24 
-    double p = black_scholes_put  (r[0], r[1], r[2], r[3], r[4]);                                // 25 
-    printf("{ 'inputs': [ %6.3f, %6.3f, %6.3f, %6.3f, %6.3f ], 'call': %6.3f, 'put': %6.3f }\n", // 26 
-      r[0], r[1], r[2], r[3], r[4], c, p);                                                       // 27 
-  }                                                                                              // 28 
-  return 0;                                                                                      // 29 
-}                                                                                                // 30 
+#include <stdio.h>                                                                     //  1 
+#include "black_scholes.h"                                                             //  2 
+                                                                                      
+int main(int argc, char **argv) {                                                      //  4 
+  double data[][5] = {                                                                 //  5 
+    // strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry:
+    // vary expiry:                                                                   
+    { 1.50, 2.00, 0.5,  2.25, 30 },                                                    //  8 
+    { 1.50, 2.00, 0.5,  2.25, 15 },                                                    //  9 
+    { 1.50, 2.00, 0.5,  2.25, 10 },                                                    // 10 
+    { 1.50, 2.00, 0.5,  2.25,  5 },                                                    // 11 
+    { 1.50, 2.00, 0.5,  2.25,  2 },                                                    // 12 
+     // vary strike:                                                                  
+    { 0.50, 2.00, 0.25, 2.25, 15 },                                                    // 14 
+    { 1.00, 2.00, 0.25, 2.25, 15 },                                                    // 15 
+    { 1.50, 2.00, 0.25, 2.25, 15 },                                                    // 16 
+    { 2.00, 2.00, 0.25, 2.25, 15 },                                                    // 17 
+    { 2.50, 2.00, 0.25, 2.25, 15 },                                                    // 18 
+    { 3.00, 2.00, 0.25, 2.25, 15 },                                                    // 19 
+    { 3.50, 2.00, 0.25, 2.25, 15 },                                                    // 20 
+  };                                                                                   // 21 
+  for ( int i = 0; i < sizeof(data) / sizeof(data[0]); i ++ ) {                        // 22 
+    double *r = data[i];                                                               // 23 
+    double c = black_scholes_call (r[0], r[1], r[2], r[3], r[4]);                      // 24 
+    double p = black_scholes_put  (r[0], r[1], r[2], r[3], r[4]);                      // 25 
+    printf("inputs: [ %5.2f, %5.2f, %5.2f, %5.2f, %5.2f ], call: %6.3f, put: %6.3f\n", // 26 
+      r[0], r[1], r[2], r[3], r[4], c, p);                                             // 27 
+  }                                                                                    // 28 
+  return 0;                                                                            // 29 
+}                                                                                      // 30 
 ```
 
 
@@ -1902,18 +1899,18 @@ int main(int argc, char **argv) {                                               
 
 ```
 $ bin/run target/native/black_scholes
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 30.000 ], 'call':  0.753, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 10.000 ], 'call':  0.590, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  5.000 ], 'call':  0.546, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  2.000 ], 'call':  0.518, 'put':  0.000 }
-{ 'inputs': [  0.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.544, 'put':  0.000 }
-{ 'inputs': [  1.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.088, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
-{ 'inputs': [  2.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.178, 'put':  0.001 }
-{ 'inputs': [  2.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.279 }
-{ 'inputs': [  3.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.735 }
-{ 'inputs': [  3.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  1.191 }
+inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  5.00 ], call:  0.546, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  2.00 ], call:  0.518, put:  0.000
+inputs: [  0.50,  2.00,  0.25,  2.25, 15.00 ], call:  1.544, put:  0.000
+inputs: [  1.00,  2.00,  0.25,  2.25, 15.00 ], call:  1.088, put:  0.000
+inputs: [  1.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  2.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.178, put:  0.001
+inputs: [  2.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.279
+inputs: [  3.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.735
+inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 ```
 
 ---
@@ -1936,28 +1933,29 @@ $ bin/run target/native/black_scholes
 ```python
 import sys ; sys.path.append('target/python')                                         #   1 
 import black_scholes_swig as bs                                                       #   2 
-import json                                                                           #   3 
+                                                                                     
 data = [                                                                              #   4 
     # strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry:
     # vary expiry:                                                                   
-    [ 1.50, 2.00, 0.5,  2.25, 30 ],                                                   #   7 
-    [ 1.50, 2.00, 0.5,  2.25, 15 ],                                                   #   8 
-    [ 1.50, 2.00, 0.5,  2.25, 10 ],                                                   #   9 
-    [ 1.50, 2.00, 0.5,  2.25,  5 ],                                                   #  10 
-    [ 1.50, 2.00, 0.5,  2.25,  2 ],                                                   #  11 
+    [ 1.50, 2.00, 0.5,  2.25, 30.0 ],                                                 #   7 
+    [ 1.50, 2.00, 0.5,  2.25, 15.0 ],                                                 #   8 
+    [ 1.50, 2.00, 0.5,  2.25, 10.0 ],                                                 #   9 
+    [ 1.50, 2.00, 0.5,  2.25,  5.0 ],                                                 #  10 
+    [ 1.50, 2.00, 0.5,  2.25,  2.0 ],                                                 #  11 
     # vary strike:                                                                   
-    [ 0.50, 2.00, 0.25, 2.25, 15 ],                                                   #  13 
-    [ 1.00, 2.00, 0.25, 2.25, 15 ],                                                   #  14 
-    [ 1.50, 2.00, 0.25, 2.25, 15 ],                                                   #  15 
-    [ 2.00, 2.00, 0.25, 2.25, 15 ],                                                   #  16 
-    [ 2.50, 2.00, 0.25, 2.25, 15 ],                                                   #  17 
-    [ 3.00, 2.00, 0.25, 2.25, 15 ],                                                   #  18 
-    [ 3.50, 2.00, 0.25, 2.25, 15 ],                                                   #  19 
+    [ 0.50, 2.00, 0.25, 2.25, 15.0 ],                                                 #  13 
+    [ 1.00, 2.00, 0.25, 2.25, 15.0 ],                                                 #  14 
+    [ 1.50, 2.00, 0.25, 2.25, 15.0 ],                                                 #  15 
+    [ 2.00, 2.00, 0.25, 2.25, 15.0 ],                                                 #  16 
+    [ 2.50, 2.00, 0.25, 2.25, 15.0 ],                                                 #  17 
+    [ 3.00, 2.00, 0.25, 2.25, 15.0 ],                                                 #  18 
+    [ 3.50, 2.00, 0.25, 2.25, 15.0 ],                                                 #  19 
 ]                                                                                     #  20 
 for r in data:                                                                        #  21 
-   c = bs.black_scholes_call (r[0], r[1], r[2], r[3], r[4])                           #  22 
-   p = bs.black_scholes_put  (r[0], r[1], r[2], r[3], r[4])                           #  23 
-   print(json.dumps({'input': r, "call": round(c, 3), "put": round(p, 3)}))           #  24 
+    c = bs.black_scholes_call (*r)                                                    #  22 
+    p = bs.black_scholes_put  (*r)                                                    #  23 
+    print("inputs: [ %5.2f, %5.2f, %5.2f, %5.2f, %5.2f ], call: %6.3f, put: %6.3f" %  #  24 
+            (*r, c, p))                                                               #  25 
 ```
 
 
@@ -1965,18 +1963,18 @@ for r in data:                                                                  
 
 ```
 $ bin/run src/black_scholes.py
-{"input": [1.5, 2.0, 0.5, 2.25, 30], "call": 0.753, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 15], "call": 0.632, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 10], "call": 0.59, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 5], "call": 0.546, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 2], "call": 0.518, "put": 0.0}
-{"input": [0.5, 2.0, 0.25, 2.25, 15], "call": 1.544, "put": 0.0}
-{"input": [1.0, 2.0, 0.25, 2.25, 15], "call": 1.088, "put": 0.0}
-{"input": [1.5, 2.0, 0.25, 2.25, 15], "call": 0.632, "put": 0.0}
-{"input": [2.0, 2.0, 0.25, 2.25, 15], "call": 0.178, "put": 0.001}
-{"input": [2.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.279}
-{"input": [3.0, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.735}
-{"input": [3.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 1.191}
+inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  5.00 ], call:  0.546, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  2.00 ], call:  0.518, put:  0.000
+inputs: [  0.50,  2.00,  0.25,  2.25, 15.00 ], call:  1.544, put:  0.000
+inputs: [  1.00,  2.00,  0.25,  2.25, 15.00 ], call:  1.088, put:  0.000
+inputs: [  1.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  2.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.178, put:  0.001
+inputs: [  2.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.279
+inputs: [  3.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.735
+inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 ```
 
 ---
@@ -1991,7 +1989,7 @@ $ bin/run src/black_scholes.py
 ```sql
 -- Load the extension:                                                                                                   
 CREATE EXTENSION black_scholes_swig;                                                                                      --  2 
-                                                                                                                          --  3 
+                                                                                                                         
 -- Create some sample input data:                                                                                        
 CREATE TABLE bs_data (                                                                                                    --  5 
   id SERIAL PRIMARY KEY,                                                                                                  --  6 
@@ -2001,7 +1999,7 @@ CREATE TABLE bs_data (                                                          
   risk_free_rate FLOAT8,                                                                                                  -- 10 
   days_to_expiry FLOAT8                                                                                                   -- 11 
 );                                                                                                                        -- 12 
-                                                                                                                          -- 13 
+                                                                                                                         
 INSERT INTO bs_data                                                                                                       -- 14 
   ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )                                       -- 15 
 VALUES                                                                                                                    -- 16 
@@ -2019,7 +2017,7 @@ VALUES                                                                          
   ( 2.50, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 28 
   ( 3.00, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 29 
   ( 3.50, 2.00, 0.25, 2.25, 15 );                                                                                         -- 30 
-                                                                                                                          -- 31 
+                                                                                                                         
 -- Apply Black-Scholes to data:                                                                                          
 CREATE TABLE bs_eval                                                                                                      -- 33 
 AS                                                                                                                        -- 34 
@@ -2059,7 +2057,7 @@ $ bin/run src/black_scholes-1.psql
 ```sql
 -- Load the extension:                                                                                                   
 CREATE EXTENSION black_scholes_swig;                                                                                      --  2 
-                                                                                                                          --  3 
+                                                                                                                         
 -- Create some sample input data:                                                                                        
 CREATE TABLE bs_data (                                                                                                    --  5 
   id SERIAL PRIMARY KEY,                                                                                                  --  6 
@@ -2069,7 +2067,7 @@ CREATE TABLE bs_data (                                                          
   risk_free_rate FLOAT8,                                                                                                  -- 10 
   days_to_expiry FLOAT8                                                                                                   -- 11 
 );                                                                                                                        -- 12 
-                                                                                                                          -- 13 
+                                                                                                                         
 INSERT INTO bs_data                                                                                                       -- 14 
   ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )                                       -- 15 
 VALUES                                                                                                                    -- 16 
@@ -2087,7 +2085,7 @@ VALUES                                                                          
   ( 2.50, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 28 
   ( 3.00, 2.00, 0.25, 2.25, 15 ),                                                                                         -- 29 
   ( 3.50, 2.00, 0.25, 2.25, 15 );                                                                                         -- 30 
-                                                                                                                          -- 31 
+                                                                                                                         
 -- Apply Black-Scholes to data:                                                                                          
 CREATE TABLE bs_eval                                                                                                      -- 33 
 AS                                                                                                                        -- 34 
@@ -2160,22 +2158,23 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   91 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             13 |    1.802 |       0 |            18.63 |            -100
-   26 |  6 |          0.5 |        1.61 |               0.25 |           2.25 |             13 |    1.816 |       0 |           12.795 |            -100
-   10 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             17 |    1.946 |       0 |           12.096 |            -100
-   31 |  6 |          0.5 |        1.64 |               0.25 |           2.25 |             12 |    1.798 |       0 |            9.634 |            -100
-   45 |  6 |          0.5 |       1.602 |               0.25 |           2.25 |             15 |    1.749 |       0 |            9.176 |            -100
-   84 |  6 |          0.5 |       1.739 |               0.25 |           2.25 |             17 |    1.857 |       0 |            6.785 |            -100
-   63 |  6 |          0.5 |       1.769 |               0.25 |           2.25 |             16 |    1.863 |       0 |            5.313 |            -100
-   40 |  6 |          0.5 |       1.926 |               0.25 |           2.25 |             18 |    1.978 |       0 |            2.699 |            -100
-   11 |  6 |          0.5 |       1.972 |               0.25 |           2.25 |             11 |    2.014 |       0 |            2.129 |            -100
-   94 |  6 |          0.5 |       1.558 |               0.25 |           2.25 |             12 |     1.59 |       0 |            2.053 |            -100
+   19 |  6 |          0.5 |       1.503 |               0.25 |           2.25 |             15 |     1.89 |       0 |           25.748 |            -100
+   14 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             15 |    1.867 |       0 |           21.155 |            -100
+   85 |  6 |          0.5 |       1.589 |               0.25 |           2.25 |             14 |    1.871 |       0 |           17.747 |            -100
+   20 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             11 |    1.753 |       0 |           15.557 |            -100
+   81 |  6 |          0.5 |       1.687 |               0.25 |           2.25 |             13 |    1.922 |       0 |            13.93 |            -100
+   62 |  6 |          0.5 |       1.694 |               0.25 |           2.25 |             16 |    1.915 |       0 |           13.046 |            -100
+   49 |  6 |          0.5 |       1.623 |               0.25 |           2.25 |             11 |    1.829 |       0 |           12.692 |            -100
+   91 |  6 |          0.5 |       1.603 |               0.25 |           2.25 |             17 |    1.783 |       0 |           11.228 |            -100
+   72 |  6 |          0.5 |       1.713 |               0.25 |           2.25 |             17 |    1.888 |       0 |           10.215 |            -100
+   39 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             17 |    1.643 |       0 |             7.95 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    9 | 12 |          3.5 |       1.528 |               0.25 |           2.25 |             14 |        0 |   1.602 |             -100 |           4.842
-(1 row)
+   87 | 12 |          3.5 |       1.595 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           6.457
+   50 | 12 |          3.5 |       1.565 |               0.25 |           2.25 |             15 |        0 |   1.627 |             -100 |           3.961
+(2 rows)
 ```
 
 ---
@@ -2190,18 +2189,18 @@ $ bin/run src/black_scholes-2.psql
 
 ```
 $ bin/run target/native/black_scholes
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 30.000 ], 'call':  0.753, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250, 10.000 ], 'call':  0.590, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  5.000 ], 'call':  0.546, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.500,  2.250,  2.000 ], 'call':  0.518, 'put':  0.000 }
-{ 'inputs': [  0.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.544, 'put':  0.000 }
-{ 'inputs': [  1.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  1.088, 'put':  0.000 }
-{ 'inputs': [  1.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.632, 'put':  0.000 }
-{ 'inputs': [  2.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.178, 'put':  0.001 }
-{ 'inputs': [  2.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.279 }
-{ 'inputs': [  3.000,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  0.735 }
-{ 'inputs': [  3.500,  2.000,  0.250,  2.250, 15.000 ], 'call':  0.000, 'put':  1.191 }
+inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  5.00 ], call:  0.546, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  2.00 ], call:  0.518, put:  0.000
+inputs: [  0.50,  2.00,  0.25,  2.25, 15.00 ], call:  1.544, put:  0.000
+inputs: [  1.00,  2.00,  0.25,  2.25, 15.00 ], call:  1.088, put:  0.000
+inputs: [  1.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  2.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.178, put:  0.001
+inputs: [  2.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.279
+inputs: [  3.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.735
+inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 ```
 
 ---
@@ -2210,18 +2209,18 @@ $ bin/run target/native/black_scholes
 
 ```
 $ bin/run src/black_scholes.py
-{"input": [1.5, 2.0, 0.5, 2.25, 30], "call": 0.753, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 15], "call": 0.632, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 10], "call": 0.59, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 5], "call": 0.546, "put": 0.0}
-{"input": [1.5, 2.0, 0.5, 2.25, 2], "call": 0.518, "put": 0.0}
-{"input": [0.5, 2.0, 0.25, 2.25, 15], "call": 1.544, "put": 0.0}
-{"input": [1.0, 2.0, 0.25, 2.25, 15], "call": 1.088, "put": 0.0}
-{"input": [1.5, 2.0, 0.25, 2.25, 15], "call": 0.632, "put": 0.0}
-{"input": [2.0, 2.0, 0.25, 2.25, 15], "call": 0.178, "put": 0.001}
-{"input": [2.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.279}
-{"input": [3.0, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 0.735}
-{"input": [3.5, 2.0, 0.25, 2.25, 15], "call": 0.0, "put": 1.191}
+inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  5.00 ], call:  0.546, put:  0.000
+inputs: [  1.50,  2.00,  0.50,  2.25,  2.00 ], call:  0.518, put:  0.000
+inputs: [  0.50,  2.00,  0.25,  2.25, 15.00 ], call:  1.544, put:  0.000
+inputs: [  1.00,  2.00,  0.25,  2.25, 15.00 ], call:  1.088, put:  0.000
+inputs: [  1.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.632, put:  0.000
+inputs: [  2.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.178, put:  0.001
+inputs: [  2.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.279
+inputs: [  3.00,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  0.735
+inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 ```
 
 ---
@@ -2276,22 +2275,23 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   91 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             13 |    1.802 |       0 |            18.63 |            -100
-   26 |  6 |          0.5 |        1.61 |               0.25 |           2.25 |             13 |    1.816 |       0 |           12.795 |            -100
-   10 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             17 |    1.946 |       0 |           12.096 |            -100
-   31 |  6 |          0.5 |        1.64 |               0.25 |           2.25 |             12 |    1.798 |       0 |            9.634 |            -100
-   45 |  6 |          0.5 |       1.602 |               0.25 |           2.25 |             15 |    1.749 |       0 |            9.176 |            -100
-   84 |  6 |          0.5 |       1.739 |               0.25 |           2.25 |             17 |    1.857 |       0 |            6.785 |            -100
-   63 |  6 |          0.5 |       1.769 |               0.25 |           2.25 |             16 |    1.863 |       0 |            5.313 |            -100
-   40 |  6 |          0.5 |       1.926 |               0.25 |           2.25 |             18 |    1.978 |       0 |            2.699 |            -100
-   11 |  6 |          0.5 |       1.972 |               0.25 |           2.25 |             11 |    2.014 |       0 |            2.129 |            -100
-   94 |  6 |          0.5 |       1.558 |               0.25 |           2.25 |             12 |     1.59 |       0 |            2.053 |            -100
+   19 |  6 |          0.5 |       1.503 |               0.25 |           2.25 |             15 |     1.89 |       0 |           25.748 |            -100
+   14 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             15 |    1.867 |       0 |           21.155 |            -100
+   85 |  6 |          0.5 |       1.589 |               0.25 |           2.25 |             14 |    1.871 |       0 |           17.747 |            -100
+   20 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             11 |    1.753 |       0 |           15.557 |            -100
+   81 |  6 |          0.5 |       1.687 |               0.25 |           2.25 |             13 |    1.922 |       0 |            13.93 |            -100
+   62 |  6 |          0.5 |       1.694 |               0.25 |           2.25 |             16 |    1.915 |       0 |           13.046 |            -100
+   49 |  6 |          0.5 |       1.623 |               0.25 |           2.25 |             11 |    1.829 |       0 |           12.692 |            -100
+   91 |  6 |          0.5 |       1.603 |               0.25 |           2.25 |             17 |    1.783 |       0 |           11.228 |            -100
+   72 |  6 |          0.5 |       1.713 |               0.25 |           2.25 |             17 |    1.888 |       0 |           10.215 |            -100
+   39 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             17 |    1.643 |       0 |             7.95 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    9 | 12 |          3.5 |       1.528 |               0.25 |           2.25 |             14 |        0 |   1.602 |             -100 |           4.842
-(1 row)
+   87 | 12 |          3.5 |       1.595 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           6.457
+   50 | 12 |          3.5 |       1.565 |               0.25 |           2.25 |             15 |        0 |   1.627 |             -100 |           3.961
+(2 rows)
 ```
 
 ---
@@ -2380,7 +2380,6 @@ $ bin/run src/black_scholes-2.psql
 # Workflow Examples
 
 
-                                                                              
 ## Workflow - example1.c                                                      
                                                                               
 ### Compile Native Code                                                       
@@ -2392,8 +2391,8 @@ cc -Isrc -c -o target/native/example1.o src/example1.c
 # Compile and link native program:                                            
 cc -Isrc -o target/native/example1 src/example1-native.c                        \
   target/native/example1.o -L/opt/homebrew/lib                                
-                                                                              
 ```                                                                           
+                                                                              
 ### Build python Bindings                                                     
                                                                               
 ```                                                                           
@@ -2579,13 +2578,13 @@ install -c -m 644 ./example1_swig.control '$POSTGRESQL_SHARE_DIR/extension/'
 install -c -m 644 ./example1_swig--1.2.3.sql                                    \
   '$POSTGRESQL_SHARE_DIR/extension/'                                          
 install -c -m 755 example1_swig.so '$POSTGRESQL_LIB_DIR/'                     
+                                                                              
 ```                                                                           
                                                                               
 
 ---
 
 
-                                                                              
 ## Workflow - polynomial.cc                                                   
                                                                               
 ### Compile Native Code                                                       
@@ -2597,8 +2596,8 @@ cc++ -std=c++17 -Isrc -c -o target/native/polynomial.o src/polynomial.cc
 # Compile and link native program:                                            
 cc++ -std=c++17 -Isrc -o target/native/polynomial src/polynomial-native.cc      \
   target/native/polynomial.o -L/opt/homebrew/lib                              
-                                                                              
 ```                                                                           
+                                                                              
 ### Build python Bindings                                                     
                                                                               
 ```                                                                           
@@ -2796,13 +2795,13 @@ install -c -m 644 ./polynomial_swig.control '$POSTGRESQL_SHARE_DIR/extension/'
 install -c -m 644 ./polynomial_swig--1.2.3.sql                                  \
   '$POSTGRESQL_SHARE_DIR/extension/'                                          
 install -c -m 755 polynomial_swig.so '$POSTGRESQL_LIB_DIR/'                   
+                                                                              
 ```                                                                           
                                                                               
 
 ---
 
 
-                                                                              
 ## Workflow - polynomial_v2.cc                                                
                                                                               
 ### Compile Native Code                                                       
@@ -2815,8 +2814,8 @@ cc++ -std=c++17 -Isrc -c -o target/native/polynomial_v2.o src/polynomial_v2.cc
 cc++ -std=c++17 -Isrc -o target/native/polynomial_v2                            \
   src/polynomial_v2-native.cc target/native/polynomial_v2.o                     \
   -L/opt/homebrew/lib                                                         
-                                                                              
 ```                                                                           
+                                                                              
 ### Build python Bindings                                                     
                                                                               
 ```                                                                           
@@ -3050,13 +3049,13 @@ install -c -m 644 ./polynomial_v2_swig.control                                  
 install -c -m 644 ./polynomial_v2_swig--1.2.3.sql                               \
   '$POSTGRESQL_SHARE_DIR/extension/'                                          
 install -c -m 755 polynomial_v2_swig.so '$POSTGRESQL_LIB_DIR/'                
+                                                                              
 ```                                                                           
                                                                               
 
 ---
 
 
-                                                                              
 ## Workflow - tommath.c                                                       
                                                                               
 ### Compile Native Code                                                       
@@ -3068,8 +3067,8 @@ cc -Isrc -c -o target/native/tommath.o src/tommath.c
 # Compile and link native program:                                            
 cc -Isrc -o target/native/tommath src/tommath-native.c target/native/tommath.o  \
   -ltommath                                                                   
-                                                                              
 ```                                                                           
+                                                                              
 ### Build python Bindings                                                     
                                                                               
 ```                                                                           
@@ -3227,13 +3226,13 @@ $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            
 install -c -m 644 ./tommath_swig.control '$POSTGRESQL_SHARE_DIR/extension/'   
 install -c -m 644 ./tommath_swig--1.2.3.sql '$POSTGRESQL_SHARE_DIR/extension/'
 install -c -m 755 tommath_swig.so '$POSTGRESQL_LIB_DIR/'                      
+                                                                              
 ```                                                                           
                                                                               
 
 ---
 
 
-                                                                              
 ## Workflow - black_scholes.c                                                 
                                                                               
 ### Compile Native Code                                                       
@@ -3245,8 +3244,8 @@ cc -Isrc -c -o target/native/black_scholes.o src/black_scholes.c
 # Compile and link native program:                                            
 cc -Isrc -o target/native/black_scholes src/black_scholes-native.c              \
   target/native/black_scholes.o -L/opt/homebrew/lib                           
-                                                                              
 ```                                                                           
+                                                                              
 ### Build python Bindings                                                     
                                                                               
 ```                                                                           
@@ -3439,6 +3438,7 @@ install -c -m 644 ./black_scholes_swig.control                                  
 install -c -m 644 ./black_scholes_swig--1.2.3.sql                               \
   '$POSTGRESQL_SHARE_DIR/extension/'                                          
 install -c -m 755 black_scholes_swig.so '$POSTGRESQL_LIB_DIR/'                
+                                                                              
 ```                                                                           
                                                                               
 
