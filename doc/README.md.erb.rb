@@ -82,8 +82,8 @@ def line_numbers! lines, lang, swig_interface = nil
     # binding.pry if ENV['PRY'] && line =~ /Constructor:/
     case line
     when nil
-    # when %r{^\s*$}, comment_line_rx
-    #  line
+    when %r{^\s*$}
+      line
     when comment_line_rx
       # Markdeep trims whitespace in comments, thus
       # the line numbers are not right-justified.

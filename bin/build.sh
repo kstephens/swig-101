@@ -376,7 +376,7 @@ postgresql-make-extension() {
       do
         if [[ -x "$prog" ]]
         then
-          -run-prog "$prog"
+          -run-prog "$prog" || exit $?
         fi
       done
     done
@@ -388,8 +388,8 @@ postgresql-make-extension() {
   (
     set -e
     echo '```'
-    echo -n '$ '
-    -run bin/run "$@"
+    echo "\$ $*"
+    bin/run "$@"
     echo '```'
     echo ''
   ) || exit $?
