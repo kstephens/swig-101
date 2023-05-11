@@ -43,35 +43,32 @@ double black_scholes_normal(double zz)
     return rz;
 }
 
+double black_scholes_call_or_put(double strike, double s, double sd, double r, double days, int call_or_put)
+{
+    double ls = log(s);
+    double lx = log(strike);
+    double t = days / 365;
+    double sd2 = pow(sd, 2);
+    double n = (ls - lx + r * t + sd2 * t / 2);
+    double sqrtT = sqrt(days / 365);
+    double d = sd * sqrtT;
+    double d1 = n / d;
+    double d2 = d1 - sd * sqrtT;
+    double nd1 = black_scholes_normal(d1);
+    double nd2 = black_scholes_normal(d2);
+    if ( call_or_put )
+        return s * nd1 - strike * exp(-r * t) * nd2;
+    else
+        return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);
+}
+
 double black_scholes_call(double strike, double s, double sd, double r, double days)
 {
-     double ls = log(s);
-     double lx = log(strike);
-     double t = days / 365;
-     double sd2 = pow(sd, 2);
-     double n = (ls - lx + r * t + sd2 * t / 2);
-     double sqrtT = sqrt(days / 365);
-     double d = sd * sqrtT;
-     double d1 = n / d;
-     double d2 = d1 - sd * sqrtT;
-     double nd1 = black_scholes_normal(d1);
-     double nd2 = black_scholes_normal(d2);
-     return s * nd1 - strike * exp(-r * t) * nd2;
+    return black_scholes_call_or_put(strike, s, sd, r, days, 1);
 }
 
 double black_scholes_put(double strike, double s, double sd, double r, double days)
 {
-     double ls = log(s);
-     double lx = log(strike);
-     double t = days / 365;
-     double sd2 = pow(sd, 2);
-     double n = (ls - lx + r * t + sd2 * t / 2);
-     double sqrtT = sqrt(days / 365);
-     double d = sd * sqrtT;
-     double d1 = n / d;
-     double d2 = d1 - sd * sqrtT;
-     double nd1 = black_scholes_normal(d1);
-     double nd2 = black_scholes_normal(d2);
-     return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);
+    return black_scholes_call_or_put(strike, s, sd, r, days, 0);
 }
 

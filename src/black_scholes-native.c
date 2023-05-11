@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     double *r = data[i];
     double c = black_scholes_call (r[0], r[1], r[2], r[3], r[4]);
     double p = black_scholes_put  (r[0], r[1], r[2], r[3], r[4]);
-    printf("{ 'inputs': [ %6.3f, %6.3f, %6.3f, %6.3f, %6.3f ], 'call': %6.3f, 'put': %6.3f }\n",
+    printf("inputs: [ %5.2f, %5.2f, %5.2f, %5.2f, %5.2f ], call: %6.3f, put: %6.3f\n",
       r[0], r[1], r[2], r[3], r[4], c, p);
   }
   return 0;

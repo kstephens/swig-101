@@ -11,11 +11,9 @@ CREATE FUNCTION truncf(x FLOAT8, decimals INT DEFAULT 3) RETURNS FLOAT8
 
 DROP EXTENSION IF EXISTS black_scholes_swig;
 -- SELECT * FROM pg_extension;
-
 DROP TABLE IF EXISTS bs_data;
 DROP TABLE IF EXISTS bs_eval;
 DROP TABLE IF EXISTS bs_data_hypo;
-DROP TABLE IF EXISTS bs_hypo_eval;
 
 -- HEADER-END --
 -- Load the extension:
