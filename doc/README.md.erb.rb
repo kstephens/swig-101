@@ -119,7 +119,7 @@ end
 
 def code_lines s, lang, swig_interface = nil
   s = s.sub(%r{\A.*\n *-- *HEADER-END *-- *\n}m, '')
-  s = s.gsub(';;', ';')
+  s = s.gsub(/;;\s*$/, ';')
   lines = string_to_lines(s)
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
@@ -236,6 +236,8 @@ def clean_up_lines lines
     gsub(%r{/\S*/bin/(make|gmake|swig|python|ruby|tcl|tclsh|guile)}, '\1').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
+    gsub(%r{-L */opt/homebrew/lib +}, ' ').
+    gsub(%r{-I */opt/homebrew/include +}, ' ').
     # gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
     # Java:
     gsub(%r{-I *\$JAVA_HOME/include/\S+ +}, '-I $JAVA_HOME/include/$JAVA_ARCH ').
