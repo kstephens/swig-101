@@ -29,22 +29,14 @@
 -setup-vars() {
   # declare -p $(compgen -v EXAMPLE); # exit 9
 
-  MAKE=${MAKE:-make}
-  export UNAME_S="$(uname -s)"
-  export ROOT_DIR="$(/bin/pwd)"
-  export LOCAL_DIR="$ROOT_DIR/local"
-  export LC_ALL=C
-
+  : "${SWIG_EXE:=$(which swig | head -1)}"
   DEBUG=''
-  CC=''
-  CFLAGS='' CFLAGS_SO=''
-  INC_DIRS=''
-  LDFLAGS='' LIB_DIRS='' LIBS=''
-  SWIG_OPTS=''
-  SWIG_CFLAGS=''
-  SWIG_INC_DIRS=''
-  SWIG_LDFLAGS='' SWIG_LIB_DIRS='' SWIG_LIBS=''
-  SWIG_SO_SUFFIX='' SWIG_SO_PREFIX=''
+  CC=''              CFLAGS=''
+  INC_DIRS=''        LDFLAGS=''        LIB_DIRS=''      LIBS=''
+  CFLAGS_SO=''
+  SWIG_OPTS=''       SWIG_CFLAGS=''
+  SWIG_INC_DIRS=''   SWIG_LDFLAGS=''   SWIG_LIB_DIRS='' SWIG_LIBS=''
+  SWIG_SO_SUFFIX=''  SWIG_SO_PREFIX=''
   SWIG_EXTRA=''
   SWIG_GENERATED_FILES='' SWIG_GENERATED_FILES_MORE=''
 
@@ -266,36 +258,32 @@ postgresql-make-extension() {
   for EXAMPLE in $EXAMPLES
   do
     (
-      -setup-example-vars
-      echo -e "\n## Workflow - ${EXAMPLE} \n"
-    	echo ""
       set -e
+      -setup-example-vars
+      echo "## Workflow - ${EXAMPLE}"
+      echo ""
       -cmd-build-native
+      echo ""
       -cmd-build-example-targets
-    )
+      echo ""
+    ) || return $?
   done
 }
 
 -cmd-build-example-targets() {
-  (
   -filter-example-targets
   for SWIG_TARGET in $SWIG_TARGETS
   do
-    (
-      -setup-vars
-      set -e
-      -cmd-build-example-target
-    ) || exit $?
+    -cmd-build-example-target || return $?
+    echo ""
   done
-	echo ""
-  )
 }
 
 -cmd-build-native() {
-(
+  (
+  set -e
   SWIG_TARGET=native
   -setup-vars
-  set -e
   mkdir -p target/native
   lib_c=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
   lib_o=target/native/${EXAMPLE_NAME}.o
@@ -310,18 +298,19 @@ postgresql-make-extension() {
 	echo ""
 	echo "# Compile and link native program:"
 	-run $CC $CFLAGS $INC_DIRS -o $main_e $main_c $lib_o $LDFLAGS $LIB_DIRS $LIBS
-	echo ""
 	echo '```'
-) || exit $?
+  ) || return $?
 }
 
 -cmd-build-example-target() {
+(
+  set -e
+  -setup-vars
   TARGET_DIR=$(dirname $SWIG_C)
+  mkdir -p $TARGET_DIR
   EXAMPLE_I=src/${EXAMPLE_NAME}.i
   EXAMPLE_H=src/${EXAMPLE_NAME}.h
   EXAMPLE_C=src/${EXAMPLE_NAME}.c
-
-  mkdir -p $TARGET_DIR
 
 	echo "### Build ${SWIG_TARGET} Bindings"
 	echo ""
@@ -334,11 +323,11 @@ postgresql-make-extension() {
 
 	echo "# Source code statistics:"
 	-run wc -l $EXAMPLE_H $EXAMPLE_I
-	echo ''
+	echo ""
 
 	echo "# Generated code statistics:"
 	-run wc -l "$SWIG_GENERATED_FILES"
-	echo ''
+	echo ""
 
 	echo "# Compile ${SWIG_TARGET} bindings:"
 	-run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
@@ -348,19 +337,22 @@ postgresql-make-extension() {
 	-run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
 
   local extra
-  for extra in $SWIG_EXTRA :
+  for extra in $SWIG_EXTRA ''
   do
-    $extra
+    [[ -n "$extra" ]] && $extra && echo ""
   done
 
   echo '```'
-	echo ""
+) || return $?
 }
 
 -cmd-demo() {
-  -cmd-clean
-  -cmd-all
-  -cmd-demo-run
+  (
+    set -e
+    -cmd-clean
+    -cmd-all
+    -cmd-demo-run
+  ) || return $?
 }
 
 -cmd-demo-run() {
@@ -377,10 +369,11 @@ postgresql-make-extension() {
         if [[ -x "$prog" ]]
         then
           -run-prog "$prog" || exit $?
+          echo ""
         fi
       done
     done
-    ) || exit $?
+    ) || return $?
   done
 }
 
@@ -391,7 +384,6 @@ postgresql-make-extension() {
     echo "\$ $*"
     bin/run "$@"
     echo '```'
-    echo ''
   ) || exit $?
 }
 
@@ -408,21 +400,11 @@ postgresql-make-extension() {
     (
       -setup-example-vars
       rm -rf target/*/*${EXAMPLE_NAME}*
-    )
+    ) || return $?
   done
 }
 
 ############################
-
--built() {
-  local file
-  local done=1
-  for file in "$@"
-  do
-   [[ " $targets " =~ " $file " ]] || done=
-  done
-  [[ -n "$done" ]] && exit 0
-}
 
 -run() {
   echo "$*"
@@ -434,12 +416,15 @@ postgresql-make-extension() {
 declare -A SWIG_TARGET_SUFFIX_
 
 -defaults() {
+  MAKE=${MAKE:-make}
+  export UNAME_S="$(uname -s)"
+  export ROOT_DIR="$(/bin/pwd)"
+  export LOCAL_DIR="$ROOT_DIR/local"
+  export LC_ALL=C
+
   SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
   SWIG_TARGETS='python clojure ruby tcl guile postgresql'
   EXAMPLES='example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
-  # OVERRIDE:
-  # SWIG_TARGETS=python
-  # EXAMPLES='example1.c'
 }
 
 -initialize() {
@@ -467,7 +452,7 @@ declare -A SWIG_TARGET_SUFFIX_
   -initialize
   for cmd in "${cmds[@]}"
   do
-    "-cmd-$cmd"
+    "-cmd-$cmd" || return $?
   done
 }
 

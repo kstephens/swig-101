@@ -25,14 +25,14 @@ all: early build-examples
 
 early: local-dirs
 	$(SILENT)mkdir -p target/native $(foreach t,$(SWIG_TARGETS),target/$t)
-
 EXAMPLES:
 	$(SILENT)echo "$(EXAMPLES)"
+.PHONY: early EXAMPLES
 
 #################################
 
-build-examples: early build-example
-	$(SILENT)$(BUILD_SH) all
+build-examples: early
+	$(SILENT)$(BUILD_SH) all EXAMPLES='$(EXAMPLES)' SWIG_TARGETS='$(SWIG_TARGETS)'
 build-example: early
 	$(SILENT)$(BUILD_SH) all EXAMPLES='$(EXAMPLE)' SWIG_TARGETS='$(SWIG_TARGETS)'
 build-native: early
@@ -42,8 +42,6 @@ build-targets: early
 .PHONY: build-examples build-example build-native build-targets
 
 #################################
-
-RUN="bin/run"
 
 demo: clean all demo-run
 	$(SILENT)$(BUILD_SH) demo-run
