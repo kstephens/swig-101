@@ -7,5 +7,5 @@ import sys ; sys.path.append('target/python')
 import example1_swig as example1
 
 # Use SWIG bindings:
-print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)
+print(f'EXAMPLE1_VERSION = {example1.EXAMPLE1_VERSION}')
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))

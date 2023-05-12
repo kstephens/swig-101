@@ -25,7 +25,7 @@ namespace mathlib {
       return rational<I>(n * y.n, d * y.d);
     }
     int operator == (const rational<I> &y) const {
-      return n == y.n && d == y.d; 
+      return n == y.n && d == y.d;
     }
     std::string __str__() const {
       std::ostringstream os(std::ostringstream::out);
