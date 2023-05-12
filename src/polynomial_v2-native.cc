@@ -2,6 +2,7 @@
 #include <iomanip>
 #include "polynomial_v2.h"
 #include "rational.h"
+#include <complex>
 
 using namespace mathlib;
 
@@ -18,8 +19,13 @@ int main(int argc, char **argv) {
 
   typedef rational<int> R;
   polynomial<R> pr;
-  pr.coeffs = { R(7,11), R(11,13), R(13,17) };
-  std::cout << pr.evaluate(R(5,7)) << "\n";
+  pr.coeffs = { R(7, 11), R(11, 13), R(13, 17) };
+  std::cout << pr.evaluate(R(5, 7)) << "\n";
+
+  typedef std::complex<double> C;
+  polynomial<C> pc;
+  pc.coeffs = { C(7.2, 11.3), C(11.5, 13.7), C(13.11, 17.13) };
+  std::cout << pc.evaluate(C(5.7, 7.11)) << "\n";
 
   return 0;
 }

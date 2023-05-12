@@ -1,5 +1,6 @@
 #include "polynomial_v2.h"
 #include "rational.h"
+#include <complex>
 
 namespace mathlib {
   template < typename R >
@@ -16,4 +17,5 @@ namespace mathlib {
   template class polynomial<int>;
   template class polynomial<double>;
   template class polynomial<rational<int>>;
+  template class polynomial<std::complex<double>>;
 }
