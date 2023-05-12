@@ -6,10 +6,10 @@ puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]
 
 # polynomial<double>:
 PolynomialDoubleV2 poly
-VectorDoubleV2 c { 2.3 3.5 5.7 7.11 11.13 -13.17 }
+VectorDoubleV2 c { 3 5.0 7.0 11.0 }
 poly configure -coeffs c
 puts [poly cget -coeffs]
-puts [poly evaluate 1.2]
+puts [poly evaluate 2]
 
 # polynomial<int>:
 PolynomialIntV2 poly

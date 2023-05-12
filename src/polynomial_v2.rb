@@ -7,9 +7,9 @@ pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION
 
 # polynomial<double>:
 poly        = PV2::PolynomialDoubleV2.new
-poly.coeffs = PV2::VectorDoubleV2.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
+poly.coeffs = PV2::VectorDoubleV2.new([ 3, 5.0, 7.0, 11.0 ])
 pp poly.coeffs.to_a
-pp poly.evaluate(1.2)
+pp poly.evaluate(2)
 
 # polynomial<int>
 poly        = PV2::PolynomialIntV2.new

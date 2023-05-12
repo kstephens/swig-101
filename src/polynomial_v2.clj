@@ -7,9 +7,9 @@
 
 ;; polynomial<double>:
 (def p1 (PolynomialDoubleV2.))
-(.setCoeffs p1 (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))
+(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))
 (prn (.getCoeffs p1))
-(prn (.evaluate p1 1.2))
+(prn (.evaluate p1 2))
 
 ;; polynomial<int> object:
 (def p2 (PolynomialIntV2.))

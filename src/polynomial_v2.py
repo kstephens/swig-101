@@ -6,17 +6,11 @@ print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
 
 # polynomial<double>:
 poly         = PolynomialDoubleV2()
-poly.coeffs  = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])
+poly.coeffs  = VectorDoubleV2([ 3.0, 5.0, 7.0, 11.0 ])
 print(list(poly.coeffs))
-print(poly.evaluate(1.2))
+print(poly.evaluate(2))
 
-# Instantiate polynomial<int> object:
-poly        = PolynomialIntV2()
-poly.coeffs = VectorIntV2([ 2, 3, 5, 7, 11, -13 ])
-print(list(poly.coeffs))
-print(poly.evaluate(-2))
-
-# Instantiate polynomial<rational<int>> object:
+# polynomial<rational<int>>:
 poly        = PolynomialRationalV2()
 poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13, 17) ])
 print(list(poly.coeffs))
