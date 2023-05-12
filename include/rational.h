@@ -34,11 +34,21 @@ namespace mathlib {
     }
     std::string __repr__() const {
       std::ostringstream os(std::ostringstream::out);
-      os << "rational(" << n << "," << d << ")";
+      os << class_name() << "(" << n << "," << d << ")";
       return os.str();
     }
+    private:
+    const std::string& class_name() const {
+      // https://stackoverflow.com/a/59522794/1141958
+      static std::string
+        pretty_function(__PRETTY_FUNCTION__),
+        left_anchor(" &mathlib::"),
+        right_anchor("::class_name() const"),
+        type_name_left(pretty_function.substr(pretty_function.find(left_anchor) + left_anchor.length())),
+        type_name(type_name_left.substr(0, type_name_left.find(right_anchor)));
+      return type_name;
+    }
   };
-
   template <typename I>
   std::ostream& operator << (std::ostream& os, const rational<I> &r) {
     return os << r.n << "/" << r.d;
