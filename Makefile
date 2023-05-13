@@ -66,19 +66,16 @@ debian-prereq:
 
 #################################
 
-README.md : tmp/README.md
-	cp $< $@
-.PRECIOUS: README.md
-
 README_MD_DEPS=doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
-tmp/README.md: $(README_MD_DEPS)
+
+README.md :
 	$(MAKE) clean
-	mkdir -p tmp
 	erb doc/README.md.erb | tee $@.tmp | wc -l
 	mv $@.tmp $@
 	ls -l $@
+.PRECIOUS: README.md
 
-README.md.html : $(README_MD_DEPS)
+README.md.html :
 	mkdir -p tmp
 	MARKDEEP=1 erb doc/README.md.erb | tee tmp/$@.md | wc -l
 	df-markdown -v -s dark -o $@ tmp/$@.md

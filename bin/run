@@ -29,6 +29,8 @@ do
   [[ -d "$d" ]] && PATH_OPT="$d:$PATH_OPT"
 done
 
+PATH="$PATH:/Library/Developer/CommandLineTools/usr/bin/"
+
 cmd=("$@")
 dir="$(/bin/pwd)"
 

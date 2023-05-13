@@ -1,36 +1,54 @@
 #!/usr/bin/env bash
 
--cmd-build() {
-  targets=("$@")
-  build-things
+declare -A SWIG_TARGET_SUFFIX_
+
+-defaults() {
+  MAKE=${MAKE:-make}
+  export UNAME_S="$(uname -s)"
+  export ROOT_DIR="$(/bin/pwd)"
+  export LOCAL_DIR="$ROOT_DIR/local"
+  export LC_ALL=C
+
+  EXAMPLES='example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
+  SWIG_TARGETS='python clojure ruby tcl guile postgresql'
+  SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
 }
 
--cmd-show() {
-  local v
-  for v in $var
-  do
-    echo "${!v}"
-  done
+-initialize() {
+  EXAMPLES="${EXAMPLES//src\//}"
 }
 
--cmd-() {
-  -cmd-all
-}
+-setup-example-vars() {
+  EXAMPLE_NAME=${EXAMPLE%.*}
+  EXAMPLE_SUFFIX=".${EXAMPLE##*.}"
+  EXAMPLE_SWIG=${EXAMPLE_NAME}_swig
 
--cmd-all() {
-  -cmd-build-examples
-}
-####################################
+  case "${EXAMPLE_NAME}-${UNAME_S}"
+  in
+    polynomial-Linux)
+      # /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
+      # SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
+      # TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
+      #
+    ;;
+    tommath-*)
+      # tcl.h forward declares struct mp_int!
+      # target/tcl/libtommath_swig.c:2330:19: error: incomplete definition of type 'struct mp_int'
+      SWIG_TARGETS="${SWIG_TARGETS//tcl/}"
+    ;;
+  esac
 
--setup-targets() {
-  :
+  case "$EXAMPLE_NAME"
+  in
+    example1|black_scholes) ;;
+    *)
+      SWIG_TARGETS="${SWIG_TARGETS//postgresql/}"
+    ;;
+  esac
 }
 
 -setup-vars() {
-  # declare -p $(compgen -v EXAMPLE); # exit 9
-
   : "${SWIG_EXE:=$(which swig | head -1)}"
-  DEBUG=''
   CC=''              CFLAGS=''
   INC_DIRS=''        LDFLAGS=''        LIB_DIRS=''      LIBS=''
   CFLAGS_SO=''
@@ -48,7 +66,7 @@
 
   ############################
 
-  CFLAGS+=" ${DEBUG}"
+  CFLAGS+=" -g -O3"
   INC_DIRS+=' -Isrc'
   INC_DIRS+=' -Iinclude'
   INC_DIRS+=" -I${LOCAL_DIR}/include"
@@ -80,7 +98,6 @@
       LIBS+=' -ltommath'
     ;;
     polynomial)
-      SWIG_CFLAGS+=' -Wno-deprecated-declarations' # sprintf
       SWIG_CFLAGS+=' -Wno-deprecated-declarations' # sprintf
     ;;
   esac
@@ -122,7 +139,6 @@
       PYTHON_CONFIG=$(which python${PYTHON_VERSION}-config python${PYTHON_MAJOR_VERSION}-config python-config 2>/dev/null | head -1)
       PYTHON_EXE=$(which python${PYTHON_VERSION} python${PYTHON_MAJOR_VERSION} python 2>/dev/null | head -1)
 
-      # SUFFIX_[python]=.py
       SWIG_OPTS+=' -python'
       # Has include options:
       SWIG_CFLAGS+=" $(${PYTHON_CONFIG} --cflags) -Wno-deprecated-declarations"
@@ -133,7 +149,6 @@
       SWIG_GENERATED_FILES_MORE+=" target/${SWIG_TARGET}/${EXAMPLE_SWIG}.py"
     ;;
     tcl)
-      # SUFFIX_[tcl]=.tcl
       SWIG_OPTS+=' -tcl'
       SWIG_CFLAGS+=" -I${TCL_HOME}/include"
       SWIG_CFLAGS+="  -Wno-deprecated-declarations" # sprintf
@@ -175,10 +190,6 @@
       SWIG_EXTRA+=' postgresql-make-extension'
       SWIG_GENERATED_FILES_MORE="target/${SWIG_TARGET}/${EXAMPLE_SWIG}-*.sql target/${SWIG_TARGET}/${EXAMPLE_SWIG}.control target/${SWIG_TARGET}/${EXAMPLE_SWIG}.make"
     ;;
-    xml)
-      SWIG_CFLAGS+= #-I${TCL_HOME}/include
-      SWIG_CFLAGS+= #-I/usr/include/tcl # Linux: tcl-dev : #include <tcl.h>
-    ;;
   esac
 
   ############################
@@ -203,17 +214,50 @@
   SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
   #SWIG_CFLAGS+='' -DSWIGRUNTIME_DEBUG=1'
 
-  # declare -p EXAMPLE EXAMPLE_NAME EXAMPLE_SUFFIX
-  # declare -p $(compgen -v SWIG)
-
   #################################
 
   SWIG_C="target/${SWIG_TARGET}/${EXAMPLE_SWIG}${EXAMPLE_SUFFIX}"
   SWIG_O="$SWIG_C.o"
   SWIG_SO="$(dirname ${SWIG_O})/${SWIG_SO_PREFIX}${EXAMPLE_SWIG}${SWIG_SO_SUFFIX}"
 
-  # (set +x; declare -p $(compgen -v | grep -E -e '[A-Z]' | sort))
-  # exit 9
+  EXAMPLE_I=src/${EXAMPLE_NAME}.i
+  EXAMPLE_H=src/${EXAMPLE_NAME}.h
+  EXAMPLE_C=src/${EXAMPLE_NAME}.c
+
+  NATIVE_LIB_C=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
+  NATIVE_LIB_O=target/native/${EXAMPLE_NAME}.o
+  NATIVE_MAIN_C=src/${EXAMPLE_NAME}-native${EXAMPLE_SUFFIX}
+  NATIVE_MAIN_E=target/native/${EXAMPLE_NAME}
+}
+
+
+####################################
+
+-cmd-build() {
+  targets=("$@")
+  build-things
+}
+
+-cmd-show() {
+  local v
+  for v in $var
+  do
+    echo "${!v}"
+  done
+}
+
+-cmd-() {
+  -cmd-all
+}
+
+-cmd-all() {
+  -cmd-build-examples
+}
+
+####################################
+
+-setup-targets() {
+  :
 }
 
 # TODO:
@@ -221,35 +265,6 @@ postgresql-make-extension() {
   echo ""
   echo "# Compile and install ${SWIG_TARGET} extension:"
   ${MAKE} -C target/postgresql -f ${EXAMPLE_SWIG}.make install
-}
-
--filter-example-targets() {
-  case "${EXAMPLE_NAME}-${UNAME_S}"
-  in
-    polynomial-Linux)
-      # /usr/include/guile/2.2/libguile/deprecated.h:115:21: error: ‘scm_listify__GONE__REPLACE_WITH__scm_list_n’ was not declared in this scope
-      # SWIG_TARGETS:=$(filter-out guile, $(SWIG_TARGETS))
-      # TARGET_DEPS:=$(filter-out guile, $(TARGET_DEPS))
-      #
-    ;;
-    tommath-*)
-      # tcl.h forward declares struct mp_int!
-      # target/tcl/libtommath_swig.c:2330:19: error: incomplete definition of type 'struct mp_int'
-      SWIG_TARGETS="${SWIG_TARGETS//tcl/ }"
-    ;;
-  esac
-  SWIG_TARGET_SUFFIXES=
-  local target
-  for target in $SWIG_TARGETS
-  do
-    SWIG_TARGET_SUFFIXES+=" ${SWIG_TARGET_SUFFIX_[$target]}"
-  done
-}
-
--setup-example-vars() {
-  EXAMPLE_NAME=${EXAMPLE%.*}
-  EXAMPLE_SUFFIX=".${EXAMPLE##*.}"
-  EXAMPLE_SWIG=${EXAMPLE_NAME}_swig
 }
 
 ############################
@@ -262,7 +277,7 @@ postgresql-make-extension() {
       -setup-example-vars
       echo "## Workflow - ${EXAMPLE}"
       echo ""
-      -cmd-build-native
+      -cmd-build-native |& tee $NATIVE_LIB_O.log
       echo ""
       -cmd-build-example-targets
       echo ""
@@ -271,33 +286,30 @@ postgresql-make-extension() {
 }
 
 -cmd-build-example-targets() {
-  -filter-example-targets
+  (
   for SWIG_TARGET in $SWIG_TARGETS
   do
     -cmd-build-example-target || return $?
     echo ""
   done
+  ) || return $?
 }
 
 -cmd-build-native() {
   (
-  set -e
+  set -e -o pipefail
   SWIG_TARGET=native
   -setup-vars
-  mkdir -p target/native
-  lib_c=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
-  lib_o=target/native/${EXAMPLE_NAME}.o
-  main_c=src/${EXAMPLE_NAME}-native${EXAMPLE_SUFFIX}
-  main_e=target/native/${EXAMPLE_NAME}
+  mkdir -p $(dirname $NATIVE_MAIN_E)
 
 	echo "### Compile Native Code"
 	echo ""
 	echo '```'
 	echo "# Compile native library:"
-	-run $CC $CFLAGS $INC_DIRS -c -o $lib_o $lib_c
+	-run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
 	echo ""
 	echo "# Compile and link native program:"
-	-run $CC $CFLAGS $INC_DIRS -o $main_e $main_c $lib_o $LDFLAGS $LIB_DIRS $LIBS
+	-run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
 	echo '```'
   ) || return $?
 }
@@ -308,9 +320,6 @@ postgresql-make-extension() {
   -setup-vars
   TARGET_DIR=$(dirname $SWIG_C)
   mkdir -p $TARGET_DIR
-  EXAMPLE_I=src/${EXAMPLE_NAME}.i
-  EXAMPLE_H=src/${EXAMPLE_NAME}.h
-  EXAMPLE_C=src/${EXAMPLE_NAME}.c
 
 	echo "### Build ${SWIG_TARGET} Bindings"
 	echo ""
@@ -356,15 +365,16 @@ postgresql-make-extension() {
 }
 
 -cmd-demo-run() {
-  -filter-example-targets
   for EXAMPLE in $EXAMPLES
   do
     (
     -setup-example-vars
     -run-prog target/native/$EXAMPLE_NAME
-    for suffix in $SWIG_TARGET_SUFFIXES
+    echo ""
+    for SWIG_TARGET in $SWIG_TARGETS
     do
-      for prog in src/"$EXAMPLE_NAME"*"$suffix"
+      suffix=${SWIG_TARGET_SUFFIX_[$SWIG_TARGET]}
+      for prog in src/"$EXAMPLE_NAME$suffix" src/"$EXAMPLE_NAME"-*"$suffix"
       do
         if [[ -x "$prog" ]]
         then
@@ -378,11 +388,12 @@ postgresql-make-extension() {
 }
 
 -run-prog() {
+  [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
   (
     set -e
     echo '```'
     echo "\$ $*"
-    bin/run "$@"
+    bin/run "$@" || exit $?
     echo '```'
   ) || exit $?
 }
@@ -392,6 +403,7 @@ postgresql-make-extension() {
 -cmd-clean() {
 	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
 	rm -rf target/*
+  rm -rf {bin,src}/__pycache__/
 }
 
 -cmd-clean-example() {
@@ -408,28 +420,14 @@ postgresql-make-extension() {
 
 -run() {
   echo "$*"
-  $*
+  if ! $*
+  then
+    echo "ERROR: $? : $*" >&2
+    exit 9
+  fi
 }
 
 ############################
-
-declare -A SWIG_TARGET_SUFFIX_
-
--defaults() {
-  MAKE=${MAKE:-make}
-  export UNAME_S="$(uname -s)"
-  export ROOT_DIR="$(/bin/pwd)"
-  export LOCAL_DIR="$ROOT_DIR/local"
-  export LC_ALL=C
-
-  SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
-  SWIG_TARGETS='python clojure ruby tcl guile postgresql'
-  EXAMPLES='example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
-}
-
--initialize() {
-  EXAMPLE_NAMES="${EXAMPLES//.*/}"
-}
 
 -main() {
   # set -x

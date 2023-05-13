@@ -161,7 +161,7 @@ double cubic_poly(double x,                                                    /
 #include "example1.h"                                                          //  2 
                                                                               
 int main(int argc, char **argv) {                                              //  4 
-  printf("EXAMPLE1_VERSION = \"%s\"\n", EXAMPLE1_VERSION);                     //  5 
+  printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
   return 0;                                                                    //  7 
 }                                                                              //  8 
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {                                              /
 
 ```
 $ bin/run target/native/example1
-EXAMPLE1_VERSION = "1.2.3"
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
@@ -201,7 +201,7 @@ import sys ; sys.path.append('target/python')                                  #
 import example1_swig as example1                                               #   5 
                                                                               
 # Use SWIG bindings:                                                          
-print("EXAMPLE1_VERSION = " + example1.EXAMPLE1_VERSION)                       #   8 
+print(f'EXAMPLE1_VERSION = {example1.EXAMPLE1_VERSION}')                       #   8 
 print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
 ```
 
@@ -254,7 +254,7 @@ require 'example1_swig'                                                        #
 include Example1_swig                                                          #   7 
                                                                               
 # Use SWIG bindings:                                                          
-puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION}"                                  #  10 
+puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION.inspect}"                          #  10 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
 ```
 
@@ -263,7 +263,7 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 
 ```
 $ bin/run src/example1.rb
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -410,7 +410,7 @@ $ bin/run src/example1-2.psql
 
 ```
 $ bin/run target/native/example1
-EXAMPLE1_VERSION = "1.2.3"
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
@@ -438,7 +438,7 @@ EXAMPLE1_VERSION = "1.2.3"
 
 ```
 $ bin/run src/example1.rb
-EXAMPLE1_VERSION = 1.2.3
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -549,11 +549,15 @@ int main(int argc, char **argv) {                                              /
   std::cout << "POLYNOMIAL_VERSION = \"" << POLYNOMIAL_VERSION << "\"\n";      //  6 
                                                                               
   Polynomial p;                                                                //  8 
-  p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                           //  9 
-  std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";                // 10 
                                                                               
-  return 0;                                                                    // 12 
-}                                                                              // 13 
+  p.coeffs = { 3, 5.0, 7.0, 11.0 };                                            // 10 
+  std::cout << std::setprecision(9) << p.evaluate(2) << "\n";                  // 11 
+                                                                              
+  p.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                           // 13 
+  std::cout << std::setprecision(9) << p.evaluate(1.2) << "\n";                // 14 
+                                                                              
+  return 0;                                                                    // 16 
+}                                                                              // 17 
 ```
 
 
@@ -562,6 +566,7 @@ int main(int argc, char **argv) {                                              /
 ```
 $ bin/run target/native/polynomial
 POLYNOMIAL_VERSION = "1.2.1"
+129
 17.3020736
 ```
 
@@ -598,13 +603,15 @@ from polynomial_swig import *                                                  #
                                                                               
 print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
                                                                               
-# Instantiate object:                                                         
-poly = Polynomial()                                                            #   6 
-poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #   7 
+poly = Polynomial()                                                            #   5 
                                                                               
-# Invoke methods:                                                             
-print(list(poly.coeffs))                                                       #  10 
-print(poly.evaluate(1.2))                                                      #  11 
+poly.coeffs = VectorDouble([ 3, 5.0, 7.0, 11.0 ])                              #   7 
+print(list(poly.coeffs))                                                       #   8 
+print(poly.evaluate(2))                                                        #   9 
+                                                                              
+poly.coeffs = VectorDouble([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])             #  11 
+print(list(poly.coeffs))                                                       #  12 
+print(poly.evaluate(1.2))                                                      #  13 
 ```
 
 
@@ -613,6 +620,8 @@ print(poly.evaluate(1.2))                                                      #
 ```
 $ bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
 ```
@@ -628,11 +637,19 @@ import pytest                                                                  #
 def test_empty_coeffs():                                                       #   4 
     p = Polynomial()                                                           #   5 
     assert p.evaluate(1.2) == 0.0                                              #   6 
-def test_one_coeff():                                                          #   7 
-    p = Polynomial()                                                           #   8 
-    p.coeffs = VectorDouble([ 2.3 ])                                           #   9 
-    assert p.evaluate(1.2) == 2.3                                              #  10 
-    assert p.evaluate(999) == 2.3                                              #  11 
+    assert p.evaluate(999) == 0.0                                              #   7 
+                                                                              
+def test_one_coeff():                                                          #   9 
+    p = Polynomial()                                                           #  10 
+    p.coeffs = VectorDouble([ 2.3 ])                                           #  11 
+    assert p.evaluate(1.2) == 2.3                                              #  12 
+    assert p.evaluate(999) == 2.3                                              #  13 
+                                                                              
+def test_more_than_one_coeff():                                                #  15 
+    p = Polynomial()                                                           #  16 
+    p.coeffs = VectorDouble([ 3, 5.0, 7.0, 11.0 ])                             #  17 
+    assert p.evaluate(2) == 129.0                                              #  18 
+    assert p.evaluate(-3.5) == -400.375                                        #  19 
 ```
 
 
@@ -654,13 +671,16 @@ $ bin/run src/polynomial-test.py
                                                                               
 (prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  4 
                                                                               
-;; Instantiate object:                                                        
-(def p (Polynomial.))                                                          ;;  7 
-(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;;  8 
+(def p (Polynomial.))                                                          ;;  6 
                                                                               
-;; Invoke methods:                                                            
-(prn (.getCoeffs p))                                                           ;; 11 
-(prn (.evaluate p 1.2))                                                        ;; 12 
+;; Note: does not coerce java.lang.Long 3 to 3.0                              
+(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))                            ;;  9 
+(prn (.getCoeffs p))                                                           ;; 10 
+(prn (.evaluate p 2))                                                          ;; 11 
+                                                                              
+(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 13 
+(prn (.getCoeffs p))                                                           ;; 14 
+(prn (.evaluate p 1.2))                                                        ;; 15 
 ```
 
 
@@ -669,6 +689,8 @@ $ bin/run src/polynomial-test.py
 ```
 $ bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
+[3.0 5.0 7.0 11.0]
+129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
 ```
@@ -684,13 +706,15 @@ include Polynomial_swig                                                        #
                                                                               
 pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION                                      #   4 
                                                                               
-# Instantiate object:                                                         
-p = Polynomial.new                                                             #   7 
-p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #   8 
+p = Polynomial.new                                                             #   6 
                                                                               
-# Invoke methods:                                                             
-pp p.coeffs.to_a                                                               #  11 
-pp p.evaluate(1.2)                                                             #  12 
+p.coeffs = VectorDouble.new([ 3, 5.0, 7.0, 11.0 ])                             #   8 
+pp p.coeffs.to_a                                                               #   9 
+pp p.evaluate(2)                                                               #  10 
+                                                                              
+p.coeffs = VectorDouble.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])            #  12 
+pp p.coeffs.to_a                                                               #  13 
+pp p.evaluate(1.2)                                                             #  14 
 ```
 
 
@@ -699,6 +723,8 @@ pp p.evaluate(1.2)                                                             #
 ```
 $ bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
 ```
@@ -713,13 +739,15 @@ $ bin/run src/polynomial.rb
                                                                               
 (write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
                                                                               
-;; Instantiate object:                                                        
-(define p (new-Polynomial))                                                    ;;  6 
-(Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;;  7 
+(define p (new-Polynomial))                                                    ;;  5 
                                                                               
-;; Invoke methods:                                                            
-(write (Polynomial-coeffs-get p)) (newline)                                    ;; 10 
-(write (Polynomial-evaluate p 1.2)) (newline)                                  ;; 11 
+(Polynomial-coeffs-set p (new-VectorDouble '(3 5.0 7.0 11.0)))                 ;;  7 
+(write (Polynomial-coeffs-get p)) (newline)                                    ;;  8 
+(write (Polynomial-evaluate p 2)) (newline)                                    ;;  9 
+                                                                              
+(Polynomial-coeffs-set p (new-VectorDouble '(2.3 3.5 5.7 7.11 11.13 -13.17)))  ;; 11 
+(write (Polynomial-coeffs-get p)) (newline)                                    ;; 12 
+(write (Polynomial-evaluate p 1.2)) (newline)                                  ;; 13 
 ```
 
 
@@ -728,7 +756,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14be08c90>
+#<swig-pointer std::vector< double > * 154704330>
+129.0
+#<swig-pointer std::vector< double > * 154704330>
 17.3020736
 ```
 
@@ -742,14 +772,17 @@ load target/tcl/polynomial_swig.so Polynomial_swig                             #
                                                                               
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                             #   3 
                                                                               
-# Instantiate object:                                                         
-Polynomial poly                                                                #   6 
-VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #   7 
-poly configure -coeffs c                                                       #   8 
+Polynomial poly                                                                #   5 
                                                                               
-# Invoke methods:                                                             
-puts [poly cget -coeffs]                                                       #  11 
-puts [poly evaluate 1.2]                                                       #  12 
+VectorDouble c { 3 5.0 7.0 11.0 }                                              #   7 
+poly configure -coeffs c                                                       #   8 
+puts [poly cget -coeffs]                                                       #   9 
+puts [poly evaluate 2]                                                         #  10 
+                                                                              
+VectorDouble c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                               #  12 
+poly configure -coeffs c                                                       #  13 
+puts [poly cget -coeffs]                                                       #  14 
+puts [poly evaluate 1.2]                                                       #  15 
 ```
 
 
@@ -758,7 +791,9 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_d0f1602901000000_p_std__vectorT_double_t
+_9080702701000000_p_std__vectorT_double_t
+129.0
+_9080702701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -775,11 +810,19 @@ import pytest                                                                  #
 def test_empty_coeffs():                                                       #   4 
     p = Polynomial()                                                           #   5 
     assert p.evaluate(1.2) == 0.0                                              #   6 
-def test_one_coeff():                                                          #   7 
-    p = Polynomial()                                                           #   8 
-    p.coeffs = VectorDouble([ 2.3 ])                                           #   9 
-    assert p.evaluate(1.2) == 2.3                                              #  10 
-    assert p.evaluate(999) == 2.3                                              #  11 
+    assert p.evaluate(999) == 0.0                                              #   7 
+                                                                              
+def test_one_coeff():                                                          #   9 
+    p = Polynomial()                                                           #  10 
+    p.coeffs = VectorDouble([ 2.3 ])                                           #  11 
+    assert p.evaluate(1.2) == 2.3                                              #  12 
+    assert p.evaluate(999) == 2.3                                              #  13 
+                                                                              
+def test_more_than_one_coeff():                                                #  15 
+    p = Polynomial()                                                           #  16 
+    p.coeffs = VectorDouble([ 3, 5.0, 7.0, 11.0 ])                             #  17 
+    assert p.evaluate(2) == 129.0                                              #  18 
+    assert p.evaluate(-3.5) == -400.375                                        #  19 
 ```
 
 
@@ -791,11 +834,11 @@ $ bin/run python3.10 -m pytest src/polynomial-test.py
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
 plugins: cov-4.0.0
-collected 2 items
+collected 3 items
 
-src/polynomial-test.py ..                                                [100%]
+src/polynomial-test.py ...                                               [100%]
 
-============================== 2 passed in 0.00s ===============================
+============================== 3 passed in 0.01s ===============================
 ```
 
 ---
@@ -810,6 +853,7 @@ src/polynomial-test.py ..                                                [100%]
 ```
 $ bin/run target/native/polynomial
 POLYNOMIAL_VERSION = "1.2.1"
+129
 17.3020736
 ```
 
@@ -820,6 +864,8 @@ POLYNOMIAL_VERSION = "1.2.1"
 ```
 $ bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
 ```
@@ -837,6 +883,8 @@ $ bin/run src/polynomial-test.py
 ```
 $ bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
+[3.0 5.0 7.0 11.0]
+129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
 17.3020736
 ```
@@ -847,6 +895,8 @@ $ bin/run src/polynomial.clj
 ```
 $ bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
 17.3020736
 ```
@@ -857,7 +907,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 14be08c90>
+#<swig-pointer std::vector< double > * 154704330>
+129.0
+#<swig-pointer std::vector< double > * 154704330>
 17.3020736
 ```
 
@@ -867,7 +919,9 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_d0f1602901000000_p_std__vectorT_double_t
+_9080702701000000_p_std__vectorT_double_t
+129.0
+_9080702701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -881,11 +935,11 @@ $ bin/run python3.10 -m pytest src/polynomial-test.py
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
 plugins: cov-4.0.0
-collected 2 items
+collected 3 items
 
-src/polynomial-test.py ..                                                [100%]
+src/polynomial-test.py ...                                               [100%]
 
-============================== 2 passed in 0.00s ===============================
+============================== 3 passed in 0.01s ===============================
 ```
 
 ---
@@ -922,23 +976,25 @@ namespace mathlib {                                                            /
 ```c++
 #include "polynomial_v2.h"                                                     //  1 
 #include "rational.h"                                                          //  2 
+#include <complex>                                                             //  3 
                                                                               
-namespace mathlib {                                                            //  4 
-  template < typename R >                                                      //  5 
-  R polynomial< R >::evaluate(const R &x) const {                              //  6 
-    R result(0), xx(1);                                                        //  7 
-    for ( const auto &c : this->coeffs ) {                                     //  8 
-      result = result + c * xx;                                                //  9 
-      xx = xx * x;                                                             // 10 
-    }                                                                          // 11 
-    return result;                                                             // 12 
-  };                                                                           // 13 
+namespace mathlib {                                                            //  5 
+  template < typename R >                                                      //  6 
+  R polynomial< R >::evaluate(const R &x) const {                              //  7 
+    R result(0), xx(1);                                                        //  8 
+    for ( const auto &c : this->coeffs ) {                                     //  9 
+      result = result + c * xx;                                                // 10 
+      xx = xx * x;                                                             // 11 
+    }                                                                          // 12 
+    return result;                                                             // 13 
+  };                                                                           // 14 
                                                                               
   // Instantiate templates:                                                   
-  template class polynomial<int>;                                              // 16 
-  template class polynomial<double>;                                           // 17 
-  template class polynomial<rational<int>>;                                    // 18 
-}                                                                              // 19 
+  template class polynomial<int>;                                              // 17 
+  template class polynomial<double>;                                           // 18 
+  template class polynomial<rational<int>>;                                    // 19 
+  template class polynomial<std::complex<double>>;                             // 20 
+}                                                                              // 21 
 ```
 
 
@@ -950,27 +1006,33 @@ namespace mathlib {                                                            /
 #include <iomanip>                                                             //  2 
 #include "polynomial_v2.h"                                                     //  3 
 #include "rational.h"                                                          //  4 
+#include <complex>                                                             //  5 
                                                                               
-using namespace mathlib;                                                       //  6 
+using namespace mathlib;                                                       //  7 
                                                                               
-int main(int argc, char **argv) {                                              //  8 
-  std::cout << "POLYNOMIAL_VERSION = \"" << POLYNOMIAL_VERSION << "\"\n";      //  9 
+int main(int argc, char **argv) {                                              //  9 
+  std::cout << "POLYNOMIAL_VERSION = " << POLYNOMIAL_VERSION << "\n";          // 10 
                                                                               
-  polynomial<double> pd;                                                       // 11 
-  pd.coeffs = { 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 };                          // 12 
-  std::cout << std::setprecision(9) << pd.evaluate(1.2) << "\n";               // 13 
+  polynomial<double> pd;                                                       // 12 
+  pd.coeffs = { 3, 5.0, 7.0, 11.0 };                                           // 13 
+  std::cout << pd.evaluate(2) << "\n";                                         // 14 
                                                                               
-  polynomial<int> pi;                                                          // 15 
-  pi.coeffs = { 2, 3, 5, 7, 11, -13 };                                         // 16 
-  std::cout << pi.evaluate(-2) << "\n";                                        // 17 
+  polynomial<int> pi;                                                          // 16 
+  pi.coeffs = { 2, 3, 5, 7, 11, -13 };                                         // 17 
+  std::cout << pi.evaluate(-2) << "\n";                                        // 18 
                                                                               
-  typedef rational<int> R;                                                     // 19 
-  polynomial<R> pr;                                                            // 20 
-  pr.coeffs = { R(7,11), R(11,13), R(13,17) };                                 // 21 
-  std::cout << pr.evaluate(R(5,7)) << "\n";                                    // 22 
+  typedef rational<int> R;                                                     // 20 
+  polynomial<R> pr;                                                            // 21 
+  pr.coeffs = { R(7, 11), R(11, 13), R(13, 17) };                              // 22 
+  std::cout << pr.evaluate(R(-5, 7)) << "\n";                                  // 23 
                                                                               
-  return 0;                                                                    // 24 
-}                                                                              // 25 
+  typedef std::complex<double> C;                                              // 25 
+  polynomial<C> pc;                                                            // 26 
+  pc.coeffs = { C(7.2, 11.3), C(11.5, 13.7), C(13.11, 17.13) };                // 27 
+  std::cout << pc.evaluate(C(-5.7, 7.11)) << "\n";                             // 28 
+                                                                              
+  return 0;                                                                    // 30 
+}                                                                              // 31 
 ```
 
 
@@ -978,10 +1040,11 @@ int main(int argc, char **argv) {                                              /
 
 ```
 $ bin/run target/native/polynomial_v2
-POLYNOMIAL_VERSION = "2.0.2"
-17.3020736
+POLYNOMIAL_VERSION = 2.0.2
+129
 552
-194273/119119
+50283/119119
+(995.904,-1357.05)
 ```
 
 ---
@@ -993,39 +1056,35 @@ POLYNOMIAL_VERSION = "2.0.2"
 // Name of generated bindings:                                                
 %module polynomial_v2_swig                                                     //  2 
                                                                               
+// Include C++ std lib interfaces:                                            
+%include "std_string.i"   // python __str__(), __repr__()                      //  5 
+%include "std_vector.i"   // std::vector<T>                                    //  6 
+                                                                              
 // Include C++ declarations as SWIG interface definitions:                    
-%include "polynomial_v2.h"                                                     //  5 
-%include "rational.h"                                                          //  6 
-                                                                              
-// Template instantiation:                                                    
-%{                                                                             //  9 
-#include "polynomial_v2.h"                                                     // 10 
-#include "rational.h"                                                          // 11 
-                                                                              
-template class mathlib::polynomial<int>;                                       // 13 
-template class mathlib::polynomial<double>;                                    // 14 
-template class mathlib::rational<int>;                                         // 15 
-template class mathlib::polynomial<mathlib::rational<int>>;                    // 16 
-template class std::vector<mathlib::rational<int>>;                            // 17 
-%}                                                                             // 18 
-                                                                              
-%include "std_string.i"        // python __str__(), __repr__()                 // 20 
-%template(RationalV2)            mathlib::rational<int>;                       // 21 
-                                                                              
-%include "std_vector.i"                                                        // 23 
-%template(VectorDoubleV2)        std::vector<double>;                          // 24 
-%template(VectorIntV2)           std::vector<int>;                             // 25 
-%template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 26 
-                                                                              
-%template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 28 
-%template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 29 
-%template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 30 
+%include "polynomial_v2.h"                                                     //  9 
+%include "rational.h"                                                          // 10 
                                                                               
 // Prepend C++ code in generated bindings:                                    
-%{                                                                             // 33 
-#include "polynomial_v2.h"                                                     // 34 
-#include "rational.h"                                                          // 35 
-%}                                                                             // 36 
+%{                                                                             // 13 
+#include "polynomial_v2.h"                                                     // 14 
+#include "rational.h"                                                          // 15 
+%}                                                                             // 16 
+                                                                              
+%template(RationalV2)            mathlib::rational<int>;                       // 18 
+%template(VectorDoubleV2)        std::vector<double>;                          // 19 
+%template(VectorIntV2)           std::vector<int>;                             // 20 
+%template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 21 
+%template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 22 
+%template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 23 
+%template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 24 
+                                                                              
+// std::complex<double>:                                                      
+#if SWIGPYTHON || SWIGRUBY                                                     // 27 
+%include "std_complex.i"  // std::complex<double>                              // 28 
+%template(ComplexV2)             std::complex<double>;                         // 29 
+%template(VectorComplexV2)       std::vector<std::complex<double>>;            // 30 
+%template(PolynomialComplexV2)   mathlib::polynomial<std::complex<double>>;    // 31 
+#endif                                                                         // 32 
 ```
 
 
@@ -1033,27 +1092,27 @@ template class std::vector<mathlib::rational<int>>;                            /
 ### Python : polynomial_v2.py
 
 ```python
-from polynomial_v2_swig import *                                                             #   1 
-                                                                                            
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                            #   3 
-                                                                                            
-# Instantiate polynomial<double> object:                                                    
-poly         = PolynomialDoubleV2()                                                          #   6 
-poly.coeffs  = VectorDoubleV2([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                        #   7 
-print(list(poly.coeffs))                                                                     #   8 
-print(poly.evaluate(1.2))                                                                    #   9 
-                                                                                            
-# Instantiate polynomial<int> object:                                                       
-poly        = PolynomialIntV2()                                                              #  12 
-poly.coeffs = VectorIntV2([ 2, 3, 5, 7, 11, -13 ])                                           #  13 
-print(list(poly.coeffs))                                                                     #  14 
-print(poly.evaluate(-2))                                                                     #  15 
-                                                                                            
-# Instantiate polynomial<rational<int>> object:                                             
-poly        = PolynomialRationalV2()                                                         #  18 
-poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13,17) ]) #  19 
-print(list(poly.coeffs))                                                                     #  20 
-print(poly.evaluate(RationalV2(5, 7)))                                                       #  21 
+from polynomial_v2_swig import *                                                                  #   1 
+                                                                                                 
+print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                                 #   3 
+                                                                                                 
+# polynomial<double>:                                                                            
+poly         = PolynomialDoubleV2()                                                               #   6 
+poly.coeffs  = VectorDoubleV2([ 3.0, 5.0, 7.0, 11.0 ])                                            #   7 
+print(list(poly.coeffs))                                                                          #   8 
+print(poly.evaluate(2))                                                                           #   9 
+                                                                                                 
+# polynomial<rational<int>>:                                                                     
+poly        = PolynomialRationalV2()                                                              #  12 
+poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13, 17) ])     #  13 
+print(list(poly.coeffs))                                                                          #  14 
+print(poly.evaluate(RationalV2(-5, 7)))                                                           #  15 
+                                                                                                 
+# polynomial<complex<double>>:                                                                   
+poly        = PolynomialComplexV2()                                                               #  18 
+poly.coeffs = VectorComplexV2([ complex(7.2, 11.3), complex(11.5, 13.7), complex(13.11, 17.13) ]) #  19 
+print(list(poly.coeffs))                                                                          #  20 
+print(poly.evaluate(complex(-5.7, 7.11)))                                                         #  21 
 ```
 
 
@@ -1062,12 +1121,12 @@ print(poly.evaluate(RationalV2(5, 7)))                                          
 ```
 $ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-[2, 3, 5, 7, 11, -13]
-552
-[rational(7,11), rational(11,13), rational(13,17)]
-194273/119119
+[3.0, 5.0, 7.0, 11.0]
+129.0
+[rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
+50283/119119
+[(7.2+11.3j), (11.5+13.7j), (13.11+17.13j)]
+(995.9038889999997-1357.0467130000002j)
 ```
 
 ---
@@ -1081,23 +1140,23 @@ $ bin/run src/polynomial_v2.py
                                                                                                   
 (prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  4 
                                                                                                   
-;; Instantiate polynomial<double> object:                                                         
+;; polynomial<double>:                                                                            
 (def p1 (PolynomialDoubleV2.))                                                                     ;;  7 
-(.setCoeffs p1 (VectorDoubleV2. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))                                ;;  8 
+(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))                                             ;;  8 
 (prn (.getCoeffs p1))                                                                              ;;  9 
-(prn (.evaluate p1 1.2))                                                                           ;; 10 
+(prn (.evaluate p1 2))                                                                             ;; 10 
                                                                                                   
-;; Instantiate polynomial<int> object:                                                            
+;; polynomial<int> object:                                                                        
 (def p2 (PolynomialIntV2.))                                                                        ;; 13 
 (.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                          ;; 14 
 (prn (.getCoeffs p2))                                                                              ;; 15 
 (prn (.evaluate p2 -2))                                                                            ;; 16 
                                                                                                   
-;; Instantiate polynomial<rational<int>> object:                                                  
+;; polynomial<rational<int>>:                                                                     
 (def p3 (PolynomialRationalV2.))                                                                   ;; 19 
 (.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 20 
 (prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                         ;; 21 
-(prn (.__str__ (.evaluate p3 (RationalV2. 5, 7))))                                                 ;; 22 
+(prn (.__str__ (.evaluate p3 (RationalV2. -5, 7))))                                                ;; 22 
 ```
 
 
@@ -1106,12 +1165,12 @@ $ bin/run src/polynomial_v2.py
 ```
 $ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
+[3.0 5.0 7.0 11.0]
+129.0
 [2 3 5 7 11 -13]
 552
 ["7/11" "11/13" "13/17"]
-"194273/119119"
+"50283/119119"
 ```
 
 ---
@@ -1125,23 +1184,29 @@ PV2 = Polynomial_v2_swig                                                        
                                                                                                                                 
 pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION                                                                                   #   4 
                                                                                                                                 
-# Instantiate polynomial<double> object:                                                                                        
+# polynomial<double>:                                                                                                           
 poly        = PV2::PolynomialDoubleV2.new                                                                                        #   7 
-poly.coeffs = PV2::VectorDoubleV2.new([ 2.3, 3.5, 5.7, 7.11, 11.13, -13.17 ])                                                    #   8 
+poly.coeffs = PV2::VectorDoubleV2.new([ 3, 5.0, 7.0, 11.0 ])                                                                     #   8 
 pp poly.coeffs.to_a                                                                                                              #   9 
-pp poly.evaluate(1.2)                                                                                                            #  10 
+pp poly.evaluate(2)                                                                                                              #  10 
                                                                                                                                 
-# Instantiate polynomial<int> object:                                                                                           
+# polynomial<int>                                                                                                               
 poly        = PV2::PolynomialIntV2.new                                                                                           #  13 
 poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                      #  14 
 pp poly.coeffs.to_a                                                                                                              #  15 
 pp poly.evaluate(-2)                                                                                                             #  16 
                                                                                                                                 
-# Instantiate polynomial<rational<int>> object:                                                                                 
+# polynomial<rational<int>>:                                                                                                    
 poly        = PV2::PolynomialRationalV2.new()                                                                                    #  19 
 poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalV2.new(7, 11), PV2::RationalV2.new(11, 13), PV2::RationalV2.new(13,17) ]) #  20 
 pp poly.coeffs.to_a                                                                                                              #  21 
-pp poly.evaluate(PV2::RationalV2.new(5, 7))                                                                                      #  22 
+pp poly.evaluate(PV2::RationalV2.new(-5, 7))                                                                                     #  22 
+                                                                                                                                
+# polynomial<complex<double>>                                                                                                   
+poly        = PV2::PolynomialComplexV2.new()                                                                                     #  25 
+poly.coeffs = PV2::VectorComplexV2.new([ 7.2+11.3i, 11.5+13.7i, 13.11+17.13i ])                                                  #  26 
+pp poly.coeffs.to_a                                                                                                              #  27 
+pp poly.evaluate(-5.7+7.11i)                                                                                                     #  28 
 ```
 
 
@@ -1150,12 +1215,14 @@ pp poly.evaluate(PV2::RationalV2.new(5, 7))                                     
 ```
 $ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2, 3, 5, 7, 11, -13]
 552
-[rational(7,11), rational(11,13), rational(13,17)]
-rational(194273,119119)
+[rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
+rational<int>(50283,119119)
+[(7.2+11.3i), (11.5+13.7i), (13.11+17.13i)]
+(995.9038889999997-1357.0467130000002i)
 ```
 
 ---
@@ -1169,26 +1236,26 @@ load target/tcl/polynomial_v2_swig.so Polynomial_v2_swig                        
                                                                                              
 puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                                            #   3 
                                                                                              
-# Instantiate polynomial<double> object:                                                     
+# polynomial<double>:                                                                        
 PolynomialDoubleV2 poly                                                                       #   6 
-VectorDoubleV2 c { 2.3 3.5 5.7 7.11 11.13 -13.17 }                                            #   7 
+VectorDoubleV2 c { 3 5.0 7.0 11.0 }                                                           #   7 
 poly configure -coeffs c                                                                      #   8 
 puts [poly cget -coeffs]                                                                      #   9 
-puts [poly evaluate 1.2]                                                                      #  10 
+puts [poly evaluate 2]                                                                        #  10 
                                                                                              
-# Instantiate polynomial<int> object:                                                        
+# polynomial<int>:                                                                           
 PolynomialIntV2 poly                                                                          #  13 
 VectorIntV2 c { 2 3 5 7 11 -13 }                                                              #  14 
 poly configure -coeffs c                                                                      #  15 
 puts [poly cget -coeffs]                                                                      #  16 
 puts [poly evaluate -2]                                                                       #  17 
                                                                                              
-# Instantiate polynomial<rational<int>> object:                                              
+# polynomial<rational<int>>:                                                                 
 PolynomialRationalV2 poly                                                                     #  20 
 VectorRationalV2 c [list [new_RationalV2 7 11] [new_RationalV2 11 13] [new_RationalV2 13 17]] #  21 
 poly configure -coeffs c                                                                      #  22 
 puts [poly cget -coeffs]                                                                      #  23 
-puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                              #  24 
+puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                              #  24 
 ```
 
 
@@ -1197,12 +1264,12 @@ puts [RationalV2___repr__  [poly evaluate [new_RationalV2 5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_3077703001000000_p_std__vectorT_double_t
-17.3020736
-_c07e703001000000_p_std__vectorT_int_t
+_10de602001000000_p_std__vectorT_double_t
+129.0
+_c0cd602001000000_p_std__vectorT_int_t
 552
-_5077703001000000_p_std__vectorT_mathlib__rationalT_int_t_t
-rational(194273,119119)
+_f08d602001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+rational<int>(50283,119119)
 ```
 
 ---
@@ -1218,10 +1285,11 @@ rational(194273,119119)
 
 ```
 $ bin/run target/native/polynomial_v2
-POLYNOMIAL_VERSION = "2.0.2"
-17.3020736
+POLYNOMIAL_VERSION = 2.0.2
+129
 552
-194273/119119
+50283/119119
+(995.904,-1357.05)
 ```
 
 ---
@@ -1231,12 +1299,12 @@ POLYNOMIAL_VERSION = "2.0.2"
 ```
 $ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
-[2, 3, 5, 7, 11, -13]
-552
-[rational(7,11), rational(11,13), rational(13,17)]
-194273/119119
+[3.0, 5.0, 7.0, 11.0]
+129.0
+[rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
+50283/119119
+[(7.2+11.3j), (11.5+13.7j), (13.11+17.13j)]
+(995.9038889999997-1357.0467130000002j)
 ```
 
 ---
@@ -1245,12 +1313,12 @@ $ bin/run src/polynomial_v2.py
 ```
 $ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
-[2.3 3.5 5.7 7.11 11.13 -13.17]
-17.3020736
+[3.0 5.0 7.0 11.0]
+129.0
 [2 3 5 7 11 -13]
 552
 ["7/11" "11/13" "13/17"]
-"194273/119119"
+"50283/119119"
 ```
 
 ---
@@ -1259,12 +1327,14 @@ $ bin/run src/polynomial_v2.clj
 ```
 $ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
-[2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
-17.3020736
+[3.0, 5.0, 7.0, 11.0]
+129.0
 [2, 3, 5, 7, 11, -13]
 552
-[rational(7,11), rational(11,13), rational(13,17)]
-rational(194273,119119)
+[rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
+rational<int>(50283,119119)
+[(7.2+11.3i), (11.5+13.7i), (13.11+17.13i)]
+(995.9038889999997-1357.0467130000002i)
 ```
 
 ---
@@ -1274,12 +1344,12 @@ rational(194273,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_3077703001000000_p_std__vectorT_double_t
-17.3020736
-_c07e703001000000_p_std__vectorT_int_t
+_10de602001000000_p_std__vectorT_double_t
+129.0
+_c0cd602001000000_p_std__vectorT_int_t
 552
-_5077703001000000_p_std__vectorT_mathlib__rationalT_int_t_t
-rational(194273,119119)
+_f08d602001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+rational<int>(50283,119119)
 ```
 
 ---
@@ -1869,19 +1939,19 @@ int main(int argc, char **argv) {                                               
   double data[][5] = {                                                                 //  5 
     // strike_price, asset_price, standard_deviation, risk_free_rate,  days_to_expiry:
     // vary expiry:                                                                   
-    { 1.50, 2.00, 0.5,  2.25, 30 },                                                    //  8 
-    { 1.50, 2.00, 0.5,  2.25, 15 },                                                    //  9 
-    { 1.50, 2.00, 0.5,  2.25, 10 },                                                    // 10 
-    { 1.50, 2.00, 0.5,  2.25,  5 },                                                    // 11 
-    { 1.50, 2.00, 0.5,  2.25,  2 },                                                    // 12 
-     // vary strike:                                                                  
-    { 0.50, 2.00, 0.25, 2.25, 15 },                                                    // 14 
-    { 1.00, 2.00, 0.25, 2.25, 15 },                                                    // 15 
-    { 1.50, 2.00, 0.25, 2.25, 15 },                                                    // 16 
-    { 2.00, 2.00, 0.25, 2.25, 15 },                                                    // 17 
-    { 2.50, 2.00, 0.25, 2.25, 15 },                                                    // 18 
-    { 3.00, 2.00, 0.25, 2.25, 15 },                                                    // 19 
-    { 3.50, 2.00, 0.25, 2.25, 15 },                                                    // 20 
+    { 1.50, 2.00, 0.5,  2.25, 30.0 },                                                  //  8 
+    { 1.50, 2.00, 0.5,  2.25, 15.0 },                                                  //  9 
+    { 1.50, 2.00, 0.5,  2.25, 10.0 },                                                  // 10 
+    { 1.50, 2.00, 0.5,  2.25,  5.0 },                                                  // 11 
+    { 1.50, 2.00, 0.5,  2.25,  2.0 },                                                  // 12 
+     // vary strike:.0                                                                
+    { 0.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 14 
+    { 1.00, 2.00, 0.25, 2.25, 15.0 },                                                  // 15 
+    { 1.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 16 
+    { 2.00, 2.00, 0.25, 2.25, 15.0 },                                                  // 17 
+    { 2.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 18 
+    { 3.00, 2.00, 0.25, 2.25, 15.0 },                                                  // 19 
+    { 3.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 20 
   };                                                                                   // 21 
   for ( int i = 0; i < sizeof(data) / sizeof(data[0]); i ++ ) {                        // 22 
     double *r = data[i];                                                               // 23 
@@ -2158,23 +2228,24 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.503 |               0.25 |           2.25 |             15 |     1.89 |       0 |           25.748 |            -100
-   14 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             15 |    1.867 |       0 |           21.155 |            -100
-   85 |  6 |          0.5 |       1.589 |               0.25 |           2.25 |             14 |    1.871 |       0 |           17.747 |            -100
-   20 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             11 |    1.753 |       0 |           15.557 |            -100
-   81 |  6 |          0.5 |       1.687 |               0.25 |           2.25 |             13 |    1.922 |       0 |            13.93 |            -100
-   62 |  6 |          0.5 |       1.694 |               0.25 |           2.25 |             16 |    1.915 |       0 |           13.046 |            -100
-   49 |  6 |          0.5 |       1.623 |               0.25 |           2.25 |             11 |    1.829 |       0 |           12.692 |            -100
-   91 |  6 |          0.5 |       1.603 |               0.25 |           2.25 |             17 |    1.783 |       0 |           11.228 |            -100
-   72 |  6 |          0.5 |       1.713 |               0.25 |           2.25 |             17 |    1.888 |       0 |           10.215 |            -100
-   39 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             17 |    1.643 |       0 |             7.95 |            -100
+   19 |  6 |          0.5 |       1.565 |               0.25 |           2.25 |             14 |    1.858 |       0 |           18.722 |            -100
+   10 |  6 |          0.5 |       1.701 |               0.25 |           2.25 |             15 |    2.017 |       0 |           18.577 |            -100
+   86 |  6 |          0.5 |       1.696 |               0.25 |           2.25 |             15 |     1.98 |       0 |           16.745 |            -100
+   16 |  6 |          0.5 |       1.766 |               0.25 |           2.25 |             17 |     2.01 |       0 |           13.816 |            -100
+    6 |  6 |          0.5 |       1.508 |               0.25 |           2.25 |             11 |    1.716 |       0 |           13.793 |            -100
+   66 |  6 |          0.5 |       1.797 |               0.25 |           2.25 |             11 |    2.032 |       0 |           13.077 |            -100
+    3 |  6 |          0.5 |       1.576 |               0.25 |           2.25 |             18 |    1.738 |       0 |           10.279 |            -100
+   27 |  6 |          0.5 |       1.813 |               0.25 |           2.25 |             16 |    1.961 |       0 |            8.163 |            -100
+   42 |  6 |          0.5 |       1.725 |               0.25 |           2.25 |             17 |    1.864 |       0 |            8.057 |            -100
+   80 |  6 |          0.5 |       1.615 |               0.25 |           2.25 |             12 |    1.706 |       0 |            5.634 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   87 | 12 |          3.5 |       1.595 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           6.457
-   50 | 12 |          3.5 |       1.565 |               0.25 |           2.25 |             15 |        0 |   1.627 |             -100 |           3.961
-(2 rows)
+   10 | 12 |          3.5 |       1.511 |               0.25 |           2.25 |             13 |        0 |   1.632 |             -100 |           8.007
+    1 | 12 |          3.5 |       1.538 |               0.25 |           2.25 |             13 |        0 |   1.611 |             -100 |           4.746
+   81 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.536 |             -100 |            0.13
+(3 rows)
 ```
 
 ---
@@ -2275,23 +2346,24 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.503 |               0.25 |           2.25 |             15 |     1.89 |       0 |           25.748 |            -100
-   14 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             15 |    1.867 |       0 |           21.155 |            -100
-   85 |  6 |          0.5 |       1.589 |               0.25 |           2.25 |             14 |    1.871 |       0 |           17.747 |            -100
-   20 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             11 |    1.753 |       0 |           15.557 |            -100
-   81 |  6 |          0.5 |       1.687 |               0.25 |           2.25 |             13 |    1.922 |       0 |            13.93 |            -100
-   62 |  6 |          0.5 |       1.694 |               0.25 |           2.25 |             16 |    1.915 |       0 |           13.046 |            -100
-   49 |  6 |          0.5 |       1.623 |               0.25 |           2.25 |             11 |    1.829 |       0 |           12.692 |            -100
-   91 |  6 |          0.5 |       1.603 |               0.25 |           2.25 |             17 |    1.783 |       0 |           11.228 |            -100
-   72 |  6 |          0.5 |       1.713 |               0.25 |           2.25 |             17 |    1.888 |       0 |           10.215 |            -100
-   39 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             17 |    1.643 |       0 |             7.95 |            -100
+   19 |  6 |          0.5 |       1.565 |               0.25 |           2.25 |             14 |    1.858 |       0 |           18.722 |            -100
+   10 |  6 |          0.5 |       1.701 |               0.25 |           2.25 |             15 |    2.017 |       0 |           18.577 |            -100
+   86 |  6 |          0.5 |       1.696 |               0.25 |           2.25 |             15 |     1.98 |       0 |           16.745 |            -100
+   16 |  6 |          0.5 |       1.766 |               0.25 |           2.25 |             17 |     2.01 |       0 |           13.816 |            -100
+    6 |  6 |          0.5 |       1.508 |               0.25 |           2.25 |             11 |    1.716 |       0 |           13.793 |            -100
+   66 |  6 |          0.5 |       1.797 |               0.25 |           2.25 |             11 |    2.032 |       0 |           13.077 |            -100
+    3 |  6 |          0.5 |       1.576 |               0.25 |           2.25 |             18 |    1.738 |       0 |           10.279 |            -100
+   27 |  6 |          0.5 |       1.813 |               0.25 |           2.25 |             16 |    1.961 |       0 |            8.163 |            -100
+   42 |  6 |          0.5 |       1.725 |               0.25 |           2.25 |             17 |    1.864 |       0 |            8.057 |            -100
+   80 |  6 |          0.5 |       1.615 |               0.25 |           2.25 |             12 |    1.706 |       0 |            5.634 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   87 | 12 |          3.5 |       1.595 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           6.457
-   50 | 12 |          3.5 |       1.565 |               0.25 |           2.25 |             15 |        0 |   1.627 |             -100 |           3.961
-(2 rows)
+   10 | 12 |          3.5 |       1.511 |               0.25 |           2.25 |             13 |        0 |   1.632 |             -100 |           8.007
+    1 | 12 |          3.5 |       1.538 |               0.25 |           2.25 |             13 |        0 |   1.611 |             -100 |           4.746
+   81 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.536 |             -100 |            0.13
+(3 rows)
 ```
 
 ---
@@ -2744,60 +2816,6 @@ cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          
                                                                               
 ```                                                                           
                                                                               
-### Build postgresql Bindings                                                 
-                                                                              
-```                                                                           
-# Generate postgresql bindings:                                               
-swig -c++ -postgresql -extension-version 1.2.3 -addextern -I- -Isrc             \
-  -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/polynomial_swig.cc src/polynomial.i                       
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-                                                                              
-# Source code statistics:                                                     
-wc -l src/polynomial.h src/polynomial.i                                       
-10 src/polynomial.h                                                           
-16 src/polynomial.i                                                           
-26 total                                                                      
-                                                                              
-# Generated code statistics:                                                  
-wc -l target/postgresql/polynomial_swig.cc                                      \
-  target/postgresql/polynomial_swig-*.sql                                       \
-  target/postgresql/polynomial_swig.control                                     \
-  target/postgresql/polynomial_swig.make                                      
-2256 target/postgresql/polynomial_swig.cc                                     
-131 target/postgresql/polynomial_swig--1.2.3.sql                              
-8 target/postgresql/polynomial_swig.control                                   
-13 target/postgresql/polynomial_swig.make                                     
-2408 total                                                                    
-                                                                              
-# Compile postgresql bindings:                                                
-cc++ -std=c++17 -Isrc -I$POSTGRESQL_INC_DIR -c -o                               \
-  target/postgresql/polynomial_swig.cc.o target/postgresql/polynomial_swig.cc 
-                                                                              
-# Link postgresql dynamic library:                                            
-cc++ -dynamiclib -o target/postgresql/polynomial_swig.so                        \
-  target/native/polynomial.o target/postgresql/polynomial_swig.cc.o             \
-  -L/opt/homebrew/lib                                                         
-                                                                              
-# Compile and install postgresql extension:                                   
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./polynomial_swig.control '$POSTGRESQL_SHARE_DIR/extension/'
-install -c -m 644 ./polynomial_swig--1.2.3.sql                                  \
-  '$POSTGRESQL_SHARE_DIR/extension/'                                          
-install -c -m 755 polynomial_swig.so '$POSTGRESQL_LIB_DIR/'                   
-                                                                              
-```                                                                           
-                                                                              
 
 ---
 
@@ -2826,14 +2844,14 @@ swig -c++ -python -addextern -I- -Isrc -outdir target/python/ -o                
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
+32 src/polynomial_v2.i                                                        
+45 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-13398 target/python/polynomial_v2_swig.cc                                     
-508 target/python/polynomial_v2_swig.py                                       
-13906 total                                                                   
+15618 target/python/polynomial_v2_swig.cc                                     
+631 target/python/polynomial_v2_swig.py                                       
+16249 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
@@ -2852,26 +2870,26 @@ cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                        
 # Generate clojure bindings:                                                  
 swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
   target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i                    
-include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
+include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:26: Warning 503: Can't wrap 'operator *' unless renamed to   \
+include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
+32 src/polynomial_v2.i                                                        
+45 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1673 target/clojure/polynomial_v2_swig.cc                                     
+1675 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
-84 target/clojure/polynomial_v2_swigJNI.java                                  
-1780 total                                                                    
+85 target/clojure/polynomial_v2_swigJNI.java                                  
+1783 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -2895,12 +2913,12 @@ swig -c++ -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                    
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
+32 src/polynomial_v2.i                                                        
+45 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-14529 target/ruby/polynomial_v2_swig.cc                                       
+17281 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-2.7.0                           \
@@ -2920,18 +2938,18 @@ cc++ -dynamiclib -o target/ruby/polynomial_v2_swig.bundle                       
 # Generate tcl bindings:                                                      
 swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i                        
-include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
+32 src/polynomial_v2.i                                                        
+45 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-4722 target/tcl/polynomial_v2_swig.cc                                         
+4726 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -2950,22 +2968,22 @@ cc++ -dynamiclib -o target/tcl/polynomial_v2_swig.so                            
 # Generate guile bindings:                                                    
 swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i                      
-include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
+include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:26: Warning 503: Can't wrap 'operator *' unless renamed to   \
+include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
+32 src/polynomial_v2.i                                                        
+45 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-4035 target/guile/polynomial_v2_swig.cc                                       
+4044 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -2975,80 +2993,6 @@ cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      
 cc++ -dynamiclib -o target/guile/libpolynomial_v2_swig.so                       \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
   -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
-                                                                              
-```                                                                           
-                                                                              
-### Build postgresql Bindings                                                 
-                                                                              
-```                                                                           
-# Generate postgresql bindings:                                               
-swig -c++ -postgresql -extension-version 1.2.3 -addextern -I- -Isrc             \
-  -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/polynomial_v2_swig.cc src/polynomial_v2.i                 
-include/rational.h:23: Warning 503: Can't wrap 'operator +' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:26: Warning 503: Can't wrap 'operator *' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:29: Warning 503: Can't wrap 'operator ==' unless renamed to  \
-  a valid identifier.                                                         
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:332: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:316: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:151: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:158: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-$LOCAL_DIR/share/swig/4.2.0/postgresql/std_vector.i:165: Warning 468: No        \
-  'throws' typemap defined for exception type 'std::out_of_range'             
-                                                                              
-# Source code statistics:                                                     
-wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
-13 src/polynomial_v2.h                                                        
-36 src/polynomial_v2.i                                                        
-49 total                                                                      
-                                                                              
-# Generated code statistics:                                                  
-wc -l target/postgresql/polynomial_v2_swig.cc                                   \
-  target/postgresql/polynomial_v2_swig-*.sql                                    \
-  target/postgresql/polynomial_v2_swig.control                                  \
-  target/postgresql/polynomial_v2_swig.make                                   
-4191 target/postgresql/polynomial_v2_swig.cc                                  
-460 target/postgresql/polynomial_v2_swig--1.2.3.sql                           
-8 target/postgresql/polynomial_v2_swig.control                                
-13 target/postgresql/polynomial_v2_swig.make                                  
-4672 total                                                                    
-                                                                              
-# Compile postgresql bindings:                                                
-cc++ -std=c++17 -Isrc -I$POSTGRESQL_INC_DIR -c -o                               \
-  target/postgresql/polynomial_v2_swig.cc.o                                     \
-  target/postgresql/polynomial_v2_swig.cc                                     
-                                                                              
-# Link postgresql dynamic library:                                            
-cc++ -dynamiclib -o target/postgresql/polynomial_v2_swig.so                     \
-  target/native/polynomial_v2.o target/postgresql/polynomial_v2_swig.cc.o       \
-  -L/opt/homebrew/lib                                                         
-                                                                              
-# Compile and install postgresql extension:                                   
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./polynomial_v2_swig.control                                  \
-  '$POSTGRESQL_SHARE_DIR/extension/'                                          
-install -c -m 644 ./polynomial_v2_swig--1.2.3.sql                               \
-  '$POSTGRESQL_SHARE_DIR/extension/'                                          
-install -c -m 755 polynomial_v2_swig.so '$POSTGRESQL_LIB_DIR/'                
                                                                               
 ```                                                                           
                                                                               
@@ -3182,50 +3126,6 @@ cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   
 cc -dynamiclib -o target/guile/libtommath_swig.so target/native/tommath.o       \
   target/guile/tommath_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread    \
   -ltommath                                                                   
-                                                                              
-```                                                                           
-                                                                              
-### Build postgresql Bindings                                                 
-                                                                              
-```                                                                           
-# Generate postgresql bindings:                                               
-swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
-  -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/tommath_swig.c src/tommath.i                              
-                                                                              
-# Source code statistics:                                                     
-wc -l src/tommath.h src/tommath.i                                             
-52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
-                                                                              
-# Generated code statistics:                                                  
-wc -l target/postgresql/tommath_swig.c target/postgresql/tommath_swig-*.sql     \
-  target/postgresql/tommath_swig.control target/postgresql/tommath_swig.make  
-6865 target/postgresql/tommath_swig.c                                         
-1297 target/postgresql/tommath_swig--1.2.3.sql                                
-8 target/postgresql/tommath_swig.control                                      
-13 target/postgresql/tommath_swig.make                                        
-8183 total                                                                    
-                                                                              
-# Compile postgresql bindings:                                                
-cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/tommath_swig.c.o         \
-  target/postgresql/tommath_swig.c                                            
-                                                                              
-# Link postgresql dynamic library:                                            
-cc -dynamiclib -o target/postgresql/tommath_swig.so target/native/tommath.o     \
-  target/postgresql/tommath_swig.c.o -ltommath                                
-                                                                              
-# Compile and install postgresql extension:                                   
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_SHARE_DIR/extension'                                           
-$POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
-  '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./tommath_swig.control '$POSTGRESQL_SHARE_DIR/extension/'   
-install -c -m 644 ./tommath_swig--1.2.3.sql '$POSTGRESQL_SHARE_DIR/extension/'
-install -c -m 755 tommath_swig.so '$POSTGRESQL_LIB_DIR/'                      
                                                                               
 ```                                                                           
                                                                               

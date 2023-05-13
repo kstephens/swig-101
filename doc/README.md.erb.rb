@@ -215,6 +215,10 @@ def clean_up_lines lines
     gsub('gmake', 'make').
     gsub(%r{\bclang\b}, 'cc').
     gsub(%r{\bclang\+\+\b}, 'c++').
+    # Compiler flags:
+    gsub(%r{ -g }, ' ').
+    gsub(%r{ -O\d }, ' ').
+    gsub(%r{ -Wno-c++11-extensions }, ' ').
     # make options:
     gsub(%r{--no-print-directory}, ' ').
     # OSX:

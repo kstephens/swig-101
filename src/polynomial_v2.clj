@@ -21,4 +21,4 @@
 (def p3 (PolynomialRationalV2.))
 (.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ]))
 (prn (mapv #(.__str__ %) (.getCoeffs p3)))
-(prn (.__str__ (.evaluate p3 (RationalV2. 5, 7))))
+(prn (.__str__ (.evaluate p3 (RationalV2. -5, 7))))
