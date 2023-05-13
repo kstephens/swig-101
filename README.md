@@ -9,7 +9,7 @@ Introduction to [SWIG](http://www.swig.org/).
 * https://www.swig.org/
 * https://www.swig.org/papers/PyTutorial98/PyTutorial98.pdf
 * https://github.com/swig/swig
-* https://github.com/kstephens/swig-101/tree/postgresql
+* https://github.com/kstephens/swig-101
 * https://github.com/kstephens/swig/tree/postgresql
 
 # What is SWIG?
@@ -61,6 +61,7 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 * Java
 * Perl 5
 * Tcl 8
+* PostgreSQL (proof-of-concept)
 * Lua
 * D
 * Go
@@ -769,9 +770,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 14f0047e0>
 129.0
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 14f0047e0>
 17.3020736
 ```
 
@@ -804,9 +805,9 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e03201000000_p_std__vectorT_double_t
+_904b705501000000_p_std__vectorT_double_t
 129.0
-_a042e03201000000_p_std__vectorT_double_t
+_904b705501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -920,9 +921,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 14f0047e0>
 129.0
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 14f0047e0>
 17.3020736
 ```
 
@@ -932,9 +933,9 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e03201000000_p_std__vectorT_double_t
+_904b705501000000_p_std__vectorT_double_t
 129.0
-_a042e03201000000_p_std__vectorT_double_t
+_904b705501000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1277,11 +1278,11 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a042602c01000000_p_std__vectorT_double_t
+_8046002f01000000_p_std__vectorT_double_t
 129.0
-_2043602c01000000_p_std__vectorT_int_t
+_606e002f01000000_p_std__vectorT_int_t
 552
-_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_906d002f01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1357,11 +1358,11 @@ rational<int>(50283,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a042602c01000000_p_std__vectorT_double_t
+_8046002f01000000_p_std__vectorT_double_t
 129.0
-_2043602c01000000_p_std__vectorT_int_t
+_606e002f01000000_p_std__vectorT_int_t
 552
-_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_906d002f01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -2241,25 +2242,21 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
-   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
-   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
-    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
-   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
-   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
-   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
-   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
-   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
+   72 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             16 |    1.994 |       0 |           32.756 |            -100
+   21 |  6 |          0.5 |       1.595 |               0.25 |           2.25 |             13 |    2.048 |       0 |           28.401 |            -100
+   59 |  6 |          0.5 |       1.612 |               0.25 |           2.25 |             13 |    1.925 |       0 |           19.416 |            -100
+   22 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             15 |    1.714 |       0 |           14.114 |            -100
+   25 |  6 |          0.5 |       1.831 |               0.25 |           2.25 |             13 |    2.025 |       0 |           10.595 |            -100
+   65 |  6 |          0.5 |       1.817 |               0.25 |           2.25 |             14 |    1.929 |       0 |            6.164 |            -100
+   40 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             12 |    1.596 |       0 |            5.555 |            -100
+   51 |  7 |            1 |        1.51 |               0.25 |           2.25 |             16 |    1.585 |       0 |            4.966 |            -100
+   62 |  6 |          0.5 |       1.552 |               0.25 |           2.25 |             12 |    1.625 |       0 |            4.703 |            -100
+   85 |  6 |          0.5 |       1.924 |               0.25 |           2.25 |             12 |    1.998 |       0 |            3.846 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
-   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
-   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
-   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
-(4 rows)
+(0 rows)
 ```
 
 ---
@@ -2360,25 +2357,21 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
-   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
-   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
-    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
-   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
-   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
-   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
-   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
-   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
+   72 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             16 |    1.994 |       0 |           32.756 |            -100
+   21 |  6 |          0.5 |       1.595 |               0.25 |           2.25 |             13 |    2.048 |       0 |           28.401 |            -100
+   59 |  6 |          0.5 |       1.612 |               0.25 |           2.25 |             13 |    1.925 |       0 |           19.416 |            -100
+   22 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             15 |    1.714 |       0 |           14.114 |            -100
+   25 |  6 |          0.5 |       1.831 |               0.25 |           2.25 |             13 |    2.025 |       0 |           10.595 |            -100
+   65 |  6 |          0.5 |       1.817 |               0.25 |           2.25 |             14 |    1.929 |       0 |            6.164 |            -100
+   40 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             12 |    1.596 |       0 |            5.555 |            -100
+   51 |  7 |            1 |        1.51 |               0.25 |           2.25 |             16 |    1.585 |       0 |            4.966 |            -100
+   62 |  6 |          0.5 |       1.552 |               0.25 |           2.25 |             12 |    1.625 |       0 |            4.703 |            -100
+   85 |  6 |          0.5 |       1.924 |               0.25 |           2.25 |             12 |    1.998 |       0 |            3.846 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
-   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
-   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
-   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
-(4 rows)
+(0 rows)
 ```
 
 ---
