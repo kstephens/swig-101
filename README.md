@@ -4,6 +4,14 @@
 
 Introduction to [SWIG](http://www.swig.org/).
 
+# References
+
+* https://www.swig.org/
+* https://www.swig.org/papers/PyTutorial98/PyTutorial98.pdf
+* https://github.com/swig/swig
+* https://github.com/kstephens/swig-101/tree/postgresql
+* https://github.com/kstephens/swig/tree/postgresql
+
 # What is SWIG?
 
 SWIG is a foreign-function-interface (FFI) generator for native C/C++ libraries.
@@ -96,6 +104,11 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 * Does not provide any data structure functionality.
 * Requires knowledge of CPU, compiler and OS calling conventions.
 * Requires manual layout struct and union values accordingly.
+
+### References
+
+* https://github.com/libffi/libffi
+* https://www.chiark.greenend.org.uk/doc/libffi-dev/html/
 
 # Case Study
 
@@ -756,9 +769,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 154704330>
+#<swig-pointer std::vector< double > * 13f608e00>
 129.0
-#<swig-pointer std::vector< double > * 154704330>
+#<swig-pointer std::vector< double > * 13f608e00>
 17.3020736
 ```
 
@@ -791,9 +804,9 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_9080702701000000_p_std__vectorT_double_t
+_a042e03201000000_p_std__vectorT_double_t
 129.0
-_9080702701000000_p_std__vectorT_double_t
+_a042e03201000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -907,9 +920,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 154704330>
+#<swig-pointer std::vector< double > * 13f608e00>
 129.0
-#<swig-pointer std::vector< double > * 154704330>
+#<swig-pointer std::vector< double > * 13f608e00>
 17.3020736
 ```
 
@@ -919,9 +932,9 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_9080702701000000_p_std__vectorT_double_t
+_a042e03201000000_p_std__vectorT_double_t
 129.0
-_9080702701000000_p_std__vectorT_double_t
+_a042e03201000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1264,11 +1277,11 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_10de602001000000_p_std__vectorT_double_t
+_a042602c01000000_p_std__vectorT_double_t
 129.0
-_c0cd602001000000_p_std__vectorT_int_t
+_2043602c01000000_p_std__vectorT_int_t
 552
-_f08d602001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1344,11 +1357,11 @@ rational<int>(50283,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_10de602001000000_p_std__vectorT_double_t
+_a042602c01000000_p_std__vectorT_double_t
 129.0
-_c0cd602001000000_p_std__vectorT_int_t
+_2043602c01000000_p_std__vectorT_int_t
 552
-_f08d602001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -2228,24 +2241,25 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.565 |               0.25 |           2.25 |             14 |    1.858 |       0 |           18.722 |            -100
-   10 |  6 |          0.5 |       1.701 |               0.25 |           2.25 |             15 |    2.017 |       0 |           18.577 |            -100
-   86 |  6 |          0.5 |       1.696 |               0.25 |           2.25 |             15 |     1.98 |       0 |           16.745 |            -100
-   16 |  6 |          0.5 |       1.766 |               0.25 |           2.25 |             17 |     2.01 |       0 |           13.816 |            -100
-    6 |  6 |          0.5 |       1.508 |               0.25 |           2.25 |             11 |    1.716 |       0 |           13.793 |            -100
-   66 |  6 |          0.5 |       1.797 |               0.25 |           2.25 |             11 |    2.032 |       0 |           13.077 |            -100
-    3 |  6 |          0.5 |       1.576 |               0.25 |           2.25 |             18 |    1.738 |       0 |           10.279 |            -100
-   27 |  6 |          0.5 |       1.813 |               0.25 |           2.25 |             16 |    1.961 |       0 |            8.163 |            -100
-   42 |  6 |          0.5 |       1.725 |               0.25 |           2.25 |             17 |    1.864 |       0 |            8.057 |            -100
-   80 |  6 |          0.5 |       1.615 |               0.25 |           2.25 |             12 |    1.706 |       0 |            5.634 |            -100
+   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
+   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
+   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
+   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
+    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
+   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
+   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
+   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
+   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
+   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   10 | 12 |          3.5 |       1.511 |               0.25 |           2.25 |             13 |        0 |   1.632 |             -100 |           8.007
-    1 | 12 |          3.5 |       1.538 |               0.25 |           2.25 |             13 |        0 |   1.611 |             -100 |           4.746
-   81 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.536 |             -100 |            0.13
-(3 rows)
+   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
+   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
+   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
+   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
+(4 rows)
 ```
 
 ---
@@ -2346,24 +2360,25 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.565 |               0.25 |           2.25 |             14 |    1.858 |       0 |           18.722 |            -100
-   10 |  6 |          0.5 |       1.701 |               0.25 |           2.25 |             15 |    2.017 |       0 |           18.577 |            -100
-   86 |  6 |          0.5 |       1.696 |               0.25 |           2.25 |             15 |     1.98 |       0 |           16.745 |            -100
-   16 |  6 |          0.5 |       1.766 |               0.25 |           2.25 |             17 |     2.01 |       0 |           13.816 |            -100
-    6 |  6 |          0.5 |       1.508 |               0.25 |           2.25 |             11 |    1.716 |       0 |           13.793 |            -100
-   66 |  6 |          0.5 |       1.797 |               0.25 |           2.25 |             11 |    2.032 |       0 |           13.077 |            -100
-    3 |  6 |          0.5 |       1.576 |               0.25 |           2.25 |             18 |    1.738 |       0 |           10.279 |            -100
-   27 |  6 |          0.5 |       1.813 |               0.25 |           2.25 |             16 |    1.961 |       0 |            8.163 |            -100
-   42 |  6 |          0.5 |       1.725 |               0.25 |           2.25 |             17 |    1.864 |       0 |            8.057 |            -100
-   80 |  6 |          0.5 |       1.615 |               0.25 |           2.25 |             12 |    1.706 |       0 |            5.634 |            -100
+   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
+   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
+   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
+   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
+    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
+   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
+   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
+   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
+   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
+   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
 (10 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   10 | 12 |          3.5 |       1.511 |               0.25 |           2.25 |             13 |        0 |   1.632 |             -100 |           8.007
-    1 | 12 |          3.5 |       1.538 |               0.25 |           2.25 |             13 |        0 |   1.611 |             -100 |           4.746
-   81 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.536 |             -100 |            0.13
-(3 rows)
+   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
+   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
+   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
+   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
+(4 rows)
 ```
 
 ---
@@ -3345,15 +3360,6 @@ install -c -m 755 black_scholes_swig.so '$POSTGRESQL_LIB_DIR/'
 ---
 
 
-
-# Links
-
-* https://www.swig.org/
-* https://github.com/swig/swig
-* https://github.com/kstephens/swig-101
-* https://github.com/libffi/libffi
-* https://www.chiark.greenend.org.uk/doc/libffi-dev/html/
-* https://www.swig.org/papers/PyTutorial98/PyTutorial98.pdf
 
 # HOW-TO
 
