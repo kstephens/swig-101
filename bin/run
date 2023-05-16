@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+debug= verbose=
+[[ "$1" = '--verbose' ]] && shift && verbose=1
+[[ "$1" = '--debug' ]] && shift && debug=1
+
+argv=("$@")
+argv_len="${#argv[@]}"
+arg_end=
+
 export ROOT_DIR
 : "${ROOT_DIR:=$(/bin/pwd)}"
 
@@ -21,6 +29,8 @@ do
   [[ -d "$d" ]] && PATH_OPT="$d:$PATH_OPT"
 done
 
+PATH="$PATH:/Library/Developer/CommandLineTools/usr/bin/"
+
 cmd=("$@")
 dir="$(/bin/pwd)"
 
@@ -33,7 +43,8 @@ prog-path() { # VAR prog
   prog_name="$2" prog_exe= prog_dir= prog_home= prog_inc= prog_lib=
   shift 2
   "$@"
-  : "${prog_exe:=$(-which "$prog_name" || echo "$prog_name")}"
+  : "${prog_exe:=$(-which "$prog_name")}"
+  [[ -z "$prog_exe" ]] && return 1
   prog_exe="$(readlink -f "$prog_exe" 2>/dev/null || echo "$prog_exe")"
   : "${prog_dir:=$(dirname "$prog_exe")}"
   : "${prog_home:=$(cd "$prog_dir/.." && /bin/pwd)}"
@@ -46,17 +57,17 @@ prog-path() { # VAR prog
   if ! [[ "$PATH" == *"$prog_dir"* ]]
   then
     export PATH="$prog_dir:$PATH"
-    target_dir="$dir/target/$prog_name"
-    if [[ -d "$target_dir" ]]
+    prog_target_dir="$dir/target/$prog_name"
+    if [[ -d "$prog_target_dir" ]]
     then
-      export LD_LIBRARY_PATH="$dir/target/$prog_name:$LD_LIBRARY_PATH"
-      export LD_RUN_PATH="$dir/target/$prog_name:$LD_RUN_PATH"
+      export LD_LIBRARY_PATH="$prog_target_dir:$LD_LIBRARY_PATH"
+      export LD_RUN_PATH="$prog_target_dir:$LD_RUN_PATH"
     fi
   fi
 }
 
 PATH="$dir/bin:$dir/local/bin:$PATH"
-for swig_exe in "$SWIG_EXE" "$dir/local/bin/swig" "$dir/../swig/swig" "$HOME/local/bin/swig" $(which swig) CANNOT-FIND-SWIG
+for swig_exe in "$SWIG_EXE" "$dir/local/bin/swig" "$dir/../swig/swig" $(which swig) CANNOT-FIND-SWIG
 do
   [[ -x "$swig_exe" ]] && break
 done
@@ -78,30 +89,58 @@ JAVA_INC="${JAVA_INC//\/jre\//\/}"
 export RUBYLIB="$dir/target/ruby:$dir/src:$RUBYLIB"
 export GUILE_AUTO_COMPILE=0
 export PYTHONPATH="$dir/target/python:$PYTHONPATH"
+export POSTGRESQL_INC_DIR="$(pg_config --includedir-server 2>/dev/null)"
+export POSTGRESQL_LIB_DIR="$(pg_config --libdir 2>/dev/null)"
+export POSTGRESQL_SHARE_DIR="$(pg_config --sharedir 2>/dev/null)"
 
+target_dir=
 case "${cmd[0]}"
 in
   *.rb)
     target_dir="$dir/target/ruby"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
   ;;
   *.py)
     target_dir="$dir/target/python"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
   ;;
   *.clj)
     # set -x
-    target_dir="$dir/target/clojure"
-    export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
-    export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
-    export CLASSPATH="$target_dir:$(clojure -Spath 2>/dev/null):$CLASSPATH"
-    for java in "$target_dir"/*.java
+    java_target_dir="$dir/target/clojure"
+    export CLASSPATH="$java_target_dir:$($CLOJURE_EXE -Spath 2>/dev/null):$CLASSPATH"
+    export LD_LIBRARY_PATH="$java_target_dir:$LD_LIBRARY_PATH"
+    export LD_RUN_PATH="$java_target_dir:$LD_RUN_PATH"
+    for java in "$java_target_dir"/*.java
     do
       class="${java%.java}.class"
       [[ "$java" -nt "$class" ]] && javac "$java" 2>/dev/null
     done
-    cmd=(clojure -Scp "${CLASSPATH}" -J-Djava.library.path="$target_dir" "${cmd[@]}")
+    cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
+  ;;
+  *.psql)
+   if [[ -n "$debug" ]]
+   then
+    # set -x
+    # -v ON_ERROR_STOP=1
+    cat "${argv[-1]}" |
+    # Pass newlines through --echo-all:
+    sed -E -e 's/^\s*$/-- NEWLINE --/' |
+    psql --quiet -v pager=0 --echo-all 2>&1 |
+    # Omit header from output:
+    grep -A 9999 -Ee '^-- HEADER-END --' |
+    # Remove NOTICE.
+    # ';;' adds a newline.
+    # Restore newlines:
+    sed -E -e '/^NOTICE: /d' -e 's/;;$/;\n/' \
+           -e '/^-- HEADER/d' -e 's/^-- NEWLINE --//'
+    else
+      psql --quiet -v pager=0 -f "$@" |& grep -v ': NOTICE: '
+    fi
+    exit $?
   ;;
 esac
+if [[ "$target_dir" ]]
+then
+  export LD_LIBRARY_PATH="$target_dir:$LD_LIBRARY_PATH"
+  export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
+fi
 
 exec "${cmd[@]}"

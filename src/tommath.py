@@ -12,7 +12,7 @@ e = mp_int("12343456", 16)             # <-- yey!
 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})
 
-mp_mul(a, b, c);
-mp_mul(c, b, d);
+mp_mul(a, b, c)
+mp_mul(c, b, d)
 
 print({"a": a, "b": b, "c": c, "d": d, "e": e})

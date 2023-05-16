@@ -5,6 +5,7 @@ exit! if ENV['_SWIG_101_README_MD']
 ENV['_SWIG_101_README_MD'] = '1'
 
 require 'pp'
+require 'pry' if ENV['PRY']
 
 $verbose = false
 $pe  = $verbose # || true
@@ -78,12 +79,23 @@ end
 
 def line_numbers! lines, lang, swig_interface = nil
   comment_to_EOL, comment_line_rx = comment_for_lang(swig_interface || lang)
+  # log("line_numbers! : #{lang.inspect} : #{swig_interface.inspect} : #{comment_to_EOL.inspect} : #{comment_line_rx.inspect}")
   pad_lines!(lines)
   lines.map!.with_index(1) do |line, i|
+    # binding.pry if ENV['PRY'] && line =~ /Constructor:/
     case line
     when nil
-    # when %r{^\s*$}, comment_line_rx
-    #  line
+    when %r{^\s*$}
+      line
+    when comment_line_rx
+      # Markdeep trims whitespace in comments, thus
+      # the line numbers are not right-justified.
+      if ENV['MARKDEEP'] || true
+        # line = $& + $'.gsub(' ', "\u00A0")
+        line
+      else
+        ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
+      end
     else
       ('%-s %-2s %2d ' % [line, comment_to_EOL, i])
       #  .gsub(' ', "\u00A0")
@@ -101,12 +113,16 @@ def comment_for_lang lang
     [ ';;', %r{^\s*;;} ]
   when /py|tcl|shell|sh|ruby|rb/i
     [ '#' , %r{^\s*\#} ]
+  when /sql|postgres/i
+    [ '--' , %r{^\s*--} ]
   else
     [ '#' , %r{^\s*\#} ]
   end
 end
 
 def code_lines s, lang, swig_interface = nil
+  s = s.sub(%r{\A.*\n *-- *HEADER-END *-- *\n}m, '')
+  s = s.gsub(/;;\s*$/, ';')
   lines = string_to_lines(s)
   lines.map!{|s| remove_shebang(s)}
   trim_empty_lines!(lines)
@@ -155,64 +171,131 @@ end
 
 def run_workflow e
   out = cmd "bin/build clean-example build-example EXAMPLE=#{e[:name]}"
-  out = out.
+  if ENV['SWIG_101_VERBOSE']
+    log("run_workflow: #{e[:name]}")
+    # log(out)
+  end
+  lines = string_to_lines(out)
+  lines.map! do | line |
+    idempotently(line) do | line |
+      line.
   gsub(%r{//+}, '/').
+  # OSX:
   gsub(%r{-isysroot */Library/Developer/CommandLineTools/SDKs/.+?.sdk}, ' ').
   # Linux:
-  gsub(%r{-I /usr/include/tcl[^ ]* *}, ' ').
-  gsub(%r{(-Wno-unused-command-line-argument|-Wno-unknown-attributes -Wno-ignored-attributes) +}, ' ').
+  gsub(%r{-I /usr/include/tcl\S* *}, ' ').
+  # Arbitrary compiler flags:
+  gsub(%r{ +(-g|-O\d|-DNDEBUG|-fwrapv|-Wall|-Wno-c\+\+11-extensions|-Wno-sentinel|-Wno-unused-result|-Wsign-compare|-Wunreachable-code|-fno-common|-Wno-unused-command-line-argument|-Wno-unknown-attributes|-Wno-ignored-attributes|-Wno-deprecated-declarations|-Wl,-undefined,dynamic_lookup) +}, ' ').
+  gsub(%r{  +}, ' ').
   # brew:
   gsub(%r{-I */opt/homebrew/include +}, ' ').
   gsub(%r{-L */opt/homebrew/lib +}, ' ').
-  gsub(%r{-I */opt/homebrew/opt/[^/ ]+/include[^ ]* +}, ' ').
-  gsub(%r{-L */opt/homebrew/opt/[^/ ]+/lib[^ ]* +}, ' ').
+  gsub(%r{-I */opt/homebrew/opt/\S+ +}, ' ').
+  gsub(%r{-L */opt/homebrew/opt/\S+ +}, ' ').
+  gsub(%r{ld: warning: -undefined dynamic_lookup may not work with chained fixups}, ' ').
   # macports:
-  gsub(%r{-I */opt/local/include[^ ]* +}, ' ').
-  gsub(%r{-L */opt/local/lib[^ ]* +}, ' ').
+  gsub(%r{-I */opt/local/include\S* +}, ' ').
+  gsub(%r{-L */opt/local/lib\S* +}, ' ').
   # local/:
-  gsub(%r{-I *include[^ ]* +}, ' ').
-  gsub(%r{-I *local/include[^ ]* +}, ' ').
-  gsub(%r{-L *local/lib[^ ]* +}, ' ').
+  gsub(%r{-I *include\S* +}, ' ').
+  gsub(%r{-I *local/include\S* +}, ' ').
+  gsub(%r{-L *local/lib\S* +}, ' ').
   gsub(%r{  +}, ' ')
-  lines = clean_up_lines(dedup_empty_lines(string_to_lines(out)))
+  end
+end
+  lines = clean_up_lines(dedup_empty_lines(lines))
   lines_to_string(lines.map{|l| wrap_line(l.gsub(%r{  +}, ' '))})
 end
 
 def clean_up_lines lines
   lines.map! do | line |
+    idempotently(line) do | line |
     line.
     gsub('\0', ''). # mp_fwrite adds NULL?!?
     # Abs paths:
-    gsub(%r{//+}, ' ').
+    gsub(%r{//+}, '/').
+    # Normalize tool names:
     gsub('gmake', 'make').
+    gsub(%r{\bclang\b}, 'cc').
+    gsub(%r{\bclang\+\+\b}, 'c++').
+    # Compiler flags:
+    gsub(%r{ -g }, ' ').
+    gsub(%r{ -O\d }, ' ').
+    gsub(%r{ -Wno-c++11-extensions }, ' ').
+    # make options:
+    gsub(%r{--no-print-directory}, ' ').
     # OSX:
-    gsub(%r{/Library/Java/JavaVirtualMachines/jdk.+?jdk/Contents/Home}, '$JAVA_HOME').
     gsub(%r{-framework \S+ }, ' ').
     # HOME Paths:
-    gsub(ENV['ROOT_DIR']+'/local/bin/', '').
-    gsub(ENV['PYTHON_HOME'],  '$PYTHON_HOME').
-    gsub(ENV['RUBY_HOME'],    '$RUBY_HOME').
-    gsub(ENV['GUILE_HOME'],   '$GUILE_HOME').
-    gsub(ENV['JAVA_HOME'],    '$JAVA_HOME').
-    gsub(ENV['ROOT_DIR'],     '.').
+    replace_env('LOCAL_DIR').
+    replace_env('GUILE_HOME').
+    replace_env('TCL_HOME').
+    replace_env('PYTHON_HOME').
+    replace_env('RUBY_HOME').
+    replace_env('JAVA_HOME').
+    replace_env('ROOT_DIR', '.').
+    replace_env('POSTGRESQL_INC_DIR').
+    replace_env('POSTGRESQL_LIB_DIR').
+    replace_env('POSTGRESQL_SHARE_DIR').
     # Abs paths:
-    gsub(%r{/\S*/(make|gmake|swig|python|ruby|tcl|guile)}, '\1').
+    gsub(%r{/usr/bin/install}, 'install').
+    gsub(%r{^/bin/sh +}, '').
+    gsub(%r{/\S*/bin/(make|gmake|swig|python|ruby|tcl|tclsh|guile)}, '\1').
     # brew:
     gsub(%r{\$PYTHON_HOME/Frameworks/Python\.framework/Versions/[^/]+}, '$PYTHON_HOME').
-    gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
-    # Duplicates:
-    gsub(%r{\s+(-[IL]\S*)\s+\1}, ' ').
+    gsub(%r{-L */opt/homebrew/lib +}, ' ').
+    gsub(%r{-I */opt/homebrew/include +}, ' ').
+    # gsub(%r{\$GUILE_HOME/Cellar/guile/[^/]+/(bin|include|lib)}, '$GUILE_HOME/\1').
+    # Java:
+    gsub(%r{-I *\$JAVA_HOME/include/\S+ +}, '-I $JAVA_HOME/include/$JAVA_ARCH ').
+    gsub(%r{-L *\$JAVA_HOME/lib/\S+ +},     '-L $JAVA_HOME/lib/$JAVA_ARCH ').
+    # local/:
+    gsub(%r{-I *include\S* +}, ' ').
+    gsub(%r{\$LOCAL_DIR/bin/}, ' ').
+    gsub(%r{-I *\$LOCAL_DIR/include +}, ' ').
+    gsub(%r{-L *\$LOCAL_DIR/lib +}, ' ').
+    # Formatting:
+    #gsub(%r{-I(\S+)}, %q{-I \1}).
+    #gsub(%r{-L(\S+)}, %q{-L \1}).
+    gsub(%r{-I\s+(\S+)}, %q{-I\1}).
+    gsub(%r{-L\s+(\S+)}, %q{-L\1}).
     # WTF?:
     gsub(' /darwin ', ' ').
+    gsub('/arm64-darwin21', '/$RUBY_ARCH'). # Apple Silicon
     gsub(%r{//+}, '/').
-    sub(%r{\s+$}, '')
+    sub(%r{  +$}, ' ')
+    end
   end
+  lines.reject!{|l| l =~ /Experimental target language.*postgresql/}
   lines.reject!{|l| l =~ /Deprecated command line option/} # swig 4.1.0+
+  lines.reject!{|l| l =~ /Warning 801: Wrong class name/} # swig 4.1.0+
   lines.reject!{|l| l =~ /Document-method:/ } # ruby
   lines.reject!{|l| l =~ /WARNING: .*clojure\.main.*use -M/} # clojure
   lines.reject!{|l| l =~ /rootdir: .*swig-101/} # pytest
   lines.reject!{|l| l =~ /ld: warning: directory not found for option/} # ld
   lines
+end
+
+def idempotently x
+  raise unless String === x
+  # log("before: {{{{ #{x} }}}}")
+  y = yield x
+  until x == y
+    x = y
+    y = yield x
+  end
+  # log("after:  {{{{ #{x} }}}}")
+  y
+end
+
+class ::String
+  def replace_env name, rep = nil
+    if e = ENV[name] and e != ''
+      self.gsub(e, rep || "$#{name}")
+    else
+      self
+    end
+  end
 end
 
 #####################################
@@ -257,6 +340,7 @@ Clojure (Java)          | #{basename}.clj      |   | Lisp
 Ruby                    | #{basename}.rb       |   |
 Guile                   | #{basename}.scm      |   | Scheme
 TCL                     | #{basename}.tcl      |   | Shell
+PostgreSQL              | #{basename}.psql     |   | SQL
 Python Tests            | #{basename}-test.py  | python3.10 -m pytest src/#{basename}-test.py |
 END
   e[:targets] =
@@ -265,7 +349,7 @@ END
       t = [:type, :file, :cmd, :lang].zip(l).to_h
       $context = t
       t[:name] = t[:file]
-      t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig' 
+      t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig'
       t[:lang] ||= t[:type].split(/\s+/).first
       t[:code_style] ||= t[:lang].downcase
       t[:suffix] = t[:file].sub(%r{^.*(\.[^./]+)$}, '\1')
