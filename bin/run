@@ -123,7 +123,7 @@ in
     cat "${argv[-1]}" |
     # Pass newlines through --echo-all:
     sed -E -e 's/^\s*$/-- NEWLINE --/' |
-    psql --quiet -v pager=0 --echo-all 2>&1 |
+    psql --no-psqlrc --quiet -v pager=0 --echo-all 2>&1 |
     # Omit header from output:
     grep -A 9999 -Ee '^-- HEADER-END --' |
     # Remove NOTICE.
@@ -132,7 +132,7 @@ in
     sed -E -e '/^NOTICE: /d' -e 's/;;$/;\n/' \
            -e '/^-- HEADER/d' -e 's/^-- NEWLINE --//'
     else
-      psql --quiet -v pager=0 -f "$@" |& grep -v ': NOTICE: '
+      psql --no-psqlrc --quiet -v pager=0 -f "$@" |& grep -v ': NOTICE: '
     fi
     exit $?
   ;;
