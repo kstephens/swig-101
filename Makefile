@@ -54,6 +54,7 @@ demo-run:
 brew-prereq:
 	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk postgresql\@14
 	bin/run pip install   pytest
+	-createdb $(USER)
 
 debian-prereq:
 	sudo apt-get install  automake libtool autoconf cmake bison byacc tcl-dev  guile-2.2-dev
