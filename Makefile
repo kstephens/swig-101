@@ -115,7 +115,7 @@ $(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
 	git fetch ;\
 	git checkout postgresql ;\
 	git pull ;\
-	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$(PCRE_VERSION)/$(PCRE_VERSION).tar.gz ;\
+	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$(PCRE2_VERSION)/$(PCRE2_VERSION).tar.gz ;\
 	./Tools/pcre-build.sh ;\
 	./autogen.sh ;\
 	./configure --prefix='$(LOCAL_DIR)' ;\
