@@ -43,18 +43,19 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # Comprehensive Native Code Support
 
 * C struct and union
+* C/C++ `#define` macros
 * C/C++ pointers, references, `const` declarations
 * C/C++ function signatures and calls
 * C++ classes
 * C++ methods: static, virtual and operator overrides
 * C++ templates
+* C++ STL support.
 * `in`, `out`, `in-out` parameters
-* C/C++ `#define` macros
-* Memory Management
+* Proper memory management
 
 # Target Languages
 
-SWIG can generate FFI bindings for multiple target languages from one set of interface files:
+SWIG can generate bindings for multiple target languages from one set of interface files:
 
 * Python
 * Ruby
@@ -113,14 +114,25 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Case Study
 
-Kind              |  Language     |  Files  |   Lines
-------------------|:-------------:|--------:|----------:
-Native Library    | C/C++ Header  |      40 |    3505
-SWIG Interfaces   | SWIG          |       9 |    2667
-Python Bindings   | Python        |       1 |    8922
-"                 | C++           |       1 |   35235
-Java Bindings     | Java          |      55 |    6741
-"                 | C++           |       1 |   17987
+|                      |      Language      |  Files  |   Lines
+|:--------------------:|-------------------:|--------:|--------------:
+| ***Source Code***    |                    |         |
+|   Native Library     |     C/C++ Header   |      40 |     3,505
+|   SWIG Interfaces    |     SWIG           |       9 |     2,667
+|                      |           _TOTAL:_ |      49 |  ***6,172***
+|                      |                    |         |
+| ***Generated Code*** |                    |         |
+|  Python Bindings     |     Python         |       1 |     8,922
+|                      |     C++            |       1 |    35,235
+|                      |           _TOTAL:_ |       2 | ***44,157***
+|                      |                    |         |
+|  Java Bindings       |     Java           |      55 |     6,741
+|                      |     C++            |       1 |    17,987
+|                      |           _TOTAL:_ |      56 | ***24,728***
+|                      |                    |         |
+|                      | ***GRAND TOTAL:*** |     107 | ***68,885***
+
+A ***10x gain*** for only **two** target languages.
 
 # Examples
 
@@ -135,14 +147,15 @@ The examples below target:
 
 
 
-## mathlib.c
+
+## example1.c
 
 
 
-### C Header : mathlib.h
+### C Header : example1.h
 
 ```c
-#define MATHLIB_VERSION "1.2.3"                                                //  1 
+#define EXAMPLE1_VERSION "1.2.3"                                               //  1 
 /* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */                                    
 double cubic_poly(double x,                                                    //  3 
                   double c0,                                                   //  4 
@@ -153,10 +166,10 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Library : mathlib.c
+### C Library : example1.c
 
 ```c
-#include "mathlib.h"                                                           //  1 
+#include "example1.h"                                                          //  1 
 double cubic_poly(double x,                                                    //  2 
                   double c0,                                                   //  3 
                   double c1,                                                   //  4 
@@ -168,14 +181,14 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Main : mathlib-native.c
+### C Main : example1-native.c
 
 ```c
 #include <stdio.h>                                                             //  1 
-#include "mathlib.h"                                                           //  2 
+#include "example1.h"                                                          //  2 
                                                                               
 int main(int argc, char **argv) {                                              //  4 
-  printf("MATHLIB_VERSION = %s\n", MATHLIB_VERSION);                           //  5 
+  printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
   return 0;                                                                    //  7 
 }                                                                              //  8 
@@ -185,78 +198,78 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/mathlib
-MATHLIB_VERSION = 1.2.3
+$ bin/run target/native/example1
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### C SWIG Interface : mathlib.i
+### C SWIG Interface : example1.i
 
 ```c
-%module mathlib_swig                                                           //  1 
-%include "mathlib.h"                                                           //  2 
+%module example1_swig                                                          //  1 
+%include "example1.h"                                                          //  2 
 %{                                                                             //  3 
-#include "mathlib.h"                                                           //  4 
+#include "example1.h"                                                          //  4 
 %}                                                                             //  5 
 ```
 
 
 
-### Python : mathlib.py
+### Python : example1.py
 
 ```python
 # Setup search path:                                                          
 import sys ; sys.path.append('target/python')                                  #   2 
                                                                               
 # Load SWIG bindings:                                                         
-import mathlib_swig as mathlib                                                 #   5 
+import example1_swig as example1                                               #   5 
                                                                               
 # Use SWIG bindings:                                                          
-print(f'MATHLIB_VERSION = {mathlib.MATHLIB_VERSION}')                          #   8 
-print(mathlib.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                            #   9 
+print(f'EXAMPLE1_VERSION = {example1.EXAMPLE1_VERSION}')                       #   8 
+print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
 ```
 
 
 ---
 
 ```
-$ bin/run src/mathlib.py
-MATHLIB_VERSION = 1.2.3
+$ bin/run src/example1.py
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### Clojure (Java) : mathlib.clj
+### Clojure (Java) : example1.clj
 
 ```lisp
 ;; Load SWIG bindings:                                                        
-(clojure.lang.RT/loadLibrary "mathlib_swig")                                   ;;  2 
-(import 'mathlib_swig)                                                         ;;  3 
+(clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  2 
+(import 'example1_swig)                                                        ;;  3 
                                                                               
 ;; Use SWIG bindings:                                                         
-(println (format "MATHLIB_VERSION = \"%s\""                                    ;;  6 
-               	 (mathlib_swig/MATHLIB_VERSION)))                              ;;  7 
-(prn (mathlib_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                           ;;  8 
+(println (format "EXAMPLE1_VERSION = \"%s\""                                   ;;  6 
+               	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  7 
+(prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  8 
 ```
 
 
 ---
 
 ```
-$ bin/run src/mathlib.clj
-MATHLIB_VERSION = "1.2.3"
+$ bin/run src/example1.clj
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
 ---
 
 
-### Ruby : mathlib.rb
+### Ruby : example1.rb
 
 ```ruby
 # Setup search path:                                                          
@@ -264,11 +277,11 @@ ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #
 $:.unshift 'target/ruby'                                                       #   3 
                                                                               
 # Load SWIG bindings:                                                         
-require 'mathlib_swig'                                                         #   6 
-include Mathlib_swig                                                           #   7 
+require 'example1_swig'                                                        #   6 
+include Example1_swig                                                          #   7 
                                                                               
 # Use SWIG bindings:                                                          
-puts "MATHLIB_VERSION = #{MATHLIB_VERSION.inspect}"                            #  10 
+puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION.inspect}"                          #  10 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
 ```
 
@@ -276,22 +289,22 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 ---
 
 ```
-$ bin/run src/mathlib.rb
-MATHLIB_VERSION = "1.2.3"
+$ bin/run src/example1.rb
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
 ---
 
 
-### Guile : mathlib.scm
+### Guile : example1.scm
 
 ```scheme
 ;; Load SWIG bindings:                                                        
-(load-extension "target/guile/libmathlib_swig.so" "SWIG_init")                 ;;  2 
+(load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  2 
                                                                               
 ;; Use SWIG bindings:                                                         
-(write `(MATHLIB-VERSION = ,(MATHLIB-VERSION)))                                ;;  5 
+(write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  5 
 (newline)                                                                      ;;  6 
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  7 
 (newline)                                                                      ;;  8 
@@ -301,22 +314,22 @@ MATHLIB_VERSION = "1.2.3"
 ---
 
 ```
-$ bin/run src/mathlib.scm
-(MATHLIB-VERSION = "1.2.3")
+$ bin/run src/example1.scm
+(EXAMPLE1-VERSION = "1.2.3")
 129.0
 ```
 
 ---
 
 
-### TCL : mathlib.tcl
+### TCL : example1.tcl
 
 ```shell
 # Load SWIG bindings:                                                         
-load target/tcl/mathlib_swig.so Mathlib_swig                                   #   2 
+load target/tcl/example1_swig.so Example1_swig                                 #   2 
                                                                               
 # Use SWIG bindings:                                                          
-puts "MATHLIB_VERSION = ${MATHLIB_VERSION}"                                    #   5 
+puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   5 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   6 
 ```
 
@@ -324,21 +337,21 @@ puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #
 ---
 
 ```
-$ bin/run src/mathlib.tcl
-MATHLIB_VERSION = 1.2.3
+$ bin/run src/example1.tcl
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### PostgreSQL : mathlib-1.psql
+### PostgreSQL : example1-1.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION mathlib_swig;                                                 --  2 
+CREATE EXTENSION example1_swig;                                                --  2 
 -- Call the functions:                                                        
-SELECT MATHLIB_VERSION();                                                      --  4 
+SELECT EXAMPLE1_VERSION();                                                     --  4 
 SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   --  5 
 ```
 
@@ -346,9 +359,9 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ bin/run src/mathlib-1.psql
- mathlib_version
------------------
+$ bin/run src/example1-1.psql
+ example1_version
+------------------
  1.2.3
 (1 row)
 
@@ -360,11 +373,11 @@ $ bin/run src/mathlib-1.psql
 
 ---
 
-### PostgreSQL : mathlib-2.psql
+### PostgreSQL : example1-2.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION mathlib_swig;                                                 --  2 
+CREATE EXTENSION example1_swig;                                                --  2 
 -- Create some coefficient and parameter tables:                              
 CREATE TABLE coefficients (                                                    --  4 
   c_id SERIAL PRIMARY KEY,                                                     --  5 
@@ -397,7 +410,7 @@ FROM   parameters, coefficients;                                               -
 ---
 
 ```
-$ bin/run src/mathlib-2.psql
+$ bin/run src/example1-2.psql
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -423,8 +436,8 @@ $ bin/run src/mathlib-2.psql
 
 
 ```
-$ bin/run target/native/mathlib
-MATHLIB_VERSION = 1.2.3
+$ bin/run target/native/example1
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
@@ -433,8 +446,8 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib.py
-MATHLIB_VERSION = 1.2.3
+$ bin/run src/example1.py
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
@@ -442,8 +455,8 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib.clj
-MATHLIB_VERSION = "1.2.3"
+$ bin/run src/example1.clj
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -451,8 +464,8 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/mathlib.rb
-MATHLIB_VERSION = "1.2.3"
+$ bin/run src/example1.rb
+EXAMPLE1_VERSION = "1.2.3"
 129.0
 ```
 
@@ -460,8 +473,8 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/mathlib.scm
-(MATHLIB-VERSION = "1.2.3")
+$ bin/run src/example1.scm
+(EXAMPLE1-VERSION = "1.2.3")
 129.0
 ```
 
@@ -469,8 +482,8 @@ $ bin/run src/mathlib.scm
 
 
 ```
-$ bin/run src/mathlib.tcl
-MATHLIB_VERSION = 1.2.3
+$ bin/run src/example1.tcl
+EXAMPLE1_VERSION = 1.2.3
 129.0
 ```
 
@@ -478,9 +491,9 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib-1.psql
- mathlib_version
------------------
+$ bin/run src/example1-1.psql
+ example1_version
+------------------
  1.2.3
 (1 row)
 
@@ -493,7 +506,7 @@ $ bin/run src/mathlib-1.psql
 ---
 
 ```
-$ bin/run src/mathlib-2.psql
+$ bin/run src/example1-2.psql
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -770,9 +783,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 7fe6d1004160>
+#<swig-pointer std::vector< double > * 142609460>
 129.0
-#<swig-pointer std::vector< double > * 7fe6d1004160>
+#<swig-pointer std::vector< double > * 142609460>
 17.3020736
 ```
 
@@ -805,9 +818,9 @@ puts [poly evaluate 1.2]                                                       #
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_60a67025f77f0000_p_std__vectorT_double_t
+_40bce04001000000_p_std__vectorT_double_t
 129.0
-_60a67025f77f0000_p_std__vectorT_double_t
+_40bce04001000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -845,8 +858,9 @@ def test_more_than_one_coeff():                                                #
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.11, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
+plugins: cov-4.0.0
 collected 3 items
 
 src/polynomial-test.py ...                                               [100%]
@@ -920,9 +934,9 @@ $ bin/run src/polynomial.rb
 ```
 $ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 7fe6d1004160>
+#<swig-pointer std::vector< double > * 142609460>
 129.0
-#<swig-pointer std::vector< double > * 7fe6d1004160>
+#<swig-pointer std::vector< double > * 142609460>
 17.3020736
 ```
 
@@ -932,9 +946,9 @@ $ bin/run src/polynomial.scm
 ```
 $ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_60a67025f77f0000_p_std__vectorT_double_t
+_40bce04001000000_p_std__vectorT_double_t
 129.0
-_60a67025f77f0000_p_std__vectorT_double_t
+_40bce04001000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -945,8 +959,9 @@ _60a67025f77f0000_p_std__vectorT_double_t
 ```
 $ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.11, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
+plugins: cov-4.0.0
 collected 3 items
 
 src/polynomial-test.py ...                                               [100%]
@@ -1276,11 +1291,11 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_904200d1b87f0000_p_std__vectorT_double_t
+_d043004001000000_p_std__vectorT_double_t
 129.0
-_c04400d1b87f0000_p_std__vectorT_int_t
+_2047004001000000_p_std__vectorT_int_t
 552
-_004100d1b87f0000_p_std__vectorT_mathlib__rationalT_int_t_t
+_e042004001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1356,11 +1371,11 @@ rational<int>(50283,119119)
 ```
 $ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_904200d1b87f0000_p_std__vectorT_double_t
+_d043004001000000_p_std__vectorT_double_t
 129.0
-_c04400d1b87f0000_p_std__vectorT_int_t
+_2047004001000000_p_std__vectorT_int_t
 552
-_004100d1b87f0000_p_std__vectorT_mathlib__rationalT_int_t_t
+_e042004001000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -2240,21 +2255,20 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.534 |               0.25 |           2.25 |             14 |    1.927 |       0 |           25.619 |            -100
-   90 |  6 |          0.5 |       1.622 |               0.25 |           2.25 |             16 |        2 |       0 |           23.304 |            -100
-   54 |  6 |          0.5 |       1.612 |               0.25 |           2.25 |             15 |    1.918 |       0 |           18.982 |            -100
-   51 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             16 |     1.76 |       0 |           16.865 |            -100
-   62 |  6 |          0.5 |       1.669 |               0.25 |           2.25 |             17 |    1.938 |       0 |           16.117 |            -100
-   81 |  6 |          0.5 |       1.533 |               0.25 |           2.25 |             16 |    1.749 |       0 |            14.09 |            -100
-   82 |  6 |          0.5 |       1.703 |               0.25 |           2.25 |             14 |    1.908 |       0 |           12.037 |            -100
-    7 |  6 |          0.5 |       1.875 |               0.25 |           2.25 |             14 |    2.001 |       0 |            6.719 |            -100
-   44 |  6 |          0.5 |       1.618 |               0.25 |           2.25 |             18 |    1.683 |       0 |            4.017 |            -100
-   87 |  6 |          0.5 |       1.571 |               0.25 |           2.25 |             12 |    1.631 |       0 |            3.819 |            -100
-(10 rows)
+   10 |  6 |          0.5 |       1.563 |               0.25 |           2.25 |             11 |    1.909 |       0 |           22.136 |            -100
+   49 |  6 |          0.5 |       1.688 |               0.25 |           2.25 |             17 |    2.014 |       0 |           19.312 |            -100
+   81 |  6 |          0.5 |       1.748 |               0.25 |           2.25 |             16 |    2.015 |       0 |           15.274 |            -100
+   47 |  6 |          0.5 |       1.572 |               0.25 |           2.25 |             14 |    1.726 |       0 |            9.796 |            -100
+   14 |  6 |          0.5 |       1.721 |               0.25 |           2.25 |             14 |    1.847 |       0 |            7.321 |            -100
+   18 |  6 |          0.5 |       1.733 |               0.25 |           2.25 |             12 |    1.835 |       0 |            5.885 |            -100
+   66 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             12 |    1.769 |       0 |              1.9 |            -100
+   92 |  6 |          0.5 |       1.686 |               0.25 |           2.25 |             13 |    1.704 |       0 |            1.067 |            -100
+   49 |  7 |            1 |       1.581 |               0.25 |           2.25 |             15 |    1.585 |       0 |            0.253 |            -100
+(9 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   36 | 12 |          3.5 |       1.517 |               0.25 |           2.25 |             12 |        0 |   1.638 |             -100 |           7.976
+   59 | 12 |          3.5 |       1.688 |               0.25 |           2.25 |             16 |        0 |   1.727 |             -100 |            2.31
 (1 row)
 ```
 
@@ -2356,21 +2370,20 @@ $ bin/run src/black_scholes-2.psql
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   19 |  6 |          0.5 |       1.534 |               0.25 |           2.25 |             14 |    1.927 |       0 |           25.619 |            -100
-   90 |  6 |          0.5 |       1.622 |               0.25 |           2.25 |             16 |        2 |       0 |           23.304 |            -100
-   54 |  6 |          0.5 |       1.612 |               0.25 |           2.25 |             15 |    1.918 |       0 |           18.982 |            -100
-   51 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             16 |     1.76 |       0 |           16.865 |            -100
-   62 |  6 |          0.5 |       1.669 |               0.25 |           2.25 |             17 |    1.938 |       0 |           16.117 |            -100
-   81 |  6 |          0.5 |       1.533 |               0.25 |           2.25 |             16 |    1.749 |       0 |            14.09 |            -100
-   82 |  6 |          0.5 |       1.703 |               0.25 |           2.25 |             14 |    1.908 |       0 |           12.037 |            -100
-    7 |  6 |          0.5 |       1.875 |               0.25 |           2.25 |             14 |    2.001 |       0 |            6.719 |            -100
-   44 |  6 |          0.5 |       1.618 |               0.25 |           2.25 |             18 |    1.683 |       0 |            4.017 |            -100
-   87 |  6 |          0.5 |       1.571 |               0.25 |           2.25 |             12 |    1.631 |       0 |            3.819 |            -100
-(10 rows)
+   10 |  6 |          0.5 |       1.563 |               0.25 |           2.25 |             11 |    1.909 |       0 |           22.136 |            -100
+   49 |  6 |          0.5 |       1.688 |               0.25 |           2.25 |             17 |    2.014 |       0 |           19.312 |            -100
+   81 |  6 |          0.5 |       1.748 |               0.25 |           2.25 |             16 |    2.015 |       0 |           15.274 |            -100
+   47 |  6 |          0.5 |       1.572 |               0.25 |           2.25 |             14 |    1.726 |       0 |            9.796 |            -100
+   14 |  6 |          0.5 |       1.721 |               0.25 |           2.25 |             14 |    1.847 |       0 |            7.321 |            -100
+   18 |  6 |          0.5 |       1.733 |               0.25 |           2.25 |             12 |    1.835 |       0 |            5.885 |            -100
+   66 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             12 |    1.769 |       0 |              1.9 |            -100
+   92 |  6 |          0.5 |       1.686 |               0.25 |           2.25 |             13 |    1.704 |       0 |            1.067 |            -100
+   49 |  7 |            1 |       1.581 |               0.25 |           2.25 |             15 |    1.585 |       0 |            0.253 |            -100
+(9 rows)
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   36 | 12 |          3.5 |       1.517 |               0.25 |           2.25 |             12 |        0 |   1.638 |             -100 |           7.976
+   59 | 12 |          3.5 |       1.688 |               0.25 |           2.25 |             16 |        0 |   1.727 |             -100 |            2.31
 (1 row)
 ```
 
@@ -2460,17 +2473,17 @@ $ bin/run src/black_scholes-2.psql
 # Workflow Examples
 
 
-## Workflow - mathlib.c                                                       
+## Workflow - example1.c                                                      
                                                                               
 ### Compile Native Code                                                       
                                                                               
 ```                                                                           
 # Compile native library:                                                     
-cc -Isrc -c -o target/native/mathlib.o src/mathlib.c                          
+cc -Isrc -c -o target/native/example1.o src/example1.c                        
                                                                               
 # Compile and link native program:                                            
-cc -Isrc -o target/native/mathlib src/mathlib-native.c target/native/mathlib.o  \
-  -L/opt/homebrew/lib                                                         
+cc -Isrc -o target/native/example1 src/example1-native.c                        \
+  target/native/example1.o -L/opt/homebrew/lib                                
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -2478,31 +2491,27 @@ cc -Isrc -o target/native/mathlib src/mathlib-native.c target/native/mathlib.o  
 ```                                                                           
 # Generate python bindings:                                                   
 swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
-  target/python/mathlib_swig.c src/mathlib.i                                  
+  target/python/example1_swig.c src/example1.i                                
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/python/mathlib_swig.c target/python/mathlib_swig.py              
-3662 target/python/mathlib_swig.c                                             
-65 target/python/mathlib_swig.py                                              
+wc -l target/python/example1_swig.c target/python/example1_swig.py            
+3662 target/python/example1_swig.c                                            
+65 target/python/example1_swig.py                                             
 3727 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc -Isrc                                                                                   \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -dynamic -c -o target/python/mathlib_swig.c.o target/python/mathlib_swig.c             
+cc -Isrc -dynamic -c -o target/python/example1_swig.c.o                         \
+  target/python/example1_swig.c                                               
                                                                               
 # Link python dynamic library:                                                
-cc -dynamiclib -o target/python/_mathlib_swig.so target/native/mathlib.o                                  \
-  target/python/mathlib_swig.c.o                                                                          \
-  -L/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin  \
-  -ldl -framework CoreFoundation                                                                        
+cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      \
+  target/python/example1_swig.c.o -ldl -framework CoreFoundation              
                                                                               
 ```                                                                           
                                                                               
@@ -2511,29 +2520,30 @@ cc -dynamiclib -o target/python/_mathlib_swig.so target/native/mathlib.o        
 ```                                                                           
 # Generate clojure bindings:                                                  
 swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
-  target/clojure/mathlib_swig.c src/mathlib.i                                 
+  target/clojure/example1_swig.c src/example1.i                               
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/clojure/mathlib_swig.c target/clojure/mathlib*.java              
-239 target/clojure/mathlib_swig.c                                             
-15 target/clojure/mathlib_swig.java                                           
-12 target/clojure/mathlib_swigConstants.java                                  
-13 target/clojure/mathlib_swigJNI.java                                        
+wc -l target/clojure/example1_swig.c target/clojure/example1*.java            
+239 target/clojure/example1_swig.c                                            
+15 target/clojure/example1_swig.java                                          
+12 target/clojure/example1_swigConstants.java                                 
+13 target/clojure/example1_swigJNI.java                                       
 279 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
-  target/clojure/mathlib_swig.c.o target/clojure/mathlib_swig.c               
+  target/clojure/example1_swig.c.o target/clojure/example1_swig.c             
                                                                               
 # Link clojure dynamic library:                                               
-cc -dynamiclib -o target/clojure/libmathlib_swig.jnilib                         \
-  target/native/mathlib.o target/clojure/mathlib_swig.c.o -L/opt/homebrew/lib 
+cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        \
+  target/native/example1.o target/clojure/example1_swig.c.o                     \
+  -L/opt/homebrew/lib                                                         
                                                                               
 ```                                                                           
                                                                               
@@ -2542,26 +2552,26 @@ cc -dynamiclib -o target/clojure/libmathlib_swig.jnilib                         
 ```                                                                           
 # Generate ruby bindings:                                                     
 swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
-  target/ruby/mathlib_swig.c src/mathlib.i                                    
+  target/ruby/example1_swig.c src/example1.i                                  
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/ruby/mathlib_swig.c                                              
-2282 target/ruby/mathlib_swig.c                                               
+wc -l target/ruby/example1_swig.c                                             
+2282 target/ruby/example1_swig.c                                              
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o                         \
-  target/ruby/mathlib_swig.c.o target/ruby/mathlib_swig.c                     
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+  target/ruby/example1_swig.c.o target/ruby/example1_swig.c                   
                                                                               
 # Link ruby dynamic library:                                                  
-cc -dynamiclib -o target/ruby/mathlib_swig.bundle target/native/mathlib.o       \
-  target/ruby/mathlib_swig.c.o -L/opt/homebrew/lib                            
+cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     \
+  target/ruby/example1_swig.c.o -L/opt/homebrew/lib                           
                                                                               
 ```                                                                           
                                                                               
@@ -2570,25 +2580,25 @@ cc -dynamiclib -o target/ruby/mathlib_swig.bundle target/native/mathlib.o       
 ```                                                                           
 # Generate tcl bindings:                                                      
 swig -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                           \
-  target/tcl/mathlib_swig.c src/mathlib.i                                     
+  target/tcl/example1_swig.c src/example1.i                                   
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/tcl/mathlib_swig.c                                               
-2178 target/tcl/mathlib_swig.c                                                
+wc -l target/tcl/example1_swig.c                                              
+2178 target/tcl/example1_swig.c                                               
                                                                               
 # Compile tcl bindings:                                                       
-cc -Isrc -I$TCL_HOME/include -c -o target/tcl/mathlib_swig.c.o                  \
-  target/tcl/mathlib_swig.c                                                   
+cc -Isrc -I$TCL_HOME/include -c -o target/tcl/example1_swig.c.o                 \
+  target/tcl/example1_swig.c                                                  
                                                                               
 # Link tcl dynamic library:                                                   
-cc -dynamiclib -o target/tcl/mathlib_swig.so target/native/mathlib.o            \
-  target/tcl/mathlib_swig.c.o -L/opt/homebrew/lib                             
+cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          \
+  target/tcl/example1_swig.c.o -L/opt/homebrew/lib                            
                                                                               
 ```                                                                           
                                                                               
@@ -2597,28 +2607,25 @@ cc -dynamiclib -o target/tcl/mathlib_swig.so target/native/mathlib.o            
 ```                                                                           
 # Generate guile bindings:                                                    
 swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
-  target/guile/mathlib_swig.c src/mathlib.i                                   
+  target/guile/example1_swig.c src/example1.i                                 
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/guile/mathlib_swig.c                                             
-1631 target/guile/mathlib_swig.c                                              
+wc -l target/guile/example1_swig.c                                            
+1631 target/guile/example1_swig.c                                             
                                                                               
 # Compile guile bindings:                                                     
-cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -I/opt/homebrewgmp      \
-  -I/opt/homebrewgmp/include -I/opt/homebrewreadline/include                    \
-  -I/opt/homebrewbdw-gc/include -c -o target/guile/mathlib_swig.c.o             \
-  target/guile/mathlib_swig.c                                                 
+cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
+  target/guile/example1_swig.c.o target/guile/example1_swig.c                 
                                                                               
 # Link guile dynamic library:                                                 
-cc -dynamiclib -o target/guile/libmathlib_swig.so target/native/mathlib.o       \
-  target/guile/mathlib_swig.c.o -L$GUILE_HOME/lib -L/opt/homebrewbdw-gc/lib     \
-  -lguile-3.0 -lgc -lpthread                                                  
+cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     \
+  target/guile/example1_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread 
                                                                               
 ```                                                                           
                                                                               
@@ -2628,31 +2635,30 @@ cc -dynamiclib -o target/guile/libmathlib_swig.so target/native/mathlib.o       
 # Generate postgresql bindings:                                               
 swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/mathlib_swig.c src/mathlib.i                              
+  target/postgresql/example1_swig.c src/example1.i                            
                                                                               
 # Source code statistics:                                                     
-wc -l src/mathlib.h src/mathlib.i                                             
-7 src/mathlib.h                                                               
-5 src/mathlib.i                                                               
+wc -l src/example1.h src/example1.i                                           
+7 src/example1.h                                                              
+5 src/example1.i                                                              
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/postgresql/mathlib_swig.c target/postgresql/mathlib_swig-*.sql     \
-  target/postgresql/mathlib_swig.control target/postgresql/mathlib_swig.make  
-1489 target/postgresql/mathlib_swig.c                                         
-20 target/postgresql/mathlib_swig--1.2.3.sql                                  
-8 target/postgresql/mathlib_swig.control                                      
-13 target/postgresql/mathlib_swig.make                                        
+wc -l target/postgresql/example1_swig.c target/postgresql/example1_swig-*.sql   \
+  target/postgresql/example1_swig.control target/postgresql/example1_swig.make
+1489 target/postgresql/example1_swig.c                                        
+20 target/postgresql/example1_swig--1.2.3.sql                                 
+8 target/postgresql/example1_swig.control                                     
+13 target/postgresql/example1_swig.make                                       
 1530 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
-cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/mathlib_swig.c.o         \
-  target/postgresql/mathlib_swig.c                                            
+cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/example1_swig.c.o        \
+  target/postgresql/example1_swig.c                                           
                                                                               
 # Link postgresql dynamic library:                                            
-cc -dynamiclib -o target/postgresql/mathlib_swig.so target/native/mathlib.o     \
-  target/postgresql/mathlib_swig.c.o -L/opt/homebrew/lib                      
-                                                                              
+cc -dynamiclib -o target/postgresql/example1_swig.so target/native/example1.o   \
+  target/postgresql/example1_swig.c.o -L/opt/homebrew/lib                     
                                                                               
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
@@ -2661,9 +2667,10 @@ $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            
   '$POSTGRESQL_SHARE_DIR/extension'                                           
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
   '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./mathlib_swig.control '$POSTGRESQL_SHARE_DIR/extension/'   
-install -c -m 644 ./mathlib_swig--1.2.3.sql '$POSTGRESQL_SHARE_DIR/extension/'
-install -c -m 755 mathlib_swig.so '$POSTGRESQL_LIB_DIR/'                      
+install -c -m 644 ./example1_swig.control '$POSTGRESQL_SHARE_DIR/extension/'  
+install -c -m 644 ./example1_swig--1.2.3.sql                                    \
+  '$POSTGRESQL_SHARE_DIR/extension/'                                          
+install -c -m 755 example1_swig.so '$POSTGRESQL_LIB_DIR/'                     
                                                                               
 ```                                                                           
                                                                               
@@ -2704,17 +2711,13 @@ wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py
 8753 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc++ -std=c++17 -Isrc                                                                      \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -dynamic -c -o target/python/polynomial_swig.cc.o                                        \
-  target/python/polynomial_swig.cc                                                       
+cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_swig.cc.o         \
+  target/python/polynomial_swig.cc                                            
                                                                               
 # Link python dynamic library:                                                
-cc++ -dynamiclib -o target/python/_polynomial_swig.so                                                     \
-  target/native/polynomial.o target/python/polynomial_swig.cc.o                                           \
-  -L/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin  \
-  -ldl -framework CoreFoundation                                                                        
+cc++ -dynamiclib -o target/python/_polynomial_swig.so                           \
+  target/native/polynomial.o target/python/polynomial_swig.cc.o -ldl            \
+  -framework CoreFoundation                                                   
                                                                               
 ```                                                                           
                                                                               
@@ -2769,7 +2772,7 @@ wc -l target/ruby/polynomial_swig.cc
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-2.7.0                           \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o                         \
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
   target/ruby/polynomial_swig.cc.o target/ruby/polynomial_swig.cc             
                                                                               
 # Link ruby dynamic library:                                                  
@@ -2824,15 +2827,13 @@ wc -l target/guile/polynomial_swig.cc
 2317 target/guile/polynomial_swig.cc                                          
                                                                               
 # Compile guile bindings:                                                     
-cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0            \
-  -I/opt/homebrewgmp -I/opt/homebrewgmp/include                                 \
-  -I/opt/homebrewreadline/include -I/opt/homebrewbdw-gc/include -c -o           \
+cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
   target/guile/polynomial_swig.cc.o target/guile/polynomial_swig.cc           
                                                                               
 # Link guile dynamic library:                                                 
 cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          \
   target/native/polynomial.o target/guile/polynomial_swig.cc.o                  \
-  -L$GUILE_HOME/lib -L/opt/homebrewbdw-gc/lib -lguile-3.0 -lgc -lpthread      
+  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
                                                                               
 ```                                                                           
                                                                               
@@ -2869,22 +2870,18 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-15618 target/python/polynomial_v2_swig.cc                                     
-631 target/python/polynomial_v2_swig.py                                       
-16249 total                                                                   
+15661 target/python/polynomial_v2_swig.cc                                     
+640 target/python/polynomial_v2_swig.py                                       
+16301 total                                                                   
                                                                               
 # Compile python bindings:                                                    
-cc++ -std=c++17 -Isrc                                                                      \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -dynamic -c -o target/python/polynomial_v2_swig.cc.o                                     \
-  target/python/polynomial_v2_swig.cc                                                    
+cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
+  target/python/polynomial_v2_swig.cc                                         
                                                                               
 # Link python dynamic library:                                                
-cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                                                  \
-  target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o                                     \
-  -L/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin  \
-  -ldl -framework CoreFoundation                                                                        
+cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                        \
+  target/native/polynomial_v2.o target/python/polynomial_v2_swig.cc.o -ldl      \
+  -framework CoreFoundation                                                   
                                                                               
 ```                                                                           
                                                                               
@@ -2894,11 +2891,17 @@ cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                        
 # Generate clojure bindings:                                                  
 swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
   target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i                    
-include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
+include/rational.h:18: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
+include/rational.h:21: Warning 503: Can't wrap 'operator -' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:24: Warning 503: Can't wrap 'operator -' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:27: Warning 503: Can't wrap 'operator *' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:30: Warning 503: Can't wrap 'operator /' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:33: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
@@ -2909,11 +2912,11 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1675 target/clojure/polynomial_v2_swig.cc                                     
+1645 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
-85 target/clojure/polynomial_v2_swigJNI.java                                  
-1783 total                                                                    
+83 target/clojure/polynomial_v2_swigJNI.java                                  
+1751 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -2942,11 +2945,11 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-17281 target/ruby/polynomial_v2_swig.cc                                       
+17336 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-2.7.0                           \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o                         \
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
   target/ruby/polynomial_v2_swig.cc.o target/ruby/polynomial_v2_swig.cc       
                                                                               
 # Link ruby dynamic library:                                                  
@@ -2962,7 +2965,7 @@ cc++ -dynamiclib -o target/ruby/polynomial_v2_swig.bundle                       
 # Generate tcl bindings:                                                      
 swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i                        
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:33: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
@@ -2973,7 +2976,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-4726 target/tcl/polynomial_v2_swig.cc                                         
+4795 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -2992,11 +2995,17 @@ cc++ -dynamiclib -o target/tcl/polynomial_v2_swig.so                            
 # Generate guile bindings:                                                    
 swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i                      
-include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
+include/rational.h:18: Warning 503: Can't wrap 'operator +' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
+include/rational.h:21: Warning 503: Can't wrap 'operator -' unless renamed to   \
   a valid identifier.                                                         
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
+include/rational.h:24: Warning 503: Can't wrap 'operator -' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:27: Warning 503: Can't wrap 'operator *' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:30: Warning 503: Can't wrap 'operator /' unless renamed to   \
+  a valid identifier.                                                         
+include/rational.h:33: Warning 503: Can't wrap 'operator ==' unless renamed to  \
   a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
@@ -3007,18 +3016,16 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-4044 target/guile/polynomial_v2_swig.cc                                       
+3984 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
-cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0            \
-  -I/opt/homebrewgmp -I/opt/homebrewgmp/include                                 \
-  -I/opt/homebrewreadline/include -I/opt/homebrewbdw-gc/include -c -o           \
+cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
   target/guile/polynomial_v2_swig.cc.o target/guile/polynomial_v2_swig.cc     
                                                                               
 # Link guile dynamic library:                                                 
 cc++ -dynamiclib -o target/guile/libpolynomial_v2_swig.so                       \
   target/native/polynomial_v2.o target/guile/polynomial_v2_swig.cc.o            \
-  -L$GUILE_HOME/lib -L/opt/homebrewbdw-gc/lib -lguile-3.0 -lgc -lpthread      
+  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
                                                                               
 ```                                                                           
                                                                               
@@ -3059,16 +3066,12 @@ wc -l target/python/tommath_swig.c target/python/tommath_swig.py
 9843 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc -Isrc                                                                                   \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -dynamic -c -o target/python/tommath_swig.c.o target/python/tommath_swig.c             
+cc -Isrc -dynamic -c -o target/python/tommath_swig.c.o                          \
+  target/python/tommath_swig.c                                                
                                                                               
 # Link python dynamic library:                                                
-cc -dynamiclib -o target/python/_tommath_swig.so target/native/tommath.o                                  \
-  target/python/tommath_swig.c.o                                                                          \
-  -L/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin  \
-  -ldl -ltommath                                                                                        
+cc -dynamiclib -o target/python/_tommath_swig.so target/native/tommath.o        \
+  target/python/tommath_swig.c.o -ldl -ltommath                               
                                                                               
 ```                                                                           
                                                                               
@@ -3122,7 +3125,7 @@ wc -l target/ruby/tommath_swig.c
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o                         \
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
   target/ruby/tommath_swig.c.o target/ruby/tommath_swig.c                     
                                                                               
 # Link ruby dynamic library:                                                  
@@ -3149,15 +3152,13 @@ wc -l target/guile/tommath_swig.c
 6423 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
-cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -I/opt/homebrewgmp      \
-  -I/opt/homebrewgmp/include -I/opt/homebrewreadline/include                    \
-  -I/opt/homebrewbdw-gc/include -c -o target/guile/tommath_swig.c.o             \
-  target/guile/tommath_swig.c                                                 
+cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
+  target/guile/tommath_swig.c.o target/guile/tommath_swig.c                   
                                                                               
 # Link guile dynamic library:                                                 
 cc -dynamiclib -o target/guile/libtommath_swig.so target/native/tommath.o       \
-  target/guile/tommath_swig.c.o -L$GUILE_HOME/lib -L/opt/homebrewbdw-gc/lib     \
-  -lguile-3.0 -lgc -lpthread -ltommath                                        
+  target/guile/tommath_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread    \
+  -ltommath                                                                   
                                                                               
 ```                                                                           
                                                                               
@@ -3198,17 +3199,13 @@ wc -l target/python/black_scholes_swig.c target/python/black_scholes_swig.py
 3767 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc -Isrc                                                                                   \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -I/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/include/python3.10  \
-  -dynamic -c -o target/python/black_scholes_swig.c.o                                      \
-  target/python/black_scholes_swig.c                                                     
+cc -Isrc -dynamic -c -o target/python/black_scholes_swig.c.o                    \
+  target/python/black_scholes_swig.c                                          
                                                                               
 # Link python dynamic library:                                                
-cc -dynamiclib -o target/python/_black_scholes_swig.so                                                    \
-  target/native/black_scholes.o target/python/black_scholes_swig.c.o                                      \
-  -L/opt/homebrewpython@3.10/Frameworks/Python.framework/Versions/3.10/lib/python3.10/config-3.10-darwin  \
-  -ldl -framework CoreFoundation                                                                        
+cc -dynamiclib -o target/python/_black_scholes_swig.so                          \
+  target/native/black_scholes.o target/python/black_scholes_swig.c.o -ldl       \
+  -framework CoreFoundation                                                   
                                                                               
 ```                                                                           
                                                                               
@@ -3262,7 +3259,7 @@ wc -l target/ruby/black_scholes_swig.c
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/x86_64-darwin19 -c -o                         \
+  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
   target/ruby/black_scholes_swig.c.o target/ruby/black_scholes_swig.c         
                                                                               
 # Link ruby dynamic library:                                                  
@@ -3318,15 +3315,13 @@ wc -l target/guile/black_scholes_swig.c
 1676 target/guile/black_scholes_swig.c                                        
                                                                               
 # Compile guile bindings:                                                     
-cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -I/opt/homebrewgmp      \
-  -I/opt/homebrewgmp/include -I/opt/homebrewreadline/include                    \
-  -I/opt/homebrewbdw-gc/include -c -o target/guile/black_scholes_swig.c.o       \
-  target/guile/black_scholes_swig.c                                           
+cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
+  target/guile/black_scholes_swig.c.o target/guile/black_scholes_swig.c       
                                                                               
 # Link guile dynamic library:                                                 
 cc -dynamiclib -o target/guile/libblack_scholes_swig.so                         \
   target/native/black_scholes.o target/guile/black_scholes_swig.c.o             \
-  -L$GUILE_HOME/lib -L/opt/homebrewbdw-gc/lib -lguile-3.0 -lgc -lpthread      
+  -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread                                
                                                                               
 ```                                                                           
                                                                               
@@ -3363,7 +3358,6 @@ cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/black_scholes_swig.c.o   
 cc -dynamiclib -o target/postgresql/black_scholes_swig.so                       \
   target/native/black_scholes.o target/postgresql/black_scholes_swig.c.o        \
   -L/opt/homebrew/lib                                                         
-                                                                              
                                                                               
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
@@ -3436,14 +3430,6 @@ Guile 3.0 is required.  `bin/build guile` will build and install into `./local/`
 ```Shell
 rbenv shell 2.7.6
 bin/build clean demo
-```
-
-### PostgreSQL
-
-Create a private database:
-
-```
-$ createdb $USER
 ```
 
 # Development

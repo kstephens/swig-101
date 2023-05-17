@@ -8,23 +8,25 @@ namespace mathlib {
   class rational {
   public:
     I n, d;
-    void reduce() {
-      if ( d < 0 ) {
-        d = - d;
-        n = - n;
-      }
+    rational(const I &n_ = 0, const I &d_ = 1) : n(n_), d(d_) {
+      if ( d < 0 ) { d = - d; n = - n; }
       I c(std::gcd(n, d));
       n /= c; d /= c;
     }
-    rational() : n(0), d(1) { }
-    rational(const rational<I> &r) : n(r.n), d(r.d) { }
-    rational(const I &n_) : n(n_), d(1) { }
-    rational(const I &n_, const I &d_) : n(n_), d(d_) { reduce(); }
     rational<I>  operator +  (const rational<I> &y) const {
       return rational<I>(n * y.d + y.n * d, d * y.d);
     }
+    rational<I>  operator -  (const rational<I> &y) const {
+      return rational<I>(n * y.d - y.n * d, d * y.d);
+    }
+    rational<I>  operator -  () const {
+      return rational<I>(- n, d);
+    }
     rational<I>  operator *  (const rational<I> &y) const {
       return rational<I>(n * y.n, d * y.d);
+    }
+    rational<I>  operator /  (const rational<I> &y) const {
+      return rational<I>(n * y.d, d * y.n);
     }
     bool operator == (const rational<I> &y) const {
       return n == y.n && d == y.d;
