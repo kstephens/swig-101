@@ -364,13 +364,13 @@ END
           }
         ]
       when nil
-        # Files maybe executables:
+        # Files may be executables:
         ([ "src/#{t[:file]}" ] +
           Dir["src/#{e[:basename]}-*#{t[:suffix]}"].sort
         ).map do | f |
             {
               file: f,
-              cmd: File.executable?(f) && "bin/run #{f}",
+              cmd: File.executable?(f) && "SWIG_101_VERBOSE=1 bin/run #{f}",
             }
           end
       else
@@ -378,7 +378,7 @@ END
         [
           {
             file: "src/#{t[:file]}",
-            cmd: "bin/run #{t[:cmd]}",
+            cmd: "SWIG_101_VERBOSE=1 bin/run #{t[:cmd]}",
           }
         ]
       end

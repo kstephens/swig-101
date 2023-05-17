@@ -148,14 +148,14 @@ The examples below target:
 
 
 
-## example1.c
+## mathlib.c
 
 
 
-### C Header : example1.h
+### C Header : mathlib.h
 
 ```c
-#define EXAMPLE1_VERSION "1.2.3"                                               //  1 
+#define MATHLIB_VERSION "1.2.3"                                                //  1 
 /* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */                                    
 double cubic_poly(double x,                                                    //  3 
                   double c0,                                                   //  4 
@@ -166,10 +166,10 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Library : example1.c
+### C Library : mathlib.c
 
 ```c
-#include "example1.h"                                                          //  1 
+#include "mathlib.h"                                                           //  1 
 double cubic_poly(double x,                                                    //  2 
                   double c0,                                                   //  3 
                   double c1,                                                   //  4 
@@ -181,14 +181,14 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Main : example1-native.c
+### C Main : mathlib-native.c
 
 ```c
 #include <stdio.h>                                                             //  1 
-#include "example1.h"                                                          //  2 
+#include "mathlib.h"                                                           //  2 
                                                                               
 int main(int argc, char **argv) {                                              //  4 
-  printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
+  printf("MATHLIB_VERSION = %s\n", MATHLIB_VERSION);                           //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
   return 0;                                                                    //  7 
 }                                                                              //  8 
@@ -198,78 +198,78 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run target/native/mathlib
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### C SWIG Interface : example1.i
+### C SWIG Interface : mathlib.i
 
 ```c
-%module example1_swig                                                          //  1 
-%include "example1.h"                                                          //  2 
+%module mathlib_swig                                                           //  1 
+%include "mathlib.h"                                                           //  2 
 %{                                                                             //  3 
-#include "example1.h"                                                          //  4 
+#include "mathlib.h"                                                           //  4 
 %}                                                                             //  5 
 ```
 
 
 
-### Python : example1.py
+### Python : mathlib.py
 
 ```python
 # Setup search path:                                                          
 import sys ; sys.path.append('target/python')                                  #   2 
                                                                               
 # Load SWIG bindings:                                                         
-import example1_swig as example1                                               #   5 
+import mathlib_swig as mathlib                                                 #   5 
                                                                               
 # Use SWIG bindings:                                                          
-print(f'EXAMPLE1_VERSION = {example1.EXAMPLE1_VERSION}')                       #   8 
-print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
+print(f'MATHLIB_VERSION = {mathlib.MATHLIB_VERSION}')                          #   8 
+print(mathlib.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                            #   9 
 ```
 
 
 ---
 
 ```
-$ bin/run src/example1.py
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.py
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### Clojure (Java) : example1.clj
+### Clojure (Java) : mathlib.clj
 
 ```lisp
 ;; Load SWIG bindings:                                                        
-(clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  2 
-(import 'example1_swig)                                                        ;;  3 
+(clojure.lang.RT/loadLibrary "mathlib_swig")                                   ;;  2 
+(import 'mathlib_swig)                                                         ;;  3 
                                                                               
 ;; Use SWIG bindings:                                                         
-(println (format "EXAMPLE1_VERSION = \"%s\""                                   ;;  6 
-               	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  7 
-(prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  8 
+(println (format "MATHLIB_VERSION = \"%s\""                                    ;;  6 
+               	 (mathlib_swig/MATHLIB_VERSION)))                              ;;  7 
+(prn (mathlib_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                           ;;  8 
 ```
 
 
 ---
 
 ```
-$ bin/run src/example1.clj
-EXAMPLE1_VERSION = "1.2.3"
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.clj
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
 ---
 
 
-### Ruby : example1.rb
+### Ruby : mathlib.rb
 
 ```ruby
 # Setup search path:                                                          
@@ -277,11 +277,11 @@ ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #
 $:.unshift 'target/ruby'                                                       #   3 
                                                                               
 # Load SWIG bindings:                                                         
-require 'example1_swig'                                                        #   6 
-include Example1_swig                                                          #   7 
+require 'mathlib_swig'                                                         #   6 
+include Mathlib_swig                                                           #   7 
                                                                               
 # Use SWIG bindings:                                                          
-puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION.inspect}"                          #  10 
+puts "MATHLIB_VERSION = #{MATHLIB_VERSION.inspect}"                            #  10 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
 ```
 
@@ -289,22 +289,22 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 ---
 
 ```
-$ bin/run src/example1.rb
-EXAMPLE1_VERSION = "1.2.3"
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.rb
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
 ---
 
 
-### Guile : example1.scm
+### Guile : mathlib.scm
 
 ```scheme
 ;; Load SWIG bindings:                                                        
-(load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  2 
+(load-extension "target/guile/libmathlib_swig.so" "SWIG_init")                 ;;  2 
                                                                               
 ;; Use SWIG bindings:                                                         
-(write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  5 
+(write `(MATHLIB-VERSION = ,(MATHLIB-VERSION)))                                ;;  5 
 (newline)                                                                      ;;  6 
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  7 
 (newline)                                                                      ;;  8 
@@ -314,22 +314,22 @@ EXAMPLE1_VERSION = "1.2.3"
 ---
 
 ```
-$ bin/run src/example1.scm
-(EXAMPLE1-VERSION = "1.2.3")
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.scm
+(MATHLIB-VERSION = "1.2.3")
 129.0
 ```
 
 ---
 
 
-### TCL : example1.tcl
+### TCL : mathlib.tcl
 
 ```shell
 # Load SWIG bindings:                                                         
-load target/tcl/example1_swig.so Example1_swig                                 #   2 
+load target/tcl/mathlib_swig.so Mathlib_swig                                   #   2 
                                                                               
 # Use SWIG bindings:                                                          
-puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   5 
+puts "MATHLIB_VERSION = ${MATHLIB_VERSION}"                                    #   5 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   6 
 ```
 
@@ -337,21 +337,21 @@ puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #
 ---
 
 ```
-$ bin/run src/example1.tcl
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.tcl
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### PostgreSQL : example1-1.psql
+### PostgreSQL : mathlib-1.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION example1_swig;                                                --  2 
+CREATE EXTENSION mathlib_swig;                                                 --  2 
 -- Call the functions:                                                        
-SELECT EXAMPLE1_VERSION();                                                     --  4 
+SELECT MATHLIB_VERSION();                                                      --  4 
 SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   --  5 
 ```
 
@@ -359,11 +359,20 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ bin/run src/example1-1.psql
- example1_version
-------------------
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib-1.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Call the functions:
+SELECT MATHLIB_VERSION();
+
+ mathlib_version
+-----------------
  1.2.3
 (1 row)
+
+SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 
  cubic_poly
 ------------
@@ -373,11 +382,11 @@ $ bin/run src/example1-1.psql
 
 ---
 
-### PostgreSQL : example1-2.psql
+### PostgreSQL : mathlib-2.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION example1_swig;                                                --  2 
+CREATE EXTENSION mathlib_swig;                                                 --  2 
 -- Create some coefficient and parameter tables:                              
 CREATE TABLE coefficients (                                                    --  4 
   c_id SERIAL PRIMARY KEY,                                                     --  5 
@@ -410,7 +419,44 @@ FROM   parameters, coefficients;                                               -
 ---
 
 ```
-$ bin/run src/example1-2.psql
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib-2.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Create some coefficient and parameter tables:
+CREATE TABLE coefficients (
+  c_id SERIAL PRIMARY KEY,
+  c0 FLOAT8,
+  c1 FLOAT8,
+  c2 FLOAT8,
+  c3 FLOAT8
+);
+
+CREATE TABLE parameters (
+  x_id SERIAL PRIMARY KEY,
+  x FLOAT8
+);
+
+
+-- Create some coefficient and parameter data:
+INSERT INTO coefficients
+  ( c0  ,  c1 ,    c2 ,   c3 ) VALUES
+  ( 3.00, 5.00,   7.00, 11.00),
+  ( 2.30, 5.70,  11.13, 17.23),
+  (-5.20, 1.20, -99.00, 12.34);
+
+INSERT INTO parameters
+  (x) VALUES
+  ( 2),
+  (-3.7),
+  ( 3.1415926);
+
+
+-- Apply cubic_poly to parameters and coefficients:
+SELECT *, cubic_poly(x, c0, c1, c2, c3)
+FROM   parameters, coefficients;
+
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -436,8 +482,8 @@ $ bin/run src/example1-2.psql
 
 
 ```
-$ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run target/native/mathlib
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -446,8 +492,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1.py
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.py
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -455,8 +501,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1.clj
-EXAMPLE1_VERSION = "1.2.3"
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.clj
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
@@ -464,8 +510,8 @@ EXAMPLE1_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/example1.rb
-EXAMPLE1_VERSION = "1.2.3"
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.rb
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
@@ -473,8 +519,8 @@ EXAMPLE1_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/example1.scm
-(EXAMPLE1-VERSION = "1.2.3")
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.scm
+(MATHLIB-VERSION = "1.2.3")
 129.0
 ```
 
@@ -482,8 +528,8 @@ $ bin/run src/example1.scm
 
 
 ```
-$ bin/run src/example1.tcl
-EXAMPLE1_VERSION = 1.2.3
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib.tcl
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -491,11 +537,20 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1-1.psql
- example1_version
-------------------
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib-1.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Call the functions:
+SELECT MATHLIB_VERSION();
+
+ mathlib_version
+-----------------
  1.2.3
 (1 row)
+
+SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 
  cubic_poly
 ------------
@@ -506,7 +561,44 @@ $ bin/run src/example1-1.psql
 ---
 
 ```
-$ bin/run src/example1-2.psql
+$ SWIG_101_VERBOSE=1 bin/run src/mathlib-2.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Create some coefficient and parameter tables:
+CREATE TABLE coefficients (
+  c_id SERIAL PRIMARY KEY,
+  c0 FLOAT8,
+  c1 FLOAT8,
+  c2 FLOAT8,
+  c3 FLOAT8
+);
+
+CREATE TABLE parameters (
+  x_id SERIAL PRIMARY KEY,
+  x FLOAT8
+);
+
+
+-- Create some coefficient and parameter data:
+INSERT INTO coefficients
+  ( c0  ,  c1 ,    c2 ,   c3 ) VALUES
+  ( 3.00, 5.00,   7.00, 11.00),
+  ( 2.30, 5.70,  11.13, 17.23),
+  (-5.20, 1.20, -99.00, 12.34);
+
+INSERT INTO parameters
+  (x) VALUES
+  ( 2),
+  (-3.7),
+  ( 3.1415926);
+
+
+-- Apply cubic_poly to parameters and coefficients:
+SELECT *, cubic_poly(x, c0, c1, c2, c3)
+FROM   parameters, coefficients;
+
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -591,7 +683,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial
+$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -645,7 +737,7 @@ print(poly.evaluate(1.2))                                                      #
 ---
 
 ```
-$ bin/run src/polynomial.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -683,7 +775,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
 
 ```
 
@@ -714,7 +806,7 @@ $ bin/run src/polynomial-test.py
 ---
 
 ```
-$ bin/run src/polynomial.clj
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -748,7 +840,7 @@ pp p.evaluate(1.2)                                                             #
 ---
 
 ```
-$ bin/run src/polynomial.rb
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -781,11 +873,11 @@ $ bin/run src/polynomial.rb
 ---
 
 ```
-$ bin/run src/polynomial.scm
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 142609460>
+#<swig-pointer std::vector< double > * 1431047d0>
 129.0
-#<swig-pointer std::vector< double > * 142609460>
+#<swig-pointer std::vector< double > * 1431047d0>
 17.3020736
 ```
 
@@ -816,11 +908,11 @@ puts [poly evaluate 1.2]                                                       #
 ---
 
 ```
-$ bin/run src/polynomial.tcl
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_40bce04001000000_p_std__vectorT_double_t
+_c06cf02901000000_p_std__vectorT_double_t
 129.0
-_40bce04001000000_p_std__vectorT_double_t
+_c06cf02901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -856,7 +948,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ SWIG_101_VERBOSE=1 bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -878,7 +970,7 @@ src/polynomial-test.py ...                                               [100%]
 
 
 ```
-$ bin/run target/native/polynomial
+$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -889,7 +981,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 
 
 ```
-$ bin/run src/polynomial.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -900,7 +992,7 @@ $ bin/run src/polynomial.py
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
 
 ```
 
@@ -908,7 +1000,7 @@ $ bin/run src/polynomial-test.py
 
 
 ```
-$ bin/run src/polynomial.clj
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -920,7 +1012,7 @@ $ bin/run src/polynomial.clj
 
 
 ```
-$ bin/run src/polynomial.rb
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -932,11 +1024,11 @@ $ bin/run src/polynomial.rb
 
 
 ```
-$ bin/run src/polynomial.scm
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 142609460>
+#<swig-pointer std::vector< double > * 1431047d0>
 129.0
-#<swig-pointer std::vector< double > * 142609460>
+#<swig-pointer std::vector< double > * 1431047d0>
 17.3020736
 ```
 
@@ -944,11 +1036,11 @@ $ bin/run src/polynomial.scm
 
 
 ```
-$ bin/run src/polynomial.tcl
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_40bce04001000000_p_std__vectorT_double_t
+_c06cf02901000000_p_std__vectorT_double_t
 129.0
-_40bce04001000000_p_std__vectorT_double_t
+_c06cf02901000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -957,7 +1049,7 @@ _40bce04001000000_p_std__vectorT_double_t
 
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ SWIG_101_VERBOSE=1 bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -1066,7 +1158,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial_v2
+$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial_v2
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1146,7 +1238,7 @@ print(poly.evaluate(complex(-5.7, 7.11)))                                       
 ---
 
 ```
-$ bin/run src/polynomial_v2.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1190,7 +1282,7 @@ $ bin/run src/polynomial_v2.py
 ---
 
 ```
-$ bin/run src/polynomial_v2.clj
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1240,7 +1332,7 @@ pp poly.evaluate(-5.7+7.11i)                                                    
 ---
 
 ```
-$ bin/run src/polynomial_v2.rb
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1289,13 +1381,13 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ---
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_d043004001000000_p_std__vectorT_double_t
+_8040f02701000000_p_std__vectorT_double_t
 129.0
-_2047004001000000_p_std__vectorT_int_t
+_a040f02701000000_p_std__vectorT_int_t
 552
-_e042004001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_8040f02701000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1311,7 +1403,7 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run target/native/polynomial_v2
+$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial_v2
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1324,7 +1416,7 @@ POLYNOMIAL_VERSION = 2.0.2
 
 
 ```
-$ bin/run src/polynomial_v2.py
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1338,7 +1430,7 @@ $ bin/run src/polynomial_v2.py
 
 
 ```
-$ bin/run src/polynomial_v2.clj
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1352,7 +1444,7 @@ $ bin/run src/polynomial_v2.clj
 
 
 ```
-$ bin/run src/polynomial_v2.rb
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1369,13 +1461,13 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_d043004001000000_p_std__vectorT_double_t
+_8040f02701000000_p_std__vectorT_double_t
 129.0
-_2047004001000000_p_std__vectorT_int_t
+_a040f02701000000_p_std__vectorT_int_t
 552
-_e042004001000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_8040f02701000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1527,7 +1619,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/tommath
+$ SWIG_101_VERBOSE=1 bin/run target/native/tommath
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1587,7 +1679,7 @@ print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #
 ---
 
 ```
-$ bin/run src/tommath.py
+$ SWIG_101_VERBOSE=1 bin/run src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1623,7 +1715,7 @@ puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #
 ---
 
 ```
-$ bin/run src/tommath-1.rb
+$ SWIG_101_VERBOSE=1 bin/run src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1654,7 +1746,7 @@ puts({a: a, b: b, c: c, d: d, e: e})                                           #
 ---
 
 ```
-$ bin/run src/tommath-2.rb
+$ SWIG_101_VERBOSE=1 bin/run src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1764,7 +1856,7 @@ MPI = Tommath_swig::MPI                                                        #
 ---
 
 ```
-$ bin/run src/tommath.scm
+$ SWIG_101_VERBOSE=1 bin/run src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -1793,7 +1885,7 @@ e => 305411158
 
 
 ```
-$ bin/run target/native/tommath
+$ SWIG_101_VERBOSE=1 bin/run target/native/tommath
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1807,7 +1899,7 @@ e = 305411158
 
 
 ```
-$ bin/run src/tommath.py
+$ SWIG_101_VERBOSE=1 bin/run src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1818,7 +1910,7 @@ $ bin/run src/tommath.py
 
 
 ```
-$ bin/run src/tommath-1.rb
+$ SWIG_101_VERBOSE=1 bin/run src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1827,7 +1919,7 @@ MP_ITER = -4
 ---
 
 ```
-$ bin/run src/tommath-2.rb
+$ SWIG_101_VERBOSE=1 bin/run src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1836,7 +1928,7 @@ $ bin/run src/tommath-2.rb
 
 
 ```
-$ bin/run src/tommath.scm
+$ SWIG_101_VERBOSE=1 bin/run src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -1995,7 +2087,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/black_scholes
+$ SWIG_101_VERBOSE=1 bin/run target/native/black_scholes
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2059,7 +2151,7 @@ for r in data:                                                                  
 ---
 
 ```
-$ bin/run src/black_scholes.py
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2129,7 +2221,49 @@ SELECT * FROM bs_eval;                                                          
 ---
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-1.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2190,49 +2324,94 @@ SELECT *                                                                        
   , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val -- 36 
   , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val   -- 37 
 FROM bs_data;                                                                                                             -- 38 
-SELECT * FROM bs_eval;                                                                                                    -- 39 
+                                                                                                                         
+SELECT * FROM bs_eval;                                                                                                    -- 40 
+                                                                                                                         
 -- Any profitable calls?                                                                                                 
-SELECT * FROM bs_eval                                                                                                     -- 41 
-WHERE call_val > asset_price OR put_val > asset_price;                                                                    -- 42 
+SELECT * FROM bs_eval                                                                                                     -- 43 
+WHERE call_val > asset_price OR put_val > asset_price;                                                                    -- 44 
+                                                                                                                         
 -- Create some random scenarios:                                                                                         
-CREATE TABLE bs_hypo_eval                                                                                                 -- 44 
-AS                                                                                                                        -- 45 
-WITH hd_rand AS (                                                                                                         -- 46 
-  SELECT gs.*, bsd.id                                                                                                     -- 47 
-  , strike_price -- random_offset(strike_price, 0.25) AS strike_price                                                     -- 48 
-  , truncf(random_offset(asset_price, 0.25)) AS asset_price                                                               -- 49 
-  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation                                   -- 50 
-  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate                                               -- 51 
-  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry                                                             -- 52 
-  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs                                                        -- 53 
-),                                                                                                                        -- 54 
-hd_rand_eval AS (                                                                                                         -- 55 
-SELECT *                                                                                                                  -- 56 
-  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val -- 57 
-  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val   -- 58 
-FROM hd_rand                                                                                                              -- 59 
-)                                                                                                                         -- 60 
-SELECT *                                                                                                                  -- 61 
-  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt                                                     -- 62 
-  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt                                                      -- 63 
-FROM hd_rand_eval;                                                                                                        -- 64 
+CREATE TABLE bs_hypo_eval                                                                                                 -- 47 
+AS                                                                                                                        -- 48 
+WITH hd_rand AS (                                                                                                         -- 49 
+  SELECT gs.*, bsd.id                                                                                                     -- 50 
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price                                                     -- 51 
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price                                                               -- 52 
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation                                   -- 53 
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate                                               -- 54 
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry                                                             -- 55 
+  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs                                                        -- 56 
+),                                                                                                                        -- 57 
+hd_rand_eval AS (                                                                                                         -- 58 
+SELECT *                                                                                                                  -- 59 
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val -- 60 
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val   -- 61 
+FROM hd_rand                                                                                                              -- 62 
+)                                                                                                                         -- 63 
+SELECT *                                                                                                                  -- 64 
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt                                                     -- 65 
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt                                                      -- 66 
+FROM hd_rand_eval;                                                                                                        -- 67 
+                                                                                                                         
 -- Select the most profitable random calls:                                                                              
-SELECT * FROM bs_hypo_eval                                                                                                -- 66 
-WHERE call_val > asset_price                                                                                              -- 67 
-ORDER BY call_profit_pcnt DESC                                                                                            -- 68 
-LIMIT 10;                                                                                                                 -- 69 
+SELECT * FROM bs_hypo_eval                                                                                                -- 70 
+WHERE call_val > asset_price                                                                                              -- 71 
+ORDER BY call_profit_pcnt DESC                                                                                            -- 72 
+LIMIT 10;                                                                                                                 -- 73 
+                                                                                                                         
 -- Select the most profitable random puts:                                                                               
-SELECT * FROM bs_hypo_eval                                                                                                -- 71 
-WHERE put_val > asset_price                                                                                               -- 72 
-ORDER BY put_profit_pcnt DESC                                                                                             -- 73 
-LIMIT 10;                                                                                                                 -- 74 
+SELECT * FROM bs_hypo_eval                                                                                                -- 76 
+WHERE put_val > asset_price                                                                                               -- 77 
+ORDER BY put_profit_pcnt DESC                                                                                             -- 78 
+LIMIT 10;                                                                                                                 -- 79 
 ```
 
 
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-2.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+SELECT * FROM bs_eval;
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2249,26 +2428,64 @@ $ bin/run src/black_scholes-2.psql
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
 
+
+-- Any profitable calls?
+SELECT * FROM bs_eval
+WHERE call_val > asset_price OR put_val > asset_price;
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
 (0 rows)
 
- h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
-------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   10 |  6 |          0.5 |       1.563 |               0.25 |           2.25 |             11 |    1.909 |       0 |           22.136 |            -100
-   49 |  6 |          0.5 |       1.688 |               0.25 |           2.25 |             17 |    2.014 |       0 |           19.312 |            -100
-   81 |  6 |          0.5 |       1.748 |               0.25 |           2.25 |             16 |    2.015 |       0 |           15.274 |            -100
-   47 |  6 |          0.5 |       1.572 |               0.25 |           2.25 |             14 |    1.726 |       0 |            9.796 |            -100
-   14 |  6 |          0.5 |       1.721 |               0.25 |           2.25 |             14 |    1.847 |       0 |            7.321 |            -100
-   18 |  6 |          0.5 |       1.733 |               0.25 |           2.25 |             12 |    1.835 |       0 |            5.885 |            -100
-   66 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             12 |    1.769 |       0 |              1.9 |            -100
-   92 |  6 |          0.5 |       1.686 |               0.25 |           2.25 |             13 |    1.704 |       0 |            1.067 |            -100
-   49 |  7 |            1 |       1.581 |               0.25 |           2.25 |             15 |    1.585 |       0 |            0.253 |            -100
-(9 rows)
 
+-- Create some random scenarios:
+CREATE TABLE bs_hypo_eval
+AS
+WITH hd_rand AS (
+  SELECT gs.*, bsd.id
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
+  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs
+),
+hd_rand_eval AS (
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM hd_rand
+)
+SELECT *
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
+FROM hd_rand_eval;
+
+-- Select the most profitable random calls:
+SELECT * FROM bs_hypo_eval
+WHERE call_val > asset_price
+ORDER BY call_profit_pcnt DESC
+LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   59 | 12 |          3.5 |       1.688 |               0.25 |           2.25 |             16 |        0 |   1.727 |             -100 |            2.31
+    8 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             11 |    2.019 |       0 |           33.974 |            -100
+    1 |  6 |          0.5 |       1.583 |               0.25 |           2.25 |             14 |    1.943 |       0 |           22.741 |            -100
+   98 |  6 |          0.5 |       1.674 |               0.25 |           2.25 |             13 |    1.896 |       0 |           13.261 |            -100
+   71 |  6 |          0.5 |       1.884 |               0.25 |           2.25 |             17 |    2.029 |       0 |            7.696 |            -100
+   23 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             14 |    1.634 |       0 |            6.727 |            -100
+   79 |  6 |          0.5 |        1.88 |               0.25 |           2.25 |             17 |    1.985 |       0 |            5.585 |            -100
+   84 |  6 |          0.5 |        1.89 |               0.25 |           2.25 |             12 |    1.978 |       0 |            4.656 |            -100
+   43 |  6 |          0.5 |       2.005 |               0.25 |           2.25 |             15 |    2.016 |       0 |            0.548 |            -100
+(8 rows)
+
+
+-- Select the most profitable random puts:
+SELECT * FROM bs_hypo_eval
+WHERE put_val > asset_price
+ORDER BY put_profit_pcnt DESC
+LIMIT 10;
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+    5 | 12 |          3.5 |       1.632 |               0.25 |           2.25 |             14 |        0 |   1.764 |             -100 |           8.088
 (1 row)
 ```
 
@@ -2283,7 +2500,7 @@ $ bin/run src/black_scholes-2.psql
 
 
 ```
-$ bin/run target/native/black_scholes
+$ SWIG_101_VERBOSE=1 bin/run target/native/black_scholes
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2303,7 +2520,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes.py
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2326,7 +2543,49 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-1.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2347,7 +2606,47 @@ $ bin/run src/black_scholes-1.psql
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-2.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+SELECT * FROM bs_eval;
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2364,26 +2663,64 @@ $ bin/run src/black_scholes-2.psql
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
 
+
+-- Any profitable calls?
+SELECT * FROM bs_eval
+WHERE call_val > asset_price OR put_val > asset_price;
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
 (0 rows)
 
- h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
-------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   10 |  6 |          0.5 |       1.563 |               0.25 |           2.25 |             11 |    1.909 |       0 |           22.136 |            -100
-   49 |  6 |          0.5 |       1.688 |               0.25 |           2.25 |             17 |    2.014 |       0 |           19.312 |            -100
-   81 |  6 |          0.5 |       1.748 |               0.25 |           2.25 |             16 |    2.015 |       0 |           15.274 |            -100
-   47 |  6 |          0.5 |       1.572 |               0.25 |           2.25 |             14 |    1.726 |       0 |            9.796 |            -100
-   14 |  6 |          0.5 |       1.721 |               0.25 |           2.25 |             14 |    1.847 |       0 |            7.321 |            -100
-   18 |  6 |          0.5 |       1.733 |               0.25 |           2.25 |             12 |    1.835 |       0 |            5.885 |            -100
-   66 |  6 |          0.5 |       1.736 |               0.25 |           2.25 |             12 |    1.769 |       0 |              1.9 |            -100
-   92 |  6 |          0.5 |       1.686 |               0.25 |           2.25 |             13 |    1.704 |       0 |            1.067 |            -100
-   49 |  7 |            1 |       1.581 |               0.25 |           2.25 |             15 |    1.585 |       0 |            0.253 |            -100
-(9 rows)
 
+-- Create some random scenarios:
+CREATE TABLE bs_hypo_eval
+AS
+WITH hd_rand AS (
+  SELECT gs.*, bsd.id
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
+  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs
+),
+hd_rand_eval AS (
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM hd_rand
+)
+SELECT *
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
+FROM hd_rand_eval;
+
+-- Select the most profitable random calls:
+SELECT * FROM bs_hypo_eval
+WHERE call_val > asset_price
+ORDER BY call_profit_pcnt DESC
+LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   59 | 12 |          3.5 |       1.688 |               0.25 |           2.25 |             16 |        0 |   1.727 |             -100 |            2.31
+    8 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             11 |    2.019 |       0 |           33.974 |            -100
+    1 |  6 |          0.5 |       1.583 |               0.25 |           2.25 |             14 |    1.943 |       0 |           22.741 |            -100
+   98 |  6 |          0.5 |       1.674 |               0.25 |           2.25 |             13 |    1.896 |       0 |           13.261 |            -100
+   71 |  6 |          0.5 |       1.884 |               0.25 |           2.25 |             17 |    2.029 |       0 |            7.696 |            -100
+   23 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             14 |    1.634 |       0 |            6.727 |            -100
+   79 |  6 |          0.5 |        1.88 |               0.25 |           2.25 |             17 |    1.985 |       0 |            5.585 |            -100
+   84 |  6 |          0.5 |        1.89 |               0.25 |           2.25 |             12 |    1.978 |       0 |            4.656 |            -100
+   43 |  6 |          0.5 |       2.005 |               0.25 |           2.25 |             15 |    2.016 |       0 |            0.548 |            -100
+(8 rows)
+
+
+-- Select the most profitable random puts:
+SELECT * FROM bs_hypo_eval
+WHERE put_val > asset_price
+ORDER BY put_profit_pcnt DESC
+LIMIT 10;
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+    5 | 12 |          3.5 |       1.632 |               0.25 |           2.25 |             14 |        0 |   1.764 |             -100 |           8.088
 (1 row)
 ```
 
@@ -2473,17 +2810,17 @@ $ bin/run src/black_scholes-2.psql
 # Workflow Examples
 
 
-## Workflow - example1.c                                                      
+## Workflow - mathlib.c                                                       
                                                                               
 ### Compile Native Code                                                       
                                                                               
 ```                                                                           
 # Compile native library:                                                     
-cc -Isrc -c -o target/native/example1.o src/example1.c                        
+cc -Isrc -c -o target/native/mathlib.o src/mathlib.c                          
                                                                               
 # Compile and link native program:                                            
-cc -Isrc -o target/native/example1 src/example1-native.c                        \
-  target/native/example1.o -L/opt/homebrew/lib                                
+cc -Isrc -o target/native/mathlib src/mathlib-native.c target/native/mathlib.o  \
+  -L/opt/homebrew/lib                                                         
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -2491,27 +2828,27 @@ cc -Isrc -o target/native/example1 src/example1-native.c                        
 ```                                                                           
 # Generate python bindings:                                                   
 swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
-  target/python/example1_swig.c src/example1.i                                
+  target/python/mathlib_swig.c src/mathlib.i                                  
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/python/example1_swig.c target/python/example1_swig.py            
-3662 target/python/example1_swig.c                                            
-65 target/python/example1_swig.py                                             
+wc -l target/python/mathlib_swig.c target/python/mathlib_swig.py              
+3662 target/python/mathlib_swig.c                                             
+65 target/python/mathlib_swig.py                                              
 3727 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc -Isrc -dynamic -c -o target/python/example1_swig.c.o                         \
-  target/python/example1_swig.c                                               
+cc -Isrc -dynamic -c -o target/python/mathlib_swig.c.o                          \
+  target/python/mathlib_swig.c                                                
                                                                               
 # Link python dynamic library:                                                
-cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      \
-  target/python/example1_swig.c.o -ldl -framework CoreFoundation              
+cc -dynamiclib -o target/python/_mathlib_swig.so target/native/mathlib.o        \
+  target/python/mathlib_swig.c.o -ldl -framework CoreFoundation               
                                                                               
 ```                                                                           
                                                                               
@@ -2520,30 +2857,29 @@ cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      
 ```                                                                           
 # Generate clojure bindings:                                                  
 swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
-  target/clojure/example1_swig.c src/example1.i                               
+  target/clojure/mathlib_swig.c src/mathlib.i                                 
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/clojure/example1_swig.c target/clojure/example1*.java            
-239 target/clojure/example1_swig.c                                            
-15 target/clojure/example1_swig.java                                          
-12 target/clojure/example1_swigConstants.java                                 
-13 target/clojure/example1_swigJNI.java                                       
+wc -l target/clojure/mathlib_swig.c target/clojure/mathlib*.java              
+239 target/clojure/mathlib_swig.c                                             
+15 target/clojure/mathlib_swig.java                                           
+12 target/clojure/mathlib_swigConstants.java                                  
+13 target/clojure/mathlib_swigJNI.java                                        
 279 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
-  target/clojure/example1_swig.c.o target/clojure/example1_swig.c             
+  target/clojure/mathlib_swig.c.o target/clojure/mathlib_swig.c               
                                                                               
 # Link clojure dynamic library:                                               
-cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        \
-  target/native/example1.o target/clojure/example1_swig.c.o                     \
-  -L/opt/homebrew/lib                                                         
+cc -dynamiclib -o target/clojure/libmathlib_swig.jnilib                         \
+  target/native/mathlib.o target/clojure/mathlib_swig.c.o -L/opt/homebrew/lib 
                                                                               
 ```                                                                           
                                                                               
@@ -2552,26 +2888,26 @@ cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        
 ```                                                                           
 # Generate ruby bindings:                                                     
 swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
-  target/ruby/example1_swig.c src/example1.i                                  
+  target/ruby/mathlib_swig.c src/mathlib.i                                    
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/ruby/example1_swig.c                                             
-2282 target/ruby/example1_swig.c                                              
+wc -l target/ruby/mathlib_swig.c                                              
+2282 target/ruby/mathlib_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
   -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
-  target/ruby/example1_swig.c.o target/ruby/example1_swig.c                   
+  target/ruby/mathlib_swig.c.o target/ruby/mathlib_swig.c                     
                                                                               
 # Link ruby dynamic library:                                                  
-cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     \
-  target/ruby/example1_swig.c.o -L/opt/homebrew/lib                           
+cc -dynamiclib -o target/ruby/mathlib_swig.bundle target/native/mathlib.o       \
+  target/ruby/mathlib_swig.c.o -L/opt/homebrew/lib                            
                                                                               
 ```                                                                           
                                                                               
@@ -2580,25 +2916,25 @@ cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     
 ```                                                                           
 # Generate tcl bindings:                                                      
 swig -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                           \
-  target/tcl/example1_swig.c src/example1.i                                   
+  target/tcl/mathlib_swig.c src/mathlib.i                                     
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/tcl/example1_swig.c                                              
-2178 target/tcl/example1_swig.c                                               
+wc -l target/tcl/mathlib_swig.c                                               
+2178 target/tcl/mathlib_swig.c                                                
                                                                               
 # Compile tcl bindings:                                                       
-cc -Isrc -I$TCL_HOME/include -c -o target/tcl/example1_swig.c.o                 \
-  target/tcl/example1_swig.c                                                  
+cc -Isrc -I$TCL_HOME/include -c -o target/tcl/mathlib_swig.c.o                  \
+  target/tcl/mathlib_swig.c                                                   
                                                                               
 # Link tcl dynamic library:                                                   
-cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          \
-  target/tcl/example1_swig.c.o -L/opt/homebrew/lib                            
+cc -dynamiclib -o target/tcl/mathlib_swig.so target/native/mathlib.o            \
+  target/tcl/mathlib_swig.c.o -L/opt/homebrew/lib                             
                                                                               
 ```                                                                           
                                                                               
@@ -2607,25 +2943,25 @@ cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          
 ```                                                                           
 # Generate guile bindings:                                                    
 swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
-  target/guile/example1_swig.c src/example1.i                                 
+  target/guile/mathlib_swig.c src/mathlib.i                                   
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/guile/example1_swig.c                                            
-1631 target/guile/example1_swig.c                                             
+wc -l target/guile/mathlib_swig.c                                             
+1631 target/guile/mathlib_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
-  target/guile/example1_swig.c.o target/guile/example1_swig.c                 
+  target/guile/mathlib_swig.c.o target/guile/mathlib_swig.c                   
                                                                               
 # Link guile dynamic library:                                                 
-cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     \
-  target/guile/example1_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread 
+cc -dynamiclib -o target/guile/libmathlib_swig.so target/native/mathlib.o       \
+  target/guile/mathlib_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread  
                                                                               
 ```                                                                           
                                                                               
@@ -2635,30 +2971,31 @@ cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     
 # Generate postgresql bindings:                                               
 swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/example1_swig.c src/example1.i                            
+  target/postgresql/mathlib_swig.c src/mathlib.i                              
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/postgresql/example1_swig.c target/postgresql/example1_swig-*.sql   \
-  target/postgresql/example1_swig.control target/postgresql/example1_swig.make
-1489 target/postgresql/example1_swig.c                                        
-20 target/postgresql/example1_swig--1.2.3.sql                                 
-8 target/postgresql/example1_swig.control                                     
-13 target/postgresql/example1_swig.make                                       
+wc -l target/postgresql/mathlib_swig.c target/postgresql/mathlib_swig-*.sql     \
+  target/postgresql/mathlib_swig.control target/postgresql/mathlib_swig.make  
+1489 target/postgresql/mathlib_swig.c                                         
+20 target/postgresql/mathlib_swig--1.2.3.sql                                  
+8 target/postgresql/mathlib_swig.control                                      
+13 target/postgresql/mathlib_swig.make                                        
 1530 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
-cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/example1_swig.c.o        \
-  target/postgresql/example1_swig.c                                           
+cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/mathlib_swig.c.o         \
+  target/postgresql/mathlib_swig.c                                            
                                                                               
 # Link postgresql dynamic library:                                            
-cc -dynamiclib -o target/postgresql/example1_swig.so target/native/example1.o   \
-  target/postgresql/example1_swig.c.o -L/opt/homebrew/lib                     
+cc -dynamiclib -o target/postgresql/mathlib_swig.so target/native/mathlib.o     \
+  target/postgresql/mathlib_swig.c.o -L/opt/homebrew/lib                      
+                                                                              
                                                                               
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
@@ -2667,10 +3004,9 @@ $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            
   '$POSTGRESQL_SHARE_DIR/extension'                                           
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
   '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./example1_swig.control '$POSTGRESQL_SHARE_DIR/extension/'  
-install -c -m 644 ./example1_swig--1.2.3.sql                                    \
-  '$POSTGRESQL_SHARE_DIR/extension/'                                          
-install -c -m 755 example1_swig.so '$POSTGRESQL_LIB_DIR/'                     
+install -c -m 644 ./mathlib_swig.control '$POSTGRESQL_SHARE_DIR/extension/'   
+install -c -m 644 ./mathlib_swig--1.2.3.sql '$POSTGRESQL_SHARE_DIR/extension/'
+install -c -m 755 mathlib_swig.so '$POSTGRESQL_LIB_DIR/'                      
                                                                               
 ```                                                                           
                                                                               
@@ -3359,6 +3695,7 @@ cc -dynamiclib -o target/postgresql/black_scholes_swig.so                       
   target/native/black_scholes.o target/postgresql/black_scholes_swig.c.o        \
   -L/opt/homebrew/lib                                                         
                                                                               
+                                                                              
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
   '$POSTGRESQL_SHARE_DIR/extension'                                           
@@ -3430,6 +3767,14 @@ Guile 3.0 is required.  `bin/build guile` will build and install into `./local/`
 ```Shell
 rbenv shell 2.7.6
 bin/build clean demo
+```
+
+### PostgreSQL
+
+Create a private database:
+
+```
+$ createdb $USER
 ```
 
 # Development

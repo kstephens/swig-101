@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-debug= verbose=
+debug="$SWIG_101_DEBUG" verbose="$SWIG_101_VERBOSE"
 [[ "$1" = '--verbose' ]] && shift && verbose=1
 [[ "$1" = '--debug' ]] && shift && debug=1
 
@@ -116,7 +116,7 @@ in
     cmd=($CLOJURE_EXE -Scp "${CLASSPATH}" -J-Djava.library.path="$java_target_dir" "${cmd[@]}")
   ;;
   *.psql)
-   if [[ -n "$debug" ]]
+   if [[ -n "$verbose" ]]
    then
     # set -x
     # -v ON_ERROR_STOP=1

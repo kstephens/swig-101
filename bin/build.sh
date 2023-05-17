@@ -368,6 +368,7 @@ postgresql-make-extension() {
   for EXAMPLE in $EXAMPLES
   do
     (
+    export SWIG_101_VERBOSE=1
     -setup-example-vars
     -run-prog target/native/$EXAMPLE_NAME
     echo ""

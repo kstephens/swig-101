@@ -55,13 +55,13 @@ AS
 SELECT *
   , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
   , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
-FROM bs_data;;
+FROM bs_data;
 
-SELECT * FROM bs_eval;;
+SELECT * FROM bs_eval;
 
 -- Any profitable calls?
 SELECT * FROM bs_eval
-WHERE call_val > asset_price OR put_val > asset_price;;
+WHERE call_val > asset_price OR put_val > asset_price;
 
 -- Create some random scenarios:
 CREATE TABLE bs_hypo_eval
@@ -84,16 +84,16 @@ FROM hd_rand
 SELECT *
   , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
   , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
-FROM hd_rand_eval;;
+FROM hd_rand_eval;
 
 -- Select the most profitable random calls:
 SELECT * FROM bs_hypo_eval
 WHERE call_val > asset_price
 ORDER BY call_profit_pcnt DESC
-LIMIT 10;;
+LIMIT 10;
 
 -- Select the most profitable random puts:
 SELECT * FROM bs_hypo_eval
 WHERE put_val > asset_price
 ORDER BY put_profit_pcnt DESC
-LIMIT 10;;
+LIMIT 10;
