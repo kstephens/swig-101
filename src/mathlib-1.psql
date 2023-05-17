@@ -1,0 +1,13 @@
+DROP EXTENSION IF EXISTS mathlib_swig;
+DROP FUNCTION IF EXISTS MATHLIB_VERSION;
+DROP FUNCTION IF EXISTS cubic_poly;
+-- SELECT * FROM pg_extension;
+-- HEADER-END --
+
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;;
+
+-- Call the functions:
+SELECT MATHLIB_VERSION();;
+SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);;
+

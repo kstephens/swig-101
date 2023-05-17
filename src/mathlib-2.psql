@@ -1,11 +1,11 @@
-DROP EXTENSION IF EXISTS example1_swig;
+DROP EXTENSION IF EXISTS mathlib_swig;
 -- SELECT * FROM pg_extension;
 DROP TABLE IF EXISTS coefficients;
 DROP TABLE IF EXISTS parameters;
 -- HEADER-END --
 
 -- Load the extension:
-CREATE EXTENSION example1_swig;;
+CREATE EXTENSION mathlib_swig;;
 
 -- Create some coefficient and parameter tables:
 CREATE TABLE coefficients (

@@ -9,7 +9,7 @@ declare -A SWIG_TARGET_SUFFIX_
   export LOCAL_DIR="$ROOT_DIR/local"
   export LC_ALL=C
 
-  EXAMPLES='example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
+  EXAMPLES='mathlib.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
   SWIG_TARGETS='python clojure ruby tcl guile postgresql'
   SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
 }
@@ -40,7 +40,7 @@ declare -A SWIG_TARGET_SUFFIX_
 
   case "$EXAMPLE_NAME"
   in
-    example1|black_scholes) ;;
+    mathlib|black_scholes) ;;
     *)
       SWIG_TARGETS="${SWIG_TARGETS//postgresql/}"
     ;;
