@@ -226,8 +226,8 @@ declare -A SWIG_TARGET_SUFFIX_
 
   NATIVE_LIB_C=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
   NATIVE_LIB_O=target/native/${EXAMPLE_NAME}.o
-  NATIVE_MAIN_C=src/${EXAMPLE_NAME}-native${EXAMPLE_SUFFIX}
-  NATIVE_MAIN_E=target/native/${EXAMPLE_NAME}
+  NATIVE_MAIN_C=src/${EXAMPLE_NAME}-main${EXAMPLE_SUFFIX}
+  NATIVE_MAIN_E=target/native/${EXAMPLE_NAME}-main
 }
 
 
@@ -308,7 +308,7 @@ postgresql-make-extension() {
 	echo "# Compile native library:"
 	-run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
 	echo ""
-	echo "# Compile and link native program:"
+	echo "# Compile and link main program:"
 	-run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
 	echo '```'
   ) || return $?
@@ -370,7 +370,7 @@ postgresql-make-extension() {
     (
     export SWIG_101_VERBOSE=1
     -setup-example-vars
-    -run-prog target/native/$EXAMPLE_NAME
+    -run-prog target/native/$EXAMPLE_NAME-main
     echo ""
     for SWIG_TARGET in $SWIG_TARGETS
     do

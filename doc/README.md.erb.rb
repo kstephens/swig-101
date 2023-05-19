@@ -33,7 +33,7 @@ end
 
 def cmd cmd
   log "cmd : #{cmd} : ..."
-  system "#{cmd} >tmp/cmd.out 2>&1"
+  system "SWIG_101_VERBOSE=1 #{cmd} >tmp/cmd.out 2>&1"
   result = $?
   out_raw = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out_raw))
@@ -333,7 +333,7 @@ example_names.each do | name |
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
 #{lang} Header          | #{basename}.h        | - |
 #{lang} Library         | #{name}              | - |
-#{lang} Main            | #{basename}-native.#{suffix} | target/native/#{basename}
+#{lang} Main            | #{basename}-main.#{suffix} | target/native/#{basename}-main
 #{lang} SWIG Interface  | #{basename}.i        | - | #{lang}
 Python                  | #{basename}.py       |   |
 Clojure (Java)          | #{basename}.clj      |   | Lisp
@@ -370,7 +370,7 @@ END
         ).map do | f |
             {
               file: f,
-              cmd: File.executable?(f) && "SWIG_101_VERBOSE=1 bin/run #{f}",
+              cmd: File.executable?(f) && "bin/run #{f}",
             }
           end
       else
@@ -378,7 +378,7 @@ END
         [
           {
             file: "src/#{t[:file]}",
-            cmd: "SWIG_101_VERBOSE=1 bin/run #{t[:cmd]}",
+            cmd: "bin/run #{t[:cmd]}",
           }
         ]
       end

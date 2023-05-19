@@ -181,7 +181,7 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Main : mathlib-native.c
+### C Main : mathlib-main.c
 
 ```c
 #include <stdio.h>                                                             //  1 
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/mathlib
+$ bin/run target/native/mathlib-main
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -236,7 +236,7 @@ print(mathlib.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                            #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.py
+$ bin/run src/mathlib.py
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -261,7 +261,7 @@ MATHLIB_VERSION = 1.2.3
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.clj
+$ bin/run src/mathlib.clj
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -289,7 +289,7 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.rb
+$ bin/run src/mathlib.rb
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -314,7 +314,7 @@ MATHLIB_VERSION = "1.2.3"
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.scm
+$ bin/run src/mathlib.scm
 (MATHLIB-VERSION = "1.2.3")
 129.0
 ```
@@ -337,7 +337,7 @@ puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.tcl
+$ bin/run src/mathlib.tcl
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -359,7 +359,7 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib-1.psql
+$ bin/run src/mathlib-1.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -419,7 +419,7 @@ FROM   parameters, coefficients;                                               -
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib-2.psql
+$ bin/run src/mathlib-2.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -482,7 +482,7 @@ FROM   parameters, coefficients;
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/mathlib
+$ bin/run target/native/mathlib-main
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -492,7 +492,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.py
+$ bin/run src/mathlib.py
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -501,7 +501,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.clj
+$ bin/run src/mathlib.clj
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -510,7 +510,7 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.rb
+$ bin/run src/mathlib.rb
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -519,7 +519,7 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.scm
+$ bin/run src/mathlib.scm
 (MATHLIB-VERSION = "1.2.3")
 129.0
 ```
@@ -528,7 +528,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/mathlib.scm
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib.tcl
+$ bin/run src/mathlib.tcl
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -537,7 +537,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib-1.psql
+$ bin/run src/mathlib-1.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -561,7 +561,7 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/mathlib-2.psql
+$ bin/run src/mathlib-2.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -657,7 +657,7 @@ double Polynomial::evaluate(double x) const {                                  /
 
 
 
-### C++ Main : polynomial-native.cc
+### C++ Main : polynomial-main.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -683,7 +683,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial
+$ bin/run target/native/polynomial-main
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -737,7 +737,7 @@ print(poly.evaluate(1.2))                                                      #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.py
+$ bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -775,7 +775,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
+$ bin/run src/polynomial-test.py
 
 ```
 
@@ -806,7 +806,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.clj
+$ bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -840,7 +840,7 @@ pp p.evaluate(1.2)                                                             #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
+$ bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -873,11 +873,11 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.scm
+$ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1431047d0>
+#<swig-pointer std::vector< double > * 13b609460>
 129.0
-#<swig-pointer std::vector< double > * 1431047d0>
+#<swig-pointer std::vector< double > * 13b609460>
 17.3020736
 ```
 
@@ -908,11 +908,11 @@ puts [poly evaluate 1.2]                                                       #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.tcl
+$ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_c06cf02901000000_p_std__vectorT_double_t
+_a0b9604701000000_p_std__vectorT_double_t
 129.0
-_c06cf02901000000_p_std__vectorT_double_t
+_a0b9604701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -948,7 +948,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run python3.10 -m pytest src/polynomial-test.py
+$ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -970,7 +970,7 @@ src/polynomial-test.py ...                                               [100%]
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial
+$ bin/run target/native/polynomial-main
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -981,7 +981,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.py
+$ bin/run src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -992,7 +992,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial.py
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
+$ bin/run src/polynomial-test.py
 
 ```
 
@@ -1000,7 +1000,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial-test.py
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.clj
+$ bin/run src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1012,7 +1012,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial.clj
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
+$ bin/run src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1024,11 +1024,11 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial.rb
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.scm
+$ bin/run src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 1431047d0>
+#<swig-pointer std::vector< double > * 13b609460>
 129.0
-#<swig-pointer std::vector< double > * 1431047d0>
+#<swig-pointer std::vector< double > * 13b609460>
 17.3020736
 ```
 
@@ -1036,11 +1036,11 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial.scm
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial.tcl
+$ bin/run src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_c06cf02901000000_p_std__vectorT_double_t
+_a0b9604701000000_p_std__vectorT_double_t
 129.0
-_c06cf02901000000_p_std__vectorT_double_t
+_a0b9604701000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1049,7 +1049,7 @@ _c06cf02901000000_p_std__vectorT_double_t
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run python3.10 -m pytest src/polynomial-test.py
+$ bin/run python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -1118,7 +1118,7 @@ namespace mathlib {                                                            /
 
 
 
-### C++ Main : polynomial_v2-native.cc
+### C++ Main : polynomial_v2-main.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -1158,7 +1158,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial_v2
+$ bin/run target/native/polynomial_v2-main
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1238,7 +1238,7 @@ print(poly.evaluate(complex(-5.7, 7.11)))                                       
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
+$ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1282,7 +1282,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.clj
+$ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1332,7 +1332,7 @@ pp poly.evaluate(-5.7+7.11i)                                                    
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.rb
+$ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1381,13 +1381,13 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.tcl
+$ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_8040f02701000000_p_std__vectorT_double_t
+_a0c5e02901000000_p_std__vectorT_double_t
 129.0
-_a040f02701000000_p_std__vectorT_int_t
+_508ee02901000000_p_std__vectorT_int_t
 552
-_8040f02701000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_f08de02901000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1403,7 +1403,7 @@ rational<int>(50283,119119)
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/polynomial_v2
+$ bin/run target/native/polynomial_v2-main
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1416,7 +1416,7 @@ POLYNOMIAL_VERSION = 2.0.2
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
+$ bin/run src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1430,7 +1430,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.py
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.clj
+$ bin/run src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1444,7 +1444,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.clj
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.rb
+$ bin/run src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1461,13 +1461,13 @@ rational<int>(50283,119119)
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/polynomial_v2.tcl
+$ bin/run src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_8040f02701000000_p_std__vectorT_double_t
+_a0c5e02901000000_p_std__vectorT_double_t
 129.0
-_a040f02701000000_p_std__vectorT_int_t
+_508ee02901000000_p_std__vectorT_int_t
 552
-_8040f02701000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_f08de02901000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1588,7 +1588,7 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 
 
 
-### C Main : tommath-native.c
+### C Main : tommath-main.c
 
 ```c
 #include "libtommath/tommath.h"                                                          //  1 
@@ -1619,7 +1619,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/tommath
+$ bin/run target/native/tommath-main
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1679,7 +1679,7 @@ print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath.py
+$ bin/run src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1715,7 +1715,7 @@ puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath-1.rb
+$ bin/run src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1746,7 +1746,7 @@ puts({a: a, b: b, c: c, d: d, e: e})                                           #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath-2.rb
+$ bin/run src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1856,7 +1856,7 @@ MPI = Tommath_swig::MPI                                                        #
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath.scm
+$ bin/run src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -1885,7 +1885,7 @@ e => 305411158
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/tommath
+$ bin/run target/native/tommath-main
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1899,7 +1899,7 @@ e = 305411158
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath.py
+$ bin/run src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1910,7 +1910,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/tommath.py
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath-1.rb
+$ bin/run src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1919,7 +1919,7 @@ MP_ITER = -4
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath-2.rb
+$ bin/run src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1928,7 +1928,7 @@ $ SWIG_101_VERBOSE=1 bin/run src/tommath-2.rb
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/tommath.scm
+$ bin/run src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -2048,7 +2048,7 @@ double black_scholes_put(double strike, double s, double sd, double r, double da
 
 
 
-### C Main : black_scholes-native.c
+### C Main : black_scholes-main.c
 
 ```c
 #include <stdio.h>                                                                     //  1 
@@ -2063,7 +2063,7 @@ int main(int argc, char **argv) {                                               
     { 1.50, 2.00, 0.5,  2.25, 10.0 },                                                  // 10 
     { 1.50, 2.00, 0.5,  2.25,  5.0 },                                                  // 11 
     { 1.50, 2.00, 0.5,  2.25,  2.0 },                                                  // 12 
-     // vary strike:.0                                                                
+     // vary strike:                                                                  
     { 0.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 14 
     { 1.00, 2.00, 0.25, 2.25, 15.0 },                                                  // 15 
     { 1.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 16 
@@ -2087,7 +2087,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/black_scholes
+$ bin/run target/native/black_scholes-main
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2151,7 +2151,7 @@ for r in data:                                                                  
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes.py
+$ bin/run src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2221,7 +2221,7 @@ SELECT * FROM bs_eval;                                                          
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-1.psql
+$ bin/run src/black_scholes-1.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2371,7 +2371,7 @@ LIMIT 10;                                                                       
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-2.psql
+$ bin/run src/black_scholes-2.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2467,15 +2467,17 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    8 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             11 |    2.019 |       0 |           33.974 |            -100
-    1 |  6 |          0.5 |       1.583 |               0.25 |           2.25 |             14 |    1.943 |       0 |           22.741 |            -100
-   98 |  6 |          0.5 |       1.674 |               0.25 |           2.25 |             13 |    1.896 |       0 |           13.261 |            -100
-   71 |  6 |          0.5 |       1.884 |               0.25 |           2.25 |             17 |    2.029 |       0 |            7.696 |            -100
-   23 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             14 |    1.634 |       0 |            6.727 |            -100
-   79 |  6 |          0.5 |        1.88 |               0.25 |           2.25 |             17 |    1.985 |       0 |            5.585 |            -100
-   84 |  6 |          0.5 |        1.89 |               0.25 |           2.25 |             12 |    1.978 |       0 |            4.656 |            -100
-   43 |  6 |          0.5 |       2.005 |               0.25 |           2.25 |             15 |    2.016 |       0 |            0.548 |            -100
-(8 rows)
+   36 |  6 |          0.5 |        1.51 |               0.25 |           2.25 |             16 |    1.987 |       0 |           31.589 |            -100
+    5 |  6 |          0.5 |       1.536 |               0.25 |           2.25 |             18 |    1.924 |       0 |            25.26 |            -100
+   81 |  6 |          0.5 |       1.683 |               0.25 |           2.25 |             14 |    2.035 |       0 |           20.915 |            -100
+   31 |  6 |          0.5 |       1.761 |               0.25 |           2.25 |             18 |    2.029 |       0 |           15.218 |            -100
+   52 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             17 |    1.748 |       0 |           13.285 |            -100
+   97 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             14 |    1.662 |       0 |            9.414 |            -100
+   26 |  6 |          0.5 |       1.821 |               0.25 |           2.25 |             13 |    1.989 |       0 |            9.225 |            -100
+   94 |  6 |          0.5 |       1.695 |               0.25 |           2.25 |             16 |    1.778 |       0 |            4.896 |            -100
+   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             14 |     1.71 |       0 |            4.395 |            -100
+   47 |  6 |          0.5 |       1.704 |               0.25 |           2.25 |             13 |    1.749 |       0 |             2.64 |            -100
+(10 rows)
 
 
 -- Select the most profitable random puts:
@@ -2485,8 +2487,9 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    5 | 12 |          3.5 |       1.632 |               0.25 |           2.25 |             14 |        0 |   1.764 |             -100 |           8.088
-(1 row)
+   16 | 12 |          3.5 |       1.553 |               0.25 |           2.25 |             16 |        0 |   1.668 |             -100 |           7.405
+   80 | 12 |          3.5 |       1.516 |               0.25 |           2.25 |             17 |        0 |   1.551 |             -100 |           2.308
+(2 rows)
 ```
 
 ---
@@ -2500,7 +2503,7 @@ LIMIT 10;
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run target/native/black_scholes
+$ bin/run target/native/black_scholes-main
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2520,7 +2523,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes.py
+$ bin/run src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2543,7 +2546,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-1.psql
+$ bin/run src/black_scholes-1.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2606,7 +2609,7 @@ SELECT * FROM bs_eval;
 ---
 
 ```
-$ SWIG_101_VERBOSE=1 bin/run src/black_scholes-2.psql
+$ bin/run src/black_scholes-2.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2702,15 +2705,17 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    8 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             11 |    2.019 |       0 |           33.974 |            -100
-    1 |  6 |          0.5 |       1.583 |               0.25 |           2.25 |             14 |    1.943 |       0 |           22.741 |            -100
-   98 |  6 |          0.5 |       1.674 |               0.25 |           2.25 |             13 |    1.896 |       0 |           13.261 |            -100
-   71 |  6 |          0.5 |       1.884 |               0.25 |           2.25 |             17 |    2.029 |       0 |            7.696 |            -100
-   23 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             14 |    1.634 |       0 |            6.727 |            -100
-   79 |  6 |          0.5 |        1.88 |               0.25 |           2.25 |             17 |    1.985 |       0 |            5.585 |            -100
-   84 |  6 |          0.5 |        1.89 |               0.25 |           2.25 |             12 |    1.978 |       0 |            4.656 |            -100
-   43 |  6 |          0.5 |       2.005 |               0.25 |           2.25 |             15 |    2.016 |       0 |            0.548 |            -100
-(8 rows)
+   36 |  6 |          0.5 |        1.51 |               0.25 |           2.25 |             16 |    1.987 |       0 |           31.589 |            -100
+    5 |  6 |          0.5 |       1.536 |               0.25 |           2.25 |             18 |    1.924 |       0 |            25.26 |            -100
+   81 |  6 |          0.5 |       1.683 |               0.25 |           2.25 |             14 |    2.035 |       0 |           20.915 |            -100
+   31 |  6 |          0.5 |       1.761 |               0.25 |           2.25 |             18 |    2.029 |       0 |           15.218 |            -100
+   52 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             17 |    1.748 |       0 |           13.285 |            -100
+   97 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             14 |    1.662 |       0 |            9.414 |            -100
+   26 |  6 |          0.5 |       1.821 |               0.25 |           2.25 |             13 |    1.989 |       0 |            9.225 |            -100
+   94 |  6 |          0.5 |       1.695 |               0.25 |           2.25 |             16 |    1.778 |       0 |            4.896 |            -100
+   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             14 |     1.71 |       0 |            4.395 |            -100
+   47 |  6 |          0.5 |       1.704 |               0.25 |           2.25 |             13 |    1.749 |       0 |             2.64 |            -100
+(10 rows)
 
 
 -- Select the most profitable random puts:
@@ -2720,8 +2725,9 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    5 | 12 |          3.5 |       1.632 |               0.25 |           2.25 |             14 |        0 |   1.764 |             -100 |           8.088
-(1 row)
+   16 | 12 |          3.5 |       1.553 |               0.25 |           2.25 |             16 |        0 |   1.668 |             -100 |           7.405
+   80 | 12 |          3.5 |       1.516 |               0.25 |           2.25 |             17 |        0 |   1.551 |             -100 |           2.308
+(2 rows)
 ```
 
 ---
@@ -2818,9 +2824,9 @@ LIMIT 10;
 # Compile native library:                                                     
 cc -Isrc -c -o target/native/mathlib.o src/mathlib.c                          
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/mathlib src/mathlib-native.c target/native/mathlib.o  \
-  -L/opt/homebrew/lib                                                         
+# Compile and link main program:                                              
+cc -Isrc -o target/native/mathlib-main src/mathlib-main.c                       \
+  target/native/mathlib.o -L/opt/homebrew/lib                                 
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -3022,8 +3028,8 @@ install -c -m 755 mathlib_swig.so '$POSTGRESQL_LIB_DIR/'
 # Compile native library:                                                     
 cc++ -std=c++17 -Isrc -c -o target/native/polynomial.o src/polynomial.cc      
                                                                               
-# Compile and link native program:                                            
-cc++ -std=c++17 -Isrc -o target/native/polynomial src/polynomial-native.cc      \
+# Compile and link main program:                                              
+cc++ -std=c++17 -Isrc -o target/native/polynomial-main src/polynomial-main.cc   \
   target/native/polynomial.o -L/opt/homebrew/lib                              
 ```                                                                           
                                                                               
@@ -3185,10 +3191,9 @@ cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          
 # Compile native library:                                                     
 cc++ -std=c++17 -Isrc -c -o target/native/polynomial_v2.o src/polynomial_v2.cc
                                                                               
-# Compile and link native program:                                            
-cc++ -std=c++17 -Isrc -o target/native/polynomial_v2                            \
-  src/polynomial_v2-native.cc target/native/polynomial_v2.o                     \
-  -L/opt/homebrew/lib                                                         
+# Compile and link main program:                                              
+cc++ -std=c++17 -Isrc -o target/native/polynomial_v2-main                       \
+  src/polynomial_v2-main.cc target/native/polynomial_v2.o -L/opt/homebrew/lib 
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -3377,9 +3382,9 @@ cc++ -dynamiclib -o target/guile/libpolynomial_v2_swig.so                       
 # Compile native library:                                                     
 cc -Isrc -c -o target/native/tommath.o src/tommath.c                          
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/tommath src/tommath-native.c target/native/tommath.o  \
-  -ltommath                                                                   
+# Compile and link main program:                                              
+cc -Isrc -o target/native/tommath-main src/tommath-main.c                       \
+  target/native/tommath.o -ltommath                                           
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -3510,8 +3515,8 @@ cc -dynamiclib -o target/guile/libtommath_swig.so target/native/tommath.o       
 # Compile native library:                                                     
 cc -Isrc -c -o target/native/black_scholes.o src/black_scholes.c              
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/black_scholes src/black_scholes-native.c              \
+# Compile and link main program:                                              
+cc -Isrc -o target/native/black_scholes-main src/black_scholes-main.c           \
   target/native/black_scholes.o -L/opt/homebrew/lib                           
 ```                                                                           
                                                                               
