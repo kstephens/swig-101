@@ -6,12 +6,11 @@ double black_scholes_normal(double zz)
     if (zz == 0)
         return 0.5;
 
-    double z = zz;  //zz is input variable,  use z for calculations
+    double z = zz;
 
     if (zz < 0)
-        z = -zz;  //change negative values to positive
+        z = -zz;
 
-    //set constants
     double p = 0.2316419;
     double b1 = 0.31938153;
     double b2 = -0.356563782;
@@ -19,7 +18,6 @@ double black_scholes_normal(double zz)
     double b4 = -1.821255978;
     double b5 = 1.330274428;
 
-    //CALCULATIONS
     double f = 1 / sqrt(2 * M_PI);
     double ff = exp(-pow(z, 2) / 2) * f;
     double s1 = b1 / (1 + p * z);
