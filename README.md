@@ -198,7 +198,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/mathlib-main
+$ target/native/mathlib-main
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -236,7 +236,7 @@ print(mathlib.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                            #
 ---
 
 ```
-$ bin/run src/mathlib.py
+$ src/mathlib.py
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -261,7 +261,7 @@ MATHLIB_VERSION = 1.2.3
 ---
 
 ```
-$ bin/run src/mathlib.clj
+$ src/mathlib.clj
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -289,7 +289,7 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 ---
 
 ```
-$ bin/run src/mathlib.rb
+$ src/mathlib.rb
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -314,7 +314,7 @@ MATHLIB_VERSION = "1.2.3"
 ---
 
 ```
-$ bin/run src/mathlib.scm
+$ src/mathlib.scm
 (MATHLIB-VERSION = "1.2.3")
 129.0
 ```
@@ -337,7 +337,7 @@ puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #
 ---
 
 ```
-$ bin/run src/mathlib.tcl
+$ src/mathlib.tcl
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -359,7 +359,7 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ bin/run src/mathlib-1.psql
+$ src/mathlib-1.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -419,7 +419,7 @@ FROM   parameters, coefficients;                                               -
 ---
 
 ```
-$ bin/run src/mathlib-2.psql
+$ src/mathlib-2.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -482,7 +482,7 @@ FROM   parameters, coefficients;
 
 
 ```
-$ bin/run target/native/mathlib-main
+$ target/native/mathlib-main
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -492,7 +492,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib.py
+$ src/mathlib.py
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -501,7 +501,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib.clj
+$ src/mathlib.clj
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -510,7 +510,7 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/mathlib.rb
+$ src/mathlib.rb
 MATHLIB_VERSION = "1.2.3"
 129.0
 ```
@@ -519,7 +519,7 @@ MATHLIB_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/mathlib.scm
+$ src/mathlib.scm
 (MATHLIB-VERSION = "1.2.3")
 129.0
 ```
@@ -528,7 +528,7 @@ $ bin/run src/mathlib.scm
 
 
 ```
-$ bin/run src/mathlib.tcl
+$ src/mathlib.tcl
 MATHLIB_VERSION = 1.2.3
 129.0
 ```
@@ -537,7 +537,7 @@ MATHLIB_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/mathlib-1.psql
+$ src/mathlib-1.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -561,7 +561,7 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 ---
 
 ```
-$ bin/run src/mathlib-2.psql
+$ src/mathlib-2.psql
 -- Load the extension:
 CREATE EXTENSION mathlib_swig;
 
@@ -683,7 +683,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial-main
+$ target/native/polynomial-main
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -737,7 +737,7 @@ print(poly.evaluate(1.2))                                                      #
 ---
 
 ```
-$ bin/run src/polynomial.py
+$ src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -775,7 +775,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ src/polynomial-test.py
 
 ```
 
@@ -806,7 +806,7 @@ $ bin/run src/polynomial-test.py
 ---
 
 ```
-$ bin/run src/polynomial.clj
+$ src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -840,7 +840,7 @@ pp p.evaluate(1.2)                                                             #
 ---
 
 ```
-$ bin/run src/polynomial.rb
+$ src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -873,11 +873,11 @@ $ bin/run src/polynomial.rb
 ---
 
 ```
-$ bin/run src/polynomial.scm
+$ src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13b609460>
+#<swig-pointer std::vector< double > * 1577047e0>
 129.0
-#<swig-pointer std::vector< double > * 13b609460>
+#<swig-pointer std::vector< double > * 1577047e0>
 17.3020736
 ```
 
@@ -908,11 +908,11 @@ puts [poly evaluate 1.2]                                                       #
 ---
 
 ```
-$ bin/run src/polynomial.tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a0b9604701000000_p_std__vectorT_double_t
+_c046802301000000_p_std__vectorT_double_t
 129.0
-_a0b9604701000000_p_std__vectorT_double_t
+_c046802301000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -948,7 +948,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -970,7 +970,7 @@ src/polynomial-test.py ...                                               [100%]
 
 
 ```
-$ bin/run target/native/polynomial-main
+$ target/native/polynomial-main
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -981,7 +981,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 
 
 ```
-$ bin/run src/polynomial.py
+$ src/polynomial.py
 {'POLYNOMIAL_VERSION': '1.2.1'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -992,7 +992,7 @@ $ bin/run src/polynomial.py
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ src/polynomial-test.py
 
 ```
 
@@ -1000,7 +1000,7 @@ $ bin/run src/polynomial-test.py
 
 
 ```
-$ bin/run src/polynomial.clj
+$ src/polynomial.clj
 {:POLYNOMIAL_VERSION "1.2.1"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1012,7 +1012,7 @@ $ bin/run src/polynomial.clj
 
 
 ```
-$ bin/run src/polynomial.rb
+$ src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1024,11 +1024,11 @@ $ bin/run src/polynomial.rb
 
 
 ```
-$ bin/run src/polynomial.scm
+$ src/polynomial.scm
 (POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13b609460>
+#<swig-pointer std::vector< double > * 1577047e0>
 129.0
-#<swig-pointer std::vector< double > * 13b609460>
+#<swig-pointer std::vector< double > * 1577047e0>
 17.3020736
 ```
 
@@ -1036,11 +1036,11 @@ $ bin/run src/polynomial.scm
 
 
 ```
-$ bin/run src/polynomial.tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a0b9604701000000_p_std__vectorT_double_t
+_c046802301000000_p_std__vectorT_double_t
 129.0
-_a0b9604701000000_p_std__vectorT_double_t
+_c046802301000000_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -1049,7 +1049,7 @@ _a0b9604701000000_p_std__vectorT_double_t
 
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
 platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
@@ -1158,7 +1158,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial_v2-main
+$ target/native/polynomial_v2-main
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1238,7 +1238,7 @@ print(poly.evaluate(complex(-5.7, 7.11)))                                       
 ---
 
 ```
-$ bin/run src/polynomial_v2.py
+$ src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1282,7 +1282,7 @@ $ bin/run src/polynomial_v2.py
 ---
 
 ```
-$ bin/run src/polynomial_v2.clj
+$ src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1332,7 +1332,7 @@ pp poly.evaluate(-5.7+7.11i)                                                    
 ---
 
 ```
-$ bin/run src/polynomial_v2.rb
+$ src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1381,13 +1381,13 @@ puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                
 ---
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a0c5e02901000000_p_std__vectorT_double_t
+_0045002e01000000_p_std__vectorT_double_t
 129.0
-_508ee02901000000_p_std__vectorT_int_t
+_8045002e01000000_p_std__vectorT_int_t
 552
-_f08de02901000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_c045002e01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1403,7 +1403,7 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run target/native/polynomial_v2-main
+$ target/native/polynomial_v2-main
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1416,7 +1416,7 @@ POLYNOMIAL_VERSION = 2.0.2
 
 
 ```
-$ bin/run src/polynomial_v2.py
+$ src/polynomial_v2.py
 {'POLYNOMIAL_VERSION': '2.0.2'}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1430,7 +1430,7 @@ $ bin/run src/polynomial_v2.py
 
 
 ```
-$ bin/run src/polynomial_v2.clj
+$ src/polynomial_v2.clj
 {:POLYNOMIAL_VERSION "2.0.2"}
 [3.0 5.0 7.0 11.0]
 129.0
@@ -1444,7 +1444,7 @@ $ bin/run src/polynomial_v2.clj
 
 
 ```
-$ bin/run src/polynomial_v2.rb
+$ src/polynomial_v2.rb
 {:POLYNOMIAL_VERSION=>"2.0.2"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -1461,13 +1461,13 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a0c5e02901000000_p_std__vectorT_double_t
+_0045002e01000000_p_std__vectorT_double_t
 129.0
-_508ee02901000000_p_std__vectorT_int_t
+_8045002e01000000_p_std__vectorT_int_t
 552
-_f08de02901000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_c045002e01000000_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1619,7 +1619,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/tommath-main
+$ target/native/tommath-main
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1679,7 +1679,7 @@ print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #
 ---
 
 ```
-$ bin/run src/tommath.py
+$ src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1715,7 +1715,7 @@ puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #
 ---
 
 ```
-$ bin/run src/tommath-1.rb
+$ src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1746,7 +1746,7 @@ puts({a: a, b: b, c: c, d: d, e: e})                                           #
 ---
 
 ```
-$ bin/run src/tommath-2.rb
+$ src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1856,7 +1856,7 @@ MPI = Tommath_swig::MPI                                                        #
 ---
 
 ```
-$ bin/run src/tommath.scm
+$ src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -1885,7 +1885,7 @@ e => 305411158
 
 
 ```
-$ bin/run target/native/tommath-main
+$ target/native/tommath-main
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1899,7 +1899,7 @@ e = 305411158
 
 
 ```
-$ bin/run src/tommath.py
+$ src/tommath.py
 {'MP_ITER': -4}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
@@ -1910,7 +1910,7 @@ $ bin/run src/tommath.py
 
 
 ```
-$ bin/run src/tommath-1.rb
+$ src/tommath-1.rb
 MP_ITER = -4
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
 {:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
@@ -1919,7 +1919,7 @@ MP_ITER = -4
 ---
 
 ```
-$ bin/run src/tommath-2.rb
+$ src/tommath-2.rb
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
 {:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
 ```
@@ -1928,7 +1928,7 @@ $ bin/run src/tommath-2.rb
 
 
 ```
-$ bin/run src/tommath.scm
+$ src/tommath.scm
 (MP-ITER -4)
 
 a => 2357111317
@@ -2087,7 +2087,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/black_scholes-main
+$ target/native/black_scholes-main
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2151,7 +2151,7 @@ for r in data:                                                                  
 ---
 
 ```
-$ bin/run src/black_scholes.py
+$ src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2221,7 +2221,7 @@ SELECT * FROM bs_eval;                                                          
 ---
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ src/black_scholes-1.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2371,7 +2371,7 @@ LIMIT 10;                                                                       
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ src/black_scholes-2.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2467,16 +2467,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   36 |  6 |          0.5 |        1.51 |               0.25 |           2.25 |             16 |    1.987 |       0 |           31.589 |            -100
-    5 |  6 |          0.5 |       1.536 |               0.25 |           2.25 |             18 |    1.924 |       0 |            25.26 |            -100
-   81 |  6 |          0.5 |       1.683 |               0.25 |           2.25 |             14 |    2.035 |       0 |           20.915 |            -100
-   31 |  6 |          0.5 |       1.761 |               0.25 |           2.25 |             18 |    2.029 |       0 |           15.218 |            -100
-   52 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             17 |    1.748 |       0 |           13.285 |            -100
-   97 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             14 |    1.662 |       0 |            9.414 |            -100
-   26 |  6 |          0.5 |       1.821 |               0.25 |           2.25 |             13 |    1.989 |       0 |            9.225 |            -100
-   94 |  6 |          0.5 |       1.695 |               0.25 |           2.25 |             16 |    1.778 |       0 |            4.896 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             14 |     1.71 |       0 |            4.395 |            -100
-   47 |  6 |          0.5 |       1.704 |               0.25 |           2.25 |             13 |    1.749 |       0 |             2.64 |            -100
+   61 |  6 |          0.5 |        1.62 |               0.25 |           2.25 |             11 |    1.992 |       0 |           22.962 |            -100
+   71 |  6 |          0.5 |        1.65 |               0.25 |           2.25 |             14 |    2.005 |       0 |           21.515 |            -100
+    4 |  6 |          0.5 |       1.539 |               0.25 |           2.25 |             17 |    1.858 |       0 |           20.727 |            -100
+   73 |  6 |          0.5 |       1.619 |               0.25 |           2.25 |             11 |    1.928 |       0 |           19.085 |            -100
+   62 |  6 |          0.5 |        1.56 |               0.25 |           2.25 |             12 |    1.818 |       0 |           16.538 |            -100
+   77 |  6 |          0.5 |       1.513 |               0.25 |           2.25 |             15 |    1.676 |       0 |           10.773 |            -100
+    2 |  6 |          0.5 |       1.734 |               0.25 |           2.25 |             13 |    1.911 |       0 |           10.207 |            -100
+   81 |  6 |          0.5 |       1.574 |               0.25 |           2.25 |             15 |    1.715 |       0 |            8.958 |            -100
+   54 |  6 |          0.5 |       1.858 |               0.25 |           2.25 |             12 |    2.015 |       0 |            8.449 |            -100
+   35 |  6 |          0.5 |       1.861 |               0.25 |           2.25 |             16 |    2.002 |       0 |            7.576 |            -100
 (10 rows)
 
 
@@ -2487,9 +2487,8 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   16 | 12 |          3.5 |       1.553 |               0.25 |           2.25 |             16 |        0 |   1.668 |             -100 |           7.405
-   80 | 12 |          3.5 |       1.516 |               0.25 |           2.25 |             17 |        0 |   1.551 |             -100 |           2.308
-(2 rows)
+   41 | 12 |          3.5 |       1.529 |               0.25 |           2.25 |             17 |        0 |   1.722 |             -100 |          12.622
+(1 row)
 ```
 
 ---
@@ -2503,7 +2502,7 @@ LIMIT 10;
 
 
 ```
-$ bin/run target/native/black_scholes-main
+$ target/native/black_scholes-main
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2523,7 +2522,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes.py
+$ src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2546,7 +2545,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ src/black_scholes-1.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2609,7 +2608,7 @@ SELECT * FROM bs_eval;
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ src/black_scholes-2.psql
 -- Load the extension:
 CREATE EXTENSION black_scholes_swig;
 
@@ -2705,16 +2704,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   36 |  6 |          0.5 |        1.51 |               0.25 |           2.25 |             16 |    1.987 |       0 |           31.589 |            -100
-    5 |  6 |          0.5 |       1.536 |               0.25 |           2.25 |             18 |    1.924 |       0 |            25.26 |            -100
-   81 |  6 |          0.5 |       1.683 |               0.25 |           2.25 |             14 |    2.035 |       0 |           20.915 |            -100
-   31 |  6 |          0.5 |       1.761 |               0.25 |           2.25 |             18 |    2.029 |       0 |           15.218 |            -100
-   52 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             17 |    1.748 |       0 |           13.285 |            -100
-   97 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             14 |    1.662 |       0 |            9.414 |            -100
-   26 |  6 |          0.5 |       1.821 |               0.25 |           2.25 |             13 |    1.989 |       0 |            9.225 |            -100
-   94 |  6 |          0.5 |       1.695 |               0.25 |           2.25 |             16 |    1.778 |       0 |            4.896 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             14 |     1.71 |       0 |            4.395 |            -100
-   47 |  6 |          0.5 |       1.704 |               0.25 |           2.25 |             13 |    1.749 |       0 |             2.64 |            -100
+   61 |  6 |          0.5 |        1.62 |               0.25 |           2.25 |             11 |    1.992 |       0 |           22.962 |            -100
+   71 |  6 |          0.5 |        1.65 |               0.25 |           2.25 |             14 |    2.005 |       0 |           21.515 |            -100
+    4 |  6 |          0.5 |       1.539 |               0.25 |           2.25 |             17 |    1.858 |       0 |           20.727 |            -100
+   73 |  6 |          0.5 |       1.619 |               0.25 |           2.25 |             11 |    1.928 |       0 |           19.085 |            -100
+   62 |  6 |          0.5 |        1.56 |               0.25 |           2.25 |             12 |    1.818 |       0 |           16.538 |            -100
+   77 |  6 |          0.5 |       1.513 |               0.25 |           2.25 |             15 |    1.676 |       0 |           10.773 |            -100
+    2 |  6 |          0.5 |       1.734 |               0.25 |           2.25 |             13 |    1.911 |       0 |           10.207 |            -100
+   81 |  6 |          0.5 |       1.574 |               0.25 |           2.25 |             15 |    1.715 |       0 |            8.958 |            -100
+   54 |  6 |          0.5 |       1.858 |               0.25 |           2.25 |             12 |    2.015 |       0 |            8.449 |            -100
+   35 |  6 |          0.5 |       1.861 |               0.25 |           2.25 |             16 |    2.002 |       0 |            7.576 |            -100
 (10 rows)
 
 
@@ -2725,9 +2724,8 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   16 | 12 |          3.5 |       1.553 |               0.25 |           2.25 |             16 |        0 |   1.668 |             -100 |           7.405
-   80 | 12 |          3.5 |       1.516 |               0.25 |           2.25 |             17 |        0 |   1.551 |             -100 |           2.308
-(2 rows)
+   41 | 12 |          3.5 |       1.529 |               0.25 |           2.25 |             17 |        0 |   1.722 |             -100 |          12.622
+(1 row)
 ```
 
 ---

@@ -33,7 +33,7 @@ end
 
 def cmd cmd
   log "cmd : #{cmd} : ..."
-  system "SWIG_101_VERBOSE=1 #{cmd} >tmp/cmd.out 2>&1"
+  system "SWIG_101_VERBOSE=1 bin/run #{cmd} >tmp/cmd.out 2>&1"
   result = $?
   out_raw = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out_raw))
@@ -370,7 +370,7 @@ END
         ).map do | f |
             {
               file: f,
-              cmd: File.executable?(f) && "bin/run #{f}",
+              cmd: File.executable?(f) && "#{f}",
             }
           end
       else
@@ -378,7 +378,7 @@ END
         [
           {
             file: "src/#{t[:file]}",
-            cmd: "bin/run #{t[:cmd]}",
+            cmd: "#{t[:cmd]}",
           }
         ]
       end
