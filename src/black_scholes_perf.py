@@ -6,12 +6,15 @@ main():
   examples = random_examples()
   pg_conn = pg.connect((os.environ('PG_CONN'))
   insert_examples(pg_conn, examples)
-  benchmark(examples, compute_local, black_scholes_py,   )
-  benchmark(examples, compute_local, black_scholes_swig,  )
+  benchmark(examples, compute_local, black_scholes_py,   lambda: examples)
+  benchmark(examples, compute_local, black_scholes_swig, lambda: examples)
+  benchmark(examples, compute_local, black_scholes_swig, fetch_pg)
+  benchmark(examples, compute_pg,    identity,           identity)
+                       b
   
-benchmark(examples, bs, fetch_examples):
-  examples = fetch_examples(examples)
-  (_, dt_ms) = elapsed_ms(compute, bs, examples)
+benchmark(examples, compute, fetch):
+  examples = fetch()
+  (_, dt_ms) = elapsed_ms(compute, examples, bs)
   print(f'{bs} {dt_ms} ms')
 
 compute_local(bs, examples):
