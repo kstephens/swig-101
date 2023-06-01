@@ -1,21 +1,34 @@
 import black_scholes_swig
 import black_scholes_py
+import postgresql as pg
 
 main():
   examples = random_examples()
-  benchmark(black_scholes_py,    )
-  benchmark(black_scholes_swig,  )
+  pg_conn = connnect_pg(()
+  pg_insert_examples(pg_conn, examples)
+  benchmark(examples, compute_local, black_scholes_py,   )
+  benchmark(examples, compute_local, black_scholes_swig,  )
   
-benchmark(bs, prepare_examples, example):
+benchmark(examples, bs, fetch_examples):
+  examples = fetch_examples(examples)
+  (_, dt_ms) = elapsed_ms(compute, bs, examples)
+  print(f'{bs} {dt_ms} ms')
 
+compute_local(bs, examples):
+  
+compute_postgres(bs, example):
+  profitable_short
+
+pg_insert_examples(pg_conn, examples):
+  pg.execute('DROP TABLE IF EXISTS bs_examples')
+  pg.execute('CREATE TABLE bs_examples(...)')
+                        
 random_examples():
   N = 1000000
   examples = [
     random_example()
     for i in 1 .. n
   ]
-  (_, dt_ms) = elapsed_ms(process_examples, bs, examples))
-  print(f'{bs} {dt_ms} ms')
 
 random_example():
   return [ random_offset(x, 0.10) for x in examples.sample() ]  
