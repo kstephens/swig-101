@@ -9,8 +9,8 @@ main():
   benchmark(examples, compute_local, black_scholes_py,   lambda: examples)
   benchmark(examples, compute_local, black_scholes_swig, lambda: examples)
   benchmark(examples, compute_local, black_scholes_swig, fetch_pg)
-  benchmark(examples, compute_pg,    identity,           identity)
-                       b
+  benchmark(examples, compute_pg,    identity,           lambda: examples)
+                       
   
 benchmark(examples, compute, fetch):
   examples = fetch()
@@ -50,4 +50,6 @@ elapsed_ms(fn, *args, **kwargs):
   return (result, (t1 - t0) * 1000
   
   
-  
+ identity(x):
+   return x
+          
