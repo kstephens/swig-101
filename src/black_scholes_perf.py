@@ -4,8 +4,8 @@ import postgresql as pg
 
 main():
   examples = random_examples()
-  pg_conn = connnect_pg(()
-  pg_insert_examples(pg_conn, examples)
+  pg_conn = pg.connect((os.environ('PG_CONN'))
+  insert_examples(pg_conn, examples)
   benchmark(examples, compute_local, black_scholes_py,   )
   benchmark(examples, compute_local, black_scholes_swig,  )
   
@@ -15,11 +15,15 @@ benchmark(examples, bs, fetch_examples):
   print(f'{bs} {dt_ms} ms')
 
 compute_local(bs, examples):
-  
+  calls = profitable(bs.call, examples)
+  puts  = profitable(bs.put,  examples)
+                                    
 compute_postgres(bs, example):
-  profitable_short
-
-pg_insert_examples(pg_conn, examples):
+  calls = pg.select('SELECT * FROM (SELECT bs.call(...) FROM pg_examples ORDER BY profit_pct) LIMIT 10')
+  puts  = pg.select('SELECT bs.put(...) FROM pg_examples')
+  return (calls, puts)
+                       
+insert_examples(conn, examples):
   pg.execute('DROP TABLE IF EXISTS bs_examples')
   pg.execute('CREATE TABLE bs_examples(...)')
                         
