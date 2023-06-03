@@ -388,15 +388,30 @@ postgresql-make-extension() {
   done
 }
 
--run-prog() {
-  [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
+############################
+
+-cmd-build-readme-md() {
   (
     set -e
-    echo '```'
-    echo "\$ $*"
-    bin/run "$@" || exit $?
-    echo '```'
-  ) || exit $?
+	-cmd-clean
+  : "${readme_md:=README.md}"
+	erb doc/README.md.erb | doc/normalize-object-ids | tee $readme_md.tmp |
+  wc -l
+	mv $readme_md.tmp $readme_md
+	ls -l $readme_md
+  ) || return $?
+}
+
+-cmd-build-readme-md-html() {
+  (
+    set -x
+    readme_html=README.md.html
+    readme_md=tmp/$readme_html.md
+    mkdir -p tmp
+    MARKDEEP=1 -cmd-build-readme-md
+	  df-markdown -v -s dark -o $readme_html $readme_md
+  	ls -l $readme_html
+  )
 }
 
 ############################
@@ -418,6 +433,17 @@ postgresql-make-extension() {
 }
 
 ############################
+
+-run-prog() {
+  [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
+  (
+    set -e
+    echo '```'
+    echo "\$ $*"
+    bin/run "$@" || exit $?
+    echo '```'
+  ) || exit $?
+}
 
 -run() {
   echo "$*"

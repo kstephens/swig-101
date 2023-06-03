@@ -70,17 +70,11 @@ debian-prereq:
 README_MD_DEPS=doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 
 README.md :
-	$(MAKE) clean
-	erb doc/README.md.erb | tee $@.tmp | wc -l
-	mv $@.tmp $@
-	ls -l $@
+	$(BUILD_SH) build-readme-md EXAMPLES='$(EXAMPLES)' SWIG_TARGETS='$(SWIG_TARGETS)'
 .PRECIOUS: README.md
 
 README.md.html :
-	mkdir -p tmp
-	MARKDEEP=1 erb doc/README.md.erb | tee tmp/$@.md | wc -l
-	df-markdown -v -s dark -o $@ tmp/$@.md
-	ls -l $@
+	$(BUILD_SH) build-readme-md-html EXAMPLES='$(EXAMPLES)' SWIG_TARGETS='$(SWIG_TARGETS)'
 
 #################################
 
