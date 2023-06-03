@@ -33,11 +33,14 @@ end
 
 def cmd cmd
   log "cmd : #{cmd} : ..."
+  t0 = Time.now
   system "SWIG_101_VERBOSE=1 bin/run #{cmd} >tmp/cmd.out 2>&1"
   result = $?
+  t1 = Time.now
+  dt_ms = ((t1 - t0) * 1000).to_i
   out_raw = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out_raw))
-  log "cmd : #{cmd} : DONE : #{result.exitstatus} : #{out_raw.size} bytes"
+  log "cmd : #{cmd} : DONE : #{dt_ms} ms : exit #{result.exitstatus} : #{out_raw.size} bytes"
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
