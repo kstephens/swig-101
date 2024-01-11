@@ -9,9 +9,9 @@ declare -A SWIG_TARGET_SUFFIX_
   export LOCAL_DIR="$ROOT_DIR/local"
   export LC_ALL=C
 
-  EXAMPLES='mathlib.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
-  SWIG_TARGETS='python clojure ruby tcl guile postgresql'
-  SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
+  EXAMPLES='mathlib.c polynomial.cc polynomial_v2.cc tommath.c rational.cc black_scholes.c'
+  SWIG_TARGETS='native python clojure ruby tcl guile postgresql'
+  SWIG_TARGET_SUFFIX_=([native]=-main [python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
 }
 
 -initialize() {
@@ -221,7 +221,7 @@ declare -A SWIG_TARGET_SUFFIX_
   SWIG_SO="$(dirname ${SWIG_O})/${SWIG_SO_PREFIX}${EXAMPLE_SWIG}${SWIG_SO_SUFFIX}"
 
   EXAMPLE_I=src/${EXAMPLE_NAME}.i
-  EXAMPLE_H=src/${EXAMPLE_NAME}.h
+  EXAMPLE_H=$(ls src/${EXAMPLE_NAME}.h include/${EXAMPLE_NAME}.h 2>/dev/null)
   EXAMPLE_C=src/${EXAMPLE_NAME}.c
 
   NATIVE_LIB_C=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}

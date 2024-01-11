@@ -7,7 +7,7 @@
 
 // Include C++ declarations as SWIG interface definitions:
 %include "polynomial_v2.h"
-%include "rational.h"
+%include "rational.i"     // python __eq__(), __add__(), etc.
 
 // Prepend C++ code in generated bindings:
 %{

@@ -31,6 +31,21 @@ namespace mathlib {
     bool operator == (const rational<I> &y) const {
       return n == y.n && d == y.d;
     }
+    bool operator != (const rational<I> &y) const {
+      return ! (n == y.n && d == y.d);
+    }
+    bool operator < (const rational<I> &y) const {
+      return n * y.d < y.n * d;
+    }
+    bool operator <= (const rational<I> &y) const {
+      return n * y.d <= y.n * d;
+    }
+    bool operator > (const rational<I> &y) const {
+      return n * y.d > y.n * d;
+    }
+    bool operator >= (const rational<I> &y) const {
+      return n * y.d >= y.n * d;
+    }
     std::string __str__() const {
       std::ostringstream os(std::ostringstream::out);
       os << n << "/" << d;
