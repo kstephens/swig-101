@@ -192,7 +192,7 @@ $ <%= f[:cmd] %>
 
 # Workflow
 
-<%= markdeep(File.read("doc/workflow.txt")) %>
+<%= markdeep(File.open("doc/workflow.txt", "r:UTF-8").read()) %>
 
 # Workflow Examples
 
