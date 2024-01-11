@@ -19,9 +19,9 @@ pp poly.evaluate(-2)
 
 # polynomial<rational<int>>:
 poly        = PV2::PolynomialRationalV2.new()
-poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalV2.new(7, 11), PV2::RationalV2.new(11, 13), PV2::RationalV2.new(13,17) ])
+poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalInt.new(7, 11), PV2::RationalInt.new(11, 13), PV2::RationalInt.new(13,17) ])
 pp poly.coeffs.to_a
-pp poly.evaluate(PV2::RationalV2.new(-5, 7))
+pp poly.evaluate(PV2::RationalInt.new(-5, 7))
 
 # polynomial<complex<double>>
 poly        = PV2::PolynomialComplexV2.new()

@@ -15,7 +15,6 @@
 #include "rational.h"
 %}
 
-%template(RationalV2)            mathlib::rational<int>;
 %template(VectorDoubleV2)        std::vector<double>;
 %template(VectorIntV2)           std::vector<int>;
 %template(VectorRationalV2)      std::vector<mathlib::rational<int>>;

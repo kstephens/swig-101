@@ -3,7 +3,7 @@
 from rational_swig import *
 
 def P(x):
-  print(f'{x} = {eval(x)!r}')
+  print(f'{x} = {eval(x)}')
 
 a = RationalInt(2, 3)
 b = RationalInt(5, 6)

@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+counter = 0x10000000
+norm = Hash.new{|h,k| h[k] = "%0*x" % [k.size, (counter += 1)] }
+line = nil
+until $stdin.eof?
+  scan = line = $stdin.readline
+  # $stderr.puts "  XXX : line = #{line.inspect}"
+  output = String.new
+  until scan.empty?
+    case scan
+    when /(\#\<swig-pointer .* \* )([0-9a-f_]+)(\>)/i
+      # $stderr.puts "foo"
+      output << $` + $1 + norm[$2] + $3
+      scan = $'
+    when /(_)([0-9a-f]+)(_[0-9a-z_]+)/i
+      output << $` + $1 + norm[$2] + $3
+      scan = $'
+    else
+      output << scan
+      scan = ''
+    end
+  end
+  if output != line
+    $stderr.puts "  XXX : line    #{line.inspect}"
+    $stderr.puts "  XXX : output  #{output.inspect}"
+  end
+  $stdout.write output
+end
