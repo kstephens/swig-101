@@ -197,18 +197,18 @@ declare -A SWIG_TARGET_SUFFIX_
   SWIG_OPTS+=" -addextern"
   SWIG_OPTS+=" -I-"
   SWIG_OPTS_x+=' \
-       -debug-module 1,2,3,4 \
-       -debug-symtabs  \
-       -debug-symbols  \
-       -debug-csymbols \
-       -debug-symbols \
-       -debug-tags     \
-       -debug-template \
-       -debug-top 1,2,3,4 \
-       -debug-typedef  \
-       -debug-typemap  \
-       -debug-tmsearch \
-       -debug-tmused
+      -debug-module 1,2,3,4 \
+      -debug-symtabs  \
+      -debug-symbols  \
+      -debug-csymbols \
+      -debug-symbols \
+      -debug-tags     \
+      -debug-template \
+      -debug-top 1,2,3,4 \
+      -debug-typedef  \
+      -debug-typemap  \
+      -debug-tmsearch \
+      -debug-tmused
   '
   SWIG_CFLAGS+=' -Wno-sentinel'
   SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
@@ -297,20 +297,20 @@ postgresql-make-extension() {
 
 -cmd-build-native() {
   (
-  set -e -o pipefail
-  SWIG_TARGET=native
-  -setup-vars
-  mkdir -p $(dirname $NATIVE_MAIN_E)
+    set -e # -o pipefail
+    SWIG_TARGET=native
+    -setup-vars
+    mkdir -p $(dirname $NATIVE_MAIN_E)
 
-	echo "### Compile Native Code"
-	echo ""
-	echo '```'
-	echo "# Compile native library:"
-	-run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
-	echo ""
-	echo "# Compile and link main program:"
-	-run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
-	echo '```'
+    echo "### Compile Native Code"
+    echo ""
+    echo '```'
+    echo "# Compile native library:"
+    -run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
+    echo ""
+    echo "# Compile and link main program:"
+    -run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
+    echo '```'
   ) || return $?
 }
 
@@ -325,25 +325,25 @@ postgresql-make-extension() {
 	echo ""
 	echo '```'
 
-	echo "# Generate ${SWIG_TARGET} bindings:"
+  echo "# Generate ${SWIG_TARGET} bindings:"
   -run $SWIG_EXE $SWIG_OPTS $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
-	echo ""
+  echo ""
   SWIG_GENERATED_FILES="$SWIG_C $SWIG_GENERATED_FILES_MORE"
 
-	echo "# Source code statistics:"
-	-run wc -l $EXAMPLE_H $EXAMPLE_I
-	echo ""
+  echo "# Source code statistics:"
+  -run wc -l $EXAMPLE_H $EXAMPLE_I
+  echo ""
 
-	echo "# Generated code statistics:"
-	-run wc -l "$SWIG_GENERATED_FILES"
-	echo ""
+  echo "# Generated code statistics:"
+  -run wc -l "$SWIG_GENERATED_FILES"
+  echo ""
 
-	echo "# Compile ${SWIG_TARGET} bindings:"
-	-run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
-	echo ""
+  echo "# Compile ${SWIG_TARGET} bindings:"
+  -run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
+  echo ""
 
-	echo "# Link $SWIG_TARGET dynamic library:"
-	-run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
+  echo "# Link $SWIG_TARGET dynamic library:"
+  -run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
 
   local extra
   for extra in $SWIG_EXTRA ''
@@ -393,12 +393,12 @@ postgresql-make-extension() {
 -cmd-build-readme-md() {
   (
     set -e
-	-cmd-clean
-  : "${readme_md:=README.md}"
-	erb doc/README.md.erb | doc/normalize-object-ids | tee $readme_md.tmp |
-  wc -l
-	mv $readme_md.tmp $readme_md
-	ls -l $readme_md
+    -cmd-clean
+    : "${readme_md:=README.md}"
+    erb doc/README.md.erb | doc/normalize-object-ids | tee $readme_md.tmp |
+    wc -l
+    mv $readme_md.tmp $readme_md
+    ls -l $readme_md
   ) || return $?
 }
 
@@ -409,16 +409,16 @@ postgresql-make-extension() {
     readme_md=tmp/$readme_html.md
     mkdir -p tmp
     MARKDEEP=1 -cmd-build-readme-md
-	  df-markdown -v -s dark -o $readme_html $readme_md
-  	ls -l $readme_html
+    df-markdown -v -s dark -o $readme_html $readme_md
+    ls -l $readme_html
   )
 }
 
 ############################
 
 -cmd-clean() {
-	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
-	rm -rf target/*
+  rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
+  rm -rf target/*
   rm -rf {bin,src}/__pycache__/
 }
 
