@@ -235,7 +235,7 @@ declare -A SWIG_TARGET_SUFFIX_
 
 -cmd-build() {
   targets=("$@")
-  build-things
+  -cmd-all
 }
 
 -cmd-show() {
@@ -321,9 +321,28 @@ postgresql-make-extension() {
   TARGET_DIR=$(dirname $SWIG_C)
   mkdir -p $TARGET_DIR
 
-	echo "### Build ${SWIG_TARGET} Bindings"
-	echo ""
-	echo '```'
+  if ! [[ -f $NATIVE_LIB_O ]]
+  then
+    -cmd-build-native || return $?
+  elif [[ "$SWIG_TARGET" == native ]]
+  then
+    -cmd-build-native
+    return $?
+  fi
+
+  example_base="${EXAMPLE%.*}"
+  example_suffix="${SWIG_TARGET_SUFFIX_[$SWIG_TARGET]}"
+  example_file="src/$example_base$example_suffix"
+  if ! [[ -e "$example_file" ]]
+  then
+    # declare -p EXAMPLE example_base example_suffix example_file
+    # echo "skipping $EXAMPLE $SWIG_TARGET : missing $example_file"
+    return 0
+  fi
+
+  echo "### Build ${SWIG_TARGET} Bindings"
+  echo ""
+  echo '```'
 
   echo "# Generate ${SWIG_TARGET} bindings:"
   -run $SWIG_EXE $SWIG_OPTS $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
@@ -370,8 +389,6 @@ postgresql-make-extension() {
     (
     export SWIG_101_VERBOSE=1
     -setup-example-vars
-    -run-prog target/native/$EXAMPLE_NAME-main
-    echo ""
     for SWIG_TARGET in $SWIG_TARGETS
     do
       suffix=${SWIG_TARGET_SUFFIX_[$SWIG_TARGET]}
