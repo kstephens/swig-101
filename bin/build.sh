@@ -9,7 +9,7 @@ declare -A SWIG_TARGET_SUFFIX_
   export LOCAL_DIR="$ROOT_DIR/local"
   export LC_ALL=C
 
-  EXAMPLES='mathlib.c polynomial.cc polynomial_v2.cc tommath.c rational.cc black_scholes.c'
+  EXAMPLES='mathlib.c polynomial.cc rational.cc polynomial_v2.cc tommath.c black_scholes.c'
   SWIG_TARGETS='native python clojure ruby tcl guile postgresql'
   SWIG_TARGET_SUFFIX_=([native]=-main [python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
 }
@@ -197,18 +197,18 @@ declare -A SWIG_TARGET_SUFFIX_
   SWIG_OPTS+=" -addextern"
   SWIG_OPTS+=" -I-"
   SWIG_OPTS_x+=' \
-      -debug-module 1,2,3,4 \
-      -debug-symtabs  \
-      -debug-symbols  \
-      -debug-csymbols \
-      -debug-symbols \
-      -debug-tags     \
-      -debug-template \
-      -debug-top 1,2,3,4 \
-      -debug-typedef  \
-      -debug-typemap  \
-      -debug-tmsearch \
-      -debug-tmused
+    -debug-module 1,2,3,4 \
+    -debug-symtabs  \
+    -debug-symbols  \
+    -debug-csymbols \
+    -debug-symbols \
+    -debug-tags     \
+    -debug-template \
+    -debug-top 1,2,3,4 \
+    -debug-typedef  \
+    -debug-typemap  \
+    -debug-tmsearch \
+    -debug-tmused
   '
   SWIG_CFLAGS+=' -Wno-sentinel'
   SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
@@ -337,7 +337,8 @@ postgresql-make-extension() {
   then
     # declare -p EXAMPLE example_base example_suffix example_file
     # echo "skipping $EXAMPLE $SWIG_TARGET : missing $example_file"
-    return 0
+    :
+    # return 0
   fi
 
   echo "### Build ${SWIG_TARGET} Bindings"
@@ -409,11 +410,12 @@ postgresql-make-extension() {
 
 -cmd-build-readme-md() {
   (
-    set -e
+    set -ex
     -cmd-clean
     : "${readme_md:=README.md}"
     erb doc/README.md.erb | doc/normalize-object-ids | tee $readme_md.tmp |
     wc -l
+    wc -l $readme_md.tmp
     mv $readme_md.tmp $readme_md
     ls -l $readme_md
   ) || return $?

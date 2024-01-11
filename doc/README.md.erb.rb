@@ -55,6 +55,8 @@ end
 
 def string_to_lines s
   s.split("\n", -1)
+rescue => exc
+  raise Exception, "string_to_lines: #{s.inspect} : #{exc.inspect}"
 end
 
 def trim_empty_lines!(lines)
