@@ -1,0 +1,10 @@
+{
+  "makefile.extensionOutputFolder": "./.vscode",
+  "files.associations": {
+    "*.ss": "racket",
+    "*.scm": "racket",
+    "*.psql": "sql",
+    "*.make": "makefile",
+    "numeric": "cpp"
+  }
+}
