@@ -21,7 +21,7 @@ until $stdin.eof?
     when /\b__(add|sub|mul|div)__\b/
       output << scan
       scan = ''
-    when /(_)([0-9a-f]+)(_[0-9a-z_]+)/i
+    when /\b(_)([0-9a-f]+)(_[0-9a-z_]+)/i
       output << $` + $1 + norm[$2] + $3
       scan = $'
     else

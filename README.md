@@ -1796,20 +1796,14 @@ e = 305411158
 ```c
 %module tommath_swig                                                           //  1 
 %include "stdint.i" // mp_digit typedef                                        //  2 
- // "missing sentinel in function call"                                       
+// varargs NULL terminator up to 10 arguments:                                
 %varargs(10, mp_int *ip = NULL) mp_init_multi;                                 //  4 
 %varargs(10, mp_int *ip = NULL) mp_clear_multi;                                //  5 
-//%rename(bool)  _bool;                                                        //  6 
-//%rename(true)  _true;                                                        //  7 
-//%rename(false) _false;                                                       //  8 
-//%ignore bool;                                                                //  9 
-//%ignore true;                                                                // 10 
-//%ignore false;                                                               // 11 
-%{                                                                             // 12 
-#include "tommath.h"                                                           // 13 
-%}                                                                             // 14 
-%include "libtommath/tommath.h"                                                // 15 
-%include "tommath.h"                                                           // 16 
+%{                                                                             //  6 
+#include "tommath.h"                                                           //  7 
+%}                                                                             //  8 
+%include "libtommath/tommath.h"                                                //  9 
+%include "tommath.h"                                                           // 10 
 ```
 
 
@@ -2000,8 +1994,8 @@ MPI = Tommath_swig::MPI                                                        #
 (define (show!)                                                                ;; 12 
   (newline)                                                                    ;; 13 
   (let ((r (lambda (n-v)                                                       ;; 14 
-        (write (car n-v)) (display " => ")                                     ;; 15 
-        (display (mp-int---str-- (cadr n-v))) (newline))))                     ;; 16 
+             (write (car n-v)) (display " = ")                                 ;; 15 
+             (display (mp-int---str-- (cadr n-v))) (newline))))                ;; 16 
     (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))                       ;; 17 
                                                                               
 (show!)                                                                        ;; 19 
@@ -2019,17 +2013,17 @@ MPI = Tommath_swig::MPI                                                        #
 $ src/tommath.scm
 (MP-ITER -4)
 
-a => 2357111317
-b => 1113171923
-c => 0
-d => 0
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
 
-a => 2357111317
-b => 1113171923
-c => 2623870137469952591
-d => 2920818566629701480442302493
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -2091,17 +2085,17 @@ $ src/tommath-2.rb
 $ src/tommath.scm
 (MP-ITER -4)
 
-a => 2357111317
-b => 1113171923
-c => 0
-d => 0
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
 
-a => 2357111317
-b => 1113171923
-c => 2623870137469952591
-d => 2920818566629701480442302493
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -2625,16 +2619,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-  868 |  6 |          0.5 |       1.516 |               0.25 |           2.25 |             15 |    2.047 |       0 |           35.026 |            -100
-  418 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             15 |    2.009 |       0 |           31.221 |            -100
-  127 |  6 |          0.5 |       1.525 |               0.25 |           2.25 |             12 |    1.987 |       0 |           30.295 |            -100
-  715 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             16 |    1.945 |       0 |           28.044 |            -100
-  345 |  6 |          0.5 |       1.574 |               0.25 |           2.25 |             18 |    2.013 |       0 |            27.89 |            -100
-  130 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             18 |    1.968 |       0 |           27.709 |            -100
-  407 |  6 |          0.5 |       1.552 |               0.25 |           2.25 |             17 |    1.965 |       0 |            26.61 |            -100
-  563 |  6 |          0.5 |       1.524 |               0.25 |           2.25 |             15 |    1.917 |       0 |           25.787 |            -100
-   41 |  6 |          0.5 |       1.514 |               0.25 |           2.25 |             13 |      1.9 |       0 |           25.495 |            -100
-   33 |  6 |          0.5 |       1.516 |               0.25 |           2.25 |             11 |    1.901 |       0 |           25.395 |            -100
+  700 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             13 |    2.018 |       0 |           33.465 |            -100
+  576 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.973 |       0 |           31.009 |            -100
+  202 |  6 |          0.5 |       1.521 |               0.25 |           2.25 |             15 |    1.985 |       0 |           30.506 |            -100
+  653 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             12 |    1.967 |       0 |           29.152 |            -100
+  991 |  6 |          0.5 |       1.511 |               0.25 |           2.25 |             16 |    1.943 |       0 |            28.59 |            -100
+  639 |  6 |          0.5 |       1.568 |               0.25 |           2.25 |             15 |        2 |       0 |           27.551 |            -100
+  927 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             12 |    1.998 |       0 |           27.504 |            -100
+  951 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             18 |    1.919 |       0 |           27.339 |            -100
+  139 |  6 |          0.5 |       1.529 |               0.25 |           2.25 |             18 |    1.944 |       0 |           27.141 |            -100
+  516 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             16 |    1.884 |       0 |             25.6 |            -100
 (10 rows)
 
 
@@ -2645,16 +2639,16 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    6 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.769 |             -100 |          15.319
-  789 | 12 |          3.5 |       1.506 |               0.25 |           2.25 |             18 |        0 |   1.728 |             -100 |          14.741
-  152 | 12 |          3.5 |         1.5 |               0.25 |           2.25 |             16 |        0 |   1.701 |             -100 |            13.4
-  877 | 12 |          3.5 |       1.504 |               0.25 |           2.25 |             12 |        0 |   1.674 |             -100 |          11.303
-  958 | 12 |          3.5 |        1.54 |               0.25 |           2.25 |             17 |        0 |   1.688 |             -100 |            9.61
-  942 | 12 |          3.5 |       1.533 |               0.25 |           2.25 |             12 |        0 |   1.657 |             -100 |           8.088
-  651 | 12 |          3.5 |       1.614 |               0.25 |           2.25 |             17 |        0 |   1.708 |             -100 |           5.824
-  522 | 12 |          3.5 |       1.551 |               0.25 |           2.25 |             17 |        0 |   1.631 |             -100 |           5.157
-  492 | 12 |          3.5 |       1.629 |               0.25 |           2.25 |             11 |        0 |   1.706 |             -100 |           4.726
-  950 | 12 |          3.5 |       1.604 |               0.25 |           2.25 |             17 |        0 |   1.674 |             -100 |           4.364
+   70 | 12 |          3.5 |       1.507 |               0.25 |           2.25 |             17 |        0 |    1.75 |             -100 |          16.124
+  804 | 12 |          3.5 |       1.503 |               0.25 |           2.25 |             13 |        0 |   1.725 |             -100 |           14.77
+   15 | 12 |          3.5 |       1.586 |               0.25 |           2.25 |             16 |        0 |   1.757 |             -100 |          10.781
+  747 | 12 |          3.5 |       1.525 |               0.25 |           2.25 |             17 |        0 |   1.662 |             -100 |           8.983
+  963 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.634 |             -100 |           8.788
+  156 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             16 |        0 |   1.672 |             -100 |           7.731
+  103 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             14 |        0 |   1.666 |             -100 |           7.622
+  587 | 12 |          3.5 |       1.619 |               0.25 |           2.25 |             13 |        0 |   1.738 |             -100 |            7.35
+  236 | 12 |          3.5 |       1.509 |               0.25 |           2.25 |             18 |        0 |   1.582 |             -100 |           4.837
+   88 | 12 |          3.5 |       1.638 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           3.663
 (10 rows)
 ```
 
@@ -2871,16 +2865,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-  868 |  6 |          0.5 |       1.516 |               0.25 |           2.25 |             15 |    2.047 |       0 |           35.026 |            -100
-  418 |  6 |          0.5 |       1.531 |               0.25 |           2.25 |             15 |    2.009 |       0 |           31.221 |            -100
-  127 |  6 |          0.5 |       1.525 |               0.25 |           2.25 |             12 |    1.987 |       0 |           30.295 |            -100
-  715 |  6 |          0.5 |       1.519 |               0.25 |           2.25 |             16 |    1.945 |       0 |           28.044 |            -100
-  345 |  6 |          0.5 |       1.574 |               0.25 |           2.25 |             18 |    2.013 |       0 |            27.89 |            -100
-  130 |  6 |          0.5 |       1.541 |               0.25 |           2.25 |             18 |    1.968 |       0 |           27.709 |            -100
-  407 |  6 |          0.5 |       1.552 |               0.25 |           2.25 |             17 |    1.965 |       0 |            26.61 |            -100
-  563 |  6 |          0.5 |       1.524 |               0.25 |           2.25 |             15 |    1.917 |       0 |           25.787 |            -100
-   41 |  6 |          0.5 |       1.514 |               0.25 |           2.25 |             13 |      1.9 |       0 |           25.495 |            -100
-   33 |  6 |          0.5 |       1.516 |               0.25 |           2.25 |             11 |    1.901 |       0 |           25.395 |            -100
+  700 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             13 |    2.018 |       0 |           33.465 |            -100
+  576 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.973 |       0 |           31.009 |            -100
+  202 |  6 |          0.5 |       1.521 |               0.25 |           2.25 |             15 |    1.985 |       0 |           30.506 |            -100
+  653 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             12 |    1.967 |       0 |           29.152 |            -100
+  991 |  6 |          0.5 |       1.511 |               0.25 |           2.25 |             16 |    1.943 |       0 |            28.59 |            -100
+  639 |  6 |          0.5 |       1.568 |               0.25 |           2.25 |             15 |        2 |       0 |           27.551 |            -100
+  927 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             12 |    1.998 |       0 |           27.504 |            -100
+  951 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             18 |    1.919 |       0 |           27.339 |            -100
+  139 |  6 |          0.5 |       1.529 |               0.25 |           2.25 |             18 |    1.944 |       0 |           27.141 |            -100
+  516 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             16 |    1.884 |       0 |             25.6 |            -100
 (10 rows)
 
 
@@ -2891,16 +2885,16 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-    6 | 12 |          3.5 |       1.534 |               0.25 |           2.25 |             12 |        0 |   1.769 |             -100 |          15.319
-  789 | 12 |          3.5 |       1.506 |               0.25 |           2.25 |             18 |        0 |   1.728 |             -100 |          14.741
-  152 | 12 |          3.5 |         1.5 |               0.25 |           2.25 |             16 |        0 |   1.701 |             -100 |            13.4
-  877 | 12 |          3.5 |       1.504 |               0.25 |           2.25 |             12 |        0 |   1.674 |             -100 |          11.303
-  958 | 12 |          3.5 |        1.54 |               0.25 |           2.25 |             17 |        0 |   1.688 |             -100 |            9.61
-  942 | 12 |          3.5 |       1.533 |               0.25 |           2.25 |             12 |        0 |   1.657 |             -100 |           8.088
-  651 | 12 |          3.5 |       1.614 |               0.25 |           2.25 |             17 |        0 |   1.708 |             -100 |           5.824
-  522 | 12 |          3.5 |       1.551 |               0.25 |           2.25 |             17 |        0 |   1.631 |             -100 |           5.157
-  492 | 12 |          3.5 |       1.629 |               0.25 |           2.25 |             11 |        0 |   1.706 |             -100 |           4.726
-  950 | 12 |          3.5 |       1.604 |               0.25 |           2.25 |             17 |        0 |   1.674 |             -100 |           4.364
+   70 | 12 |          3.5 |       1.507 |               0.25 |           2.25 |             17 |        0 |    1.75 |             -100 |          16.124
+  804 | 12 |          3.5 |       1.503 |               0.25 |           2.25 |             13 |        0 |   1.725 |             -100 |           14.77
+   15 | 12 |          3.5 |       1.586 |               0.25 |           2.25 |             16 |        0 |   1.757 |             -100 |          10.781
+  747 | 12 |          3.5 |       1.525 |               0.25 |           2.25 |             17 |        0 |   1.662 |             -100 |           8.983
+  963 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.634 |             -100 |           8.788
+  156 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             16 |        0 |   1.672 |             -100 |           7.731
+  103 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             14 |        0 |   1.666 |             -100 |           7.622
+  587 | 12 |          3.5 |       1.619 |               0.25 |           2.25 |             13 |        0 |   1.738 |             -100 |            7.35
+  236 | 12 |          3.5 |       1.509 |               0.25 |           2.25 |             18 |        0 |   1.582 |             -100 |           4.837
+   88 | 12 |          3.5 |       1.638 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           3.663
 (10 rows)
 ```
 
@@ -3418,9 +3412,9 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/rational_swig.cc target/python/rational_swig.py           
-4694 target/python/rational_swig.cc                                           
+4615 target/python/rational_swig.cc                                           
 115 target/python/rational_swig.py                                            
-4809 total                                                                    
+4730 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/rational_swig.cc.o           \
@@ -3447,10 +3441,10 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/rational_swig.cc target/clojure/rational*.java           
-669 target/clojure/rational_swig.cc                                           
+647 target/clojure/rational_swig.cc                                           
 11 target/clojure/rational_swig.java                                          
-34 target/clojure/rational_swigJNI.java                                       
-714 total                                                                     
+33 target/clojure/rational_swigJNI.java                                       
+691 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -3479,7 +3473,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/rational_swig.cc                                            
-3191 target/ruby/rational_swig.cc                                             
+3105 target/ruby/rational_swig.cc                                             
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
@@ -3508,7 +3502,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/rational_swig.cc                                             
-2967 target/tcl/rational_swig.cc                                              
+2891 target/tcl/rational_swig.cc                                              
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o target/tcl/rational_swig.cc.o   \
@@ -3535,7 +3529,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/rational_swig.cc                                           
-2461 target/guile/rational_swig.cc                                            
+2406 target/guile/rational_swig.cc                                            
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3590,9 +3584,9 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-15961 target/python/polynomial_v2_swig.cc                                     
+15882 target/python/polynomial_v2_swig.cc                                     
 652 target/python/polynomial_v2_swig.py                                       
-16613 total                                                                   
+16534 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
@@ -3620,11 +3614,11 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1905 target/clojure/polynomial_v2_swig.cc                                     
+1883 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
-95 target/clojure/polynomial_v2_swigJNI.java                                  
-2023 total                                                                    
+94 target/clojure/polynomial_v2_swigJNI.java                                  
+2000 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -3654,7 +3648,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-17637 target/ruby/polynomial_v2_swig.cc                                       
+17551 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
@@ -3684,7 +3678,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-5044 target/tcl/polynomial_v2_swig.cc                                         
+4968 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -3712,7 +3706,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-4456 target/guile/polynomial_v2_swig.cc                                       
+4401 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3763,8 +3757,8 @@ swig -python -addextern -I- -Isrc -outdir target/python/ -o                     
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/tommath_swig.c target/python/tommath_swig.py              
@@ -3792,8 +3786,8 @@ swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/tommath_swig.c target/clojure/tommath*.java              
@@ -3823,8 +3817,8 @@ swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/tommath_swig.c                                              
@@ -3851,8 +3845,8 @@ swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/tommath_swig.c                                             

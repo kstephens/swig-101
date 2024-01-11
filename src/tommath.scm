@@ -15,8 +15,8 @@
 (define (show!)
   (newline)
   (let ((r (lambda (n-v)
-        (write (car n-v)) (display " => ")
-        (display (mp-int---str-- (cadr n-v))) (newline))))
+             (write (car n-v)) (display " = ")
+             (display (mp-int---str-- (cadr n-v))) (newline))))
     (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))
 
 (show!)
