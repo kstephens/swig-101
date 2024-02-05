@@ -110,16 +110,16 @@ end
 
 def comment_for_lang lang
   case lang.to_s.downcase
-  when /^c|java/i
-    [ '//', %r{^\s*(//|/\*)} ]
-  when /^swig/i
-    [ '//', %r{^\s*//[^%]} ]
   when /lisp|scheme|scm|clojure|clj/i
     [ ';;', %r{^\s*;;} ]
   when /py|tcl|shell|sh|ruby|rb/i
     [ '#' , %r{^\s*\#} ]
   when /sql|postgres/i
     [ '--' , %r{^\s*--} ]
+  when /^c|java/i
+    [ '//', %r{^\s*(//|/\*)} ]
+  when /^swig/i
+    [ '//', %r{^\s*//[^%]} ]
   else
     [ '#' , %r{^\s*\#} ]
   end
@@ -340,11 +340,11 @@ example_names.each do | name |
 #{lang} Library         | #{name}              | - |
 #{lang} Native          | #{basename}-native.#{suffix} | target/native/#{basename}-native
 #{lang} SWIG Interface  | #{basename}.i        | - | #{lang}
-Python                  | #{basename}.py       |   |
-Clojure (Java)          | #{basename}.clj      |   | Lisp
-Ruby                    | #{basename}.rb       |   |
+Python                  | #{basename}.py       |   | Python
+Clojure (Java)          | #{basename}.clj      |   | Clojure
+Ruby                    | #{basename}.rb       |   | Ruby
 Guile                   | #{basename}.scm      |   | Scheme
-TCL                     | #{basename}.tcl      |   | Shell
+TCL                     | #{basename}.tcl      |   | TCL
 PostgreSQL              | #{basename}.psql     |   | SQL
 Python Tests            | #{basename}-test.py  | python3.10 -m pytest src/#{basename}-test.py |
 END
@@ -357,6 +357,7 @@ END
       t[:swig_interface] = t[:type] =~ /SWIG/i && 'swig'
       t[:lang] ||= t[:type].split(/\s+/).first
       t[:code_style] ||= t[:lang].downcase
+      t[:code_style] = 'c++' if t[:code_style] == 'cc'
       t[:suffix] = t[:file].sub(%r{^.*(\.[^./]+)$}, '\1')
 
       # Determine a list of files/commands for this target:
