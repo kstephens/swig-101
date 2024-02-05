@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# ruby -Eutf8
+Encoding.default_internal = Encoding.default_external = 'UTF-8'
+$stdin.set_encoding('UTF-8')
+$stdout.set_encoding('UTF-8')
+
+counter = 0x10000000
+norm = Hash.new{|h,k| h[k] = "%0*x" % [k.size, (counter += 1)] }
+line = nil
+until $stdin.eof?
+  scan = line = $stdin.readline
+  # $stderr.puts "  XXX : line = #{line.inspect}"
+  output = String.new
+  # output.set_encoding('UTF-8')
+  until scan.empty?
+    case scan
+    when /(\#\<swig-pointer .* \* )([0-9a-f_]+)(\>)/i
+      # $stderr.puts "foo"
+      output << $` + $1 + norm[$2] + $3
+      scan = $'
+    when /\b__(add|sub|mul|div)__\b/
+      output << scan
+      scan = ''
+    when /\b(_)([0-9a-f]+)(_[0-9a-z_]+)/i
+      output << $` + $1 + norm[$2] + $3
+      scan = $'
+    else
+      output << scan
+      scan = ''
+    end
+  end
+  if output != line
+    # $stderr.puts "  XXX : line    #{line.inspect}"
+    # $stderr.puts "  XXX : output  #{output.inspect}"
+  end
+  $stdout.write output
+end

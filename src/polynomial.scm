@@ -3,7 +3,7 @@
 
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")
 
-(write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)
+(display `(POLYNOMIAL-VERSION = ,(POLYNOMIAL-VERSION))) (newline)
 
 (define p (new-Polynomial))
 

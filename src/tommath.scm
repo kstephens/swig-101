@@ -3,7 +3,7 @@
 
 (load-extension "target/guile/libtommath_swig.so" "SWIG_init")
 
-(write `(MP-ITER ,(MP-ITER))) (newline)
+(display `(MP-ITER = ,(MP-ITER))) (newline)
 
 (define a (new-mp-int))
 (mp-set a 2357111317)                   ;; <-- awkward!
@@ -15,8 +15,8 @@
 (define (show!)
   (newline)
   (let ((r (lambda (n-v)
-        (write (car n-v)) (display " => ")
-        (display (mp-int---str-- (cadr n-v))) (newline))))
+             (write (car n-v)) (display " = ")
+             (display (mp-int---str-- (cadr n-v))) (newline))))
     (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))
 
 (show!)

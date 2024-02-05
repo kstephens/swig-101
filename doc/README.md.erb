@@ -43,18 +43,19 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # Comprehensive Native Code Support
 
 * C struct and union
+* C/C++ `#define` macros
 * C/C++ pointers, references, `const` declarations
 * C/C++ function signatures and calls
 * C++ classes
 * C++ methods: static, virtual and operator overrides
 * C++ templates
+* C++ STL support.
 * `in`, `out`, `in-out` parameters
-* C/C++ `#define` macros
-* Memory Management
+* Proper memory management
 
 # Target Languages
 
-SWIG can generate FFI bindings for multiple target languages from one set of interface files:
+SWIG can generate bindings for multiple target languages from one set of interface files:
 
 * Python
 * Ruby
@@ -113,14 +114,25 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Case Study
 
-Kind              |  Language     |  Files  |   Lines
-------------------|:-------------:|--------:|----------:
-Native Library    | C/C++ Header  |      40 |    3505
-SWIG Interfaces   | SWIG          |       9 |    2667
-Python Bindings   | Python        |       1 |    8922
-"                 | C++           |       1 |   35235
-Java Bindings     | Java          |      55 |    6741
-"                 | C++           |       1 |   17987
+|                      |      Language      |  Files  |   Lines
+|:--------------------:|-------------------:|--------:|--------------:
+| ***Source Code***    |                    |         |
+|   Native Library     |     C/C++ Header   |      40 |     3,505
+|   SWIG Interfaces    |     SWIG           |       9 |     2,667
+|                      |           _TOTAL:_ |      49 |  ***6,172***
+|                      |                    |         |
+| ***Generated Code*** |                    |         |
+|  Python Bindings     |     Python         |       1 |     8,922
+|                      |     C++            |       1 |    35,235
+|                      |           _TOTAL:_ |       2 | ***44,157***
+|                      |                    |         |
+|  Java Bindings       |     Java           |      55 |     6,741
+|                      |     C++            |       1 |    17,987
+|                      |           _TOTAL:_ |      56 | ***24,728***
+|                      |                    |         |
+|                      | ***GRAND TOTAL:*** |     107 | ***68,885***
+
+A ***68x gain*** for only **two** target languages.
 
 # Examples
 
@@ -134,7 +146,7 @@ The examples below target:
 * PostgreSQL
 
 <% $examples.each do | e |
-     targets = e[:targets] %>
+  targets = e[:targets] %>
 
 ## <%= e[:name] %>
 
@@ -179,7 +191,7 @@ $ <%= f[:cmd] %>
 
 # Workflow
 
-<%= markdeep(File.read("doc/workflow.txt")) %>
+<%= markdeep(File.open("doc/workflow.txt", "r:UTF-8").read()) %>
 
 # Workflow Examples
 
@@ -241,6 +253,14 @@ Guile 3.0 is required.  `bin/build guile` will build and install into `./local/`
 ```Shell
 rbenv shell 2.7.6
 bin/build clean demo
+```
+
+### PostgreSQL
+
+Create a private database:
+
+```
+$ createdb $USER
 ```
 
 # Development

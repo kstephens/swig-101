@@ -9,10 +9,7 @@ namespace mathlib {
   public:
     I n, d;
     void reduce() {
-      if ( d < 0 ) {
-        d = - d;
-        n = - n;
-      }
+      if ( d < 0 ) { d = - d; n = - n; }
       I c(std::gcd(n, d));
       n /= c; d /= c;
     }
@@ -23,11 +20,35 @@ namespace mathlib {
     rational<I>  operator +  (const rational<I> &y) const {
       return rational<I>(n * y.d + y.n * d, d * y.d);
     }
+    rational<I>  operator -  (const rational<I> &y) const {
+      return rational<I>(n * y.d - y.n * d, d * y.d);
+    }
+    rational<I>  operator -  () const {
+      return rational<I>(- n, d);
+    }
     rational<I>  operator *  (const rational<I> &y) const {
       return rational<I>(n * y.n, d * y.d);
     }
+    rational<I>  operator /  (const rational<I> &y) const {
+      return rational<I>(n * y.d, d * y.n);
+    }
     bool operator == (const rational<I> &y) const {
       return n == y.n && d == y.d;
+    }
+    bool operator != (const rational<I> &y) const {
+      return ! (n == y.n && d == y.d);
+    }
+    bool operator < (const rational<I> &y) const {
+      return n * y.d < y.n * d;
+    }
+    bool operator <= (const rational<I> &y) const {
+      return n * y.d <= y.n * d;
+    }
+    bool operator > (const rational<I> &y) const {
+      return n * y.d > y.n * d;
+    }
+    bool operator >= (const rational<I> &y) const {
+      return n * y.d >= y.n * d;
     }
     std::string __str__() const {
       std::ostringstream os(std::ostringstream::out);

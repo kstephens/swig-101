@@ -20,8 +20,7 @@ puts [poly evaluate -2]
 
 # polynomial<rational<int>>:
 PolynomialRationalV2 poly
-VectorRationalV2 c [list [new_RationalV2 7 11] [new_RationalV2 11 13] [new_RationalV2 13 17]]
+VectorRationalV2 c [list [new_RationalInt 7 11] [new_RationalInt 11 13] [new_RationalInt 13 17]]
 poly configure -coeffs c
 puts [poly cget -coeffs]
-puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]
-
+puts [RationalInt___repr__ [poly evaluate [new_RationalInt -5 7]]]

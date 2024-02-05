@@ -33,11 +33,14 @@ end
 
 def cmd cmd
   log "cmd : #{cmd} : ..."
-  system "#{cmd} >tmp/cmd.out 2>&1"
+  t0 = Time.now
+  system "SWIG_101_VERBOSE=1 bin/run #{cmd} >tmp/cmd.out 2>&1"
   result = $?
+  t1 = Time.now
+  dt_ms = ((t1 - t0) * 1000).to_i
   out_raw = File.read("tmp/cmd.out").gsub("\0", '')
   out = lines_to_string(string_to_lines(out_raw))
-  log "cmd : #{cmd} : DONE : #{result.exitstatus} : #{out_raw.size} bytes"
+  log "cmd : #{cmd} : DONE : #{dt_ms} ms : exit #{result.exitstatus} : #{out_raw.size} bytes"
   raise "#{cmd} : failed : #{$context.inspect} : #{out}" unless result.success?
   out
 end
@@ -52,6 +55,8 @@ end
 
 def string_to_lines s
   s.split("\n", -1)
+rescue => exc
+  raise Exception, "string_to_lines: #{s.inspect} : #{exc.inspect}"
 end
 
 def trim_empty_lines!(lines)
@@ -62,14 +67,17 @@ def trim_empty_lines!(lines)
 end
 
 def dedup_empty_lines(lines)
+  dedup_adjacent(lines, "")
+end
+
+def dedup_adjacent(enum, pat)
   result = [ ]
-  last = nil
-  while line = lines.shift
-    line = line.sub(/^\s+$/, '')
-    unless last == "" && line == ""
-      result << line
+  emitted = nil
+  enum.each do | elem |
+    unless emitted && (pat === elem && pat === result[-1])
+      result << elem
+      emitted = true
     end
-    last = line
   end
   result
 end
@@ -297,7 +305,7 @@ end
 
 #####################################
 
-msg "Start"
+log "Start"
 
 cmd "bin/build clean"
 
@@ -319,17 +327,18 @@ example_names.each do | name |
     lang:     lang,
   })
 
-  msg "{{{ Example : #{e[:name]}"
+  log "{{{ Example : #{e[:name]}"
   pe(e: e)
 
-  msg "  {{{ Workflow : #{e[:name]}"
+  log "  {{{ Workflow : #{e[:name]}"
   e[:workflow_output] = run_workflow(e)
-  msg "  }}} Workflow : #{e[:name]}"
+  msg e[:workflow_output]
+  log "  }}} Workflow : #{e[:name]}"
 
   targets = <<"END".split("\n").map{|l| l.split("|").map(&:strip).map{|f| f.empty? ? nil : f}}
 #{lang} Header          | #{basename}.h        | - |
 #{lang} Library         | #{name}              | - |
-#{lang} Main            | #{basename}-native.#{suffix} | target/native/#{basename}
+#{lang} Native          | #{basename}-native.#{suffix} | target/native/#{basename}-native
 #{lang} SWIG Interface  | #{basename}.i        | - | #{lang}
 Python                  | #{basename}.py       |   |
 Clojure (Java)          | #{basename}.clj      |   | Lisp
@@ -360,13 +369,13 @@ END
           }
         ]
       when nil
-        # Files maybe executables:
+        # Files may be executables:
         ([ "src/#{t[:file]}" ] +
           Dir["src/#{e[:basename]}-*#{t[:suffix]}"].sort
         ).map do | f |
             {
               file: f,
-              cmd: File.executable?(f) && "bin/run #{f}",
+              cmd: File.executable?(f) && "#{f}",
             }
           end
       else
@@ -374,7 +383,7 @@ END
         [
           {
             file: "src/#{t[:file]}",
-            cmd: "bin/run #{t[:cmd]}",
+            cmd: "#{t[:cmd]}",
           }
         ]
       end
@@ -391,7 +400,7 @@ END
   pe(e: e)
   # PP.pp(targets: targets, $stderr)
   # pe(targets: targets)
-  msg "}}} Example : #{e[:name]}"
+  log "}}} Example : #{e[:name]}"
 end
 
-msg 'DONE'
+log 'DONE'

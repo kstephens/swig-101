@@ -1,4 +1,4 @@
-#define EXAMPLE1_VERSION "1.2.3"
+#define MATHLIB_VERSION "1.2.3"
 /* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */
 double cubic_poly(double x,
                   double c0,

@@ -3,7 +3,8 @@
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")
 (import 'polynomial_v2_swig)
 
-(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})
+(println (format "POLYNOMIAL_VERSION = %s"
+                 (polynomial_v2_swig/POLYNOMIAL_VERSION)))
 
 ;; polynomial<double>:
 (def p1 (PolynomialDoubleV2.))
@@ -19,6 +20,6 @@
 
 ;; polynomial<rational<int>>:
 (def p3 (PolynomialRationalV2.))
-(.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ]))
+(.setCoeffs p3 (VectorRationalV2. [ (RationalInt. 7 11) (RationalInt. 11 13) (RationalInt. 13 17) ]))
 (prn (mapv #(.__str__ %) (.getCoeffs p3)))
-(prn (.__str__ (.evaluate p3 (RationalV2. -5, 7))))
+(prn (.__str__ (.evaluate p3 (RationalInt. -5, 7))))

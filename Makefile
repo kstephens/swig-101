@@ -54,6 +54,7 @@ demo-run:
 brew-prereq:
 	brew install          automake libtool autoconf cmake bison tcl-tk  guile python\@3.10 brew-pip openjdk postgresql\@14
 	bin/run pip install   pytest
+	-createdb $(USER)
 
 debian-prereq:
 	sudo apt-get install  automake libtool autoconf cmake bison byacc tcl-dev  guile-2.2-dev
@@ -69,17 +70,11 @@ debian-prereq:
 README_MD_DEPS=doc/README.md.erb doc/README.md.erb.rb doc/*.* src/*.* include/*.* Makefile
 
 README.md :
-	$(MAKE) clean
-	erb doc/README.md.erb | tee $@.tmp | wc -l
-	mv $@.tmp $@
-	ls -l $@
+	$(BUILD_SH) build-readme-md EXAMPLES='$(EXAMPLES)' SWIG_TARGETS='$(SWIG_TARGETS)'
 .PRECIOUS: README.md
 
 README.md.html :
-	mkdir -p tmp
-	MARKDEEP=1 erb doc/README.md.erb | tee tmp/$@.md | wc -l
-	df-markdown -v -s dark -o $@ tmp/$@.md
-	ls -l $@
+	$(BUILD_SH) build-readme-md-html EXAMPLES='$(EXAMPLES)' SWIG_TARGETS='$(SWIG_TARGETS)'
 
 #################################
 
@@ -106,23 +101,8 @@ local-dirs:
 
 swig : local-dirs $(LOCAL_DIR)/bin/swig
 
-PCRE2_VERSION=pcre2-10.39
-
-$(LOCAL_DIR)/bin/swig : $(LOCAL_DIR)/src/swig
-	@set -xe ;\
-	cd $(LOCAL_DIR)/src/swig ;\
-	git fetch ;\
-	git checkout postgresql ;\
-	git pull ;\
-	curl -L -O https://github.com/PhilipHazel/pcre2/releases/download/$(PCRE_VERSION)/$(PCRE_VERSION).tar.gz ;\
-	./Tools/pcre-build.sh ;\
-	./autogen.sh ;\
-	./configure --prefix='$(LOCAL_DIR)' ;\
-	make -j ;\
-	make install
-
-$(LOCAL_DIR)/src/swig :
-	git clone https://github.com/kstephens/swig.git $@
+$(LOCAL_DIR)/bin/swig :
+	bin/build.sh swig-build
 
 #################################
 

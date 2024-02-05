@@ -9,9 +9,9 @@ declare -A SWIG_TARGET_SUFFIX_
   export LOCAL_DIR="$ROOT_DIR/local"
   export LC_ALL=C
 
-  EXAMPLES='example1.c polynomial.cc polynomial_v2.cc tommath.c black_scholes.c'
-  SWIG_TARGETS='python clojure ruby tcl guile postgresql'
-  SWIG_TARGET_SUFFIX_=([python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
+  EXAMPLES='mathlib.c polynomial.cc rational.cc polynomial_v2.cc tommath.c black_scholes.c'
+  SWIG_TARGETS='native python clojure ruby tcl guile postgresql'
+  SWIG_TARGET_SUFFIX_=([native]=-native [python]=.py [clojure]=.clj [ruby]=.rb [tcl]=.tcl [guile]=.scm [postgresql]=.psql)
 }
 
 -initialize() {
@@ -40,7 +40,7 @@ declare -A SWIG_TARGET_SUFFIX_
 
   case "$EXAMPLE_NAME"
   in
-    example1|black_scholes) ;;
+    mathlib|black_scholes) ;;
     *)
       SWIG_TARGETS="${SWIG_TARGETS//postgresql/}"
     ;;
@@ -197,18 +197,18 @@ declare -A SWIG_TARGET_SUFFIX_
   SWIG_OPTS+=" -addextern"
   SWIG_OPTS+=" -I-"
   SWIG_OPTS_x+=' \
-       -debug-module 1,2,3,4 \
-       -debug-symtabs  \
-       -debug-symbols  \
-       -debug-csymbols \
-       -debug-symbols \
-       -debug-tags     \
-       -debug-template \
-       -debug-top 1,2,3,4 \
-       -debug-typedef  \
-       -debug-typemap  \
-       -debug-tmsearch \
-       -debug-tmused
+    -debug-module 1,2,3,4 \
+    -debug-symtabs  \
+    -debug-symbols  \
+    -debug-csymbols \
+    -debug-symbols \
+    -debug-tags     \
+    -debug-template \
+    -debug-top 1,2,3,4 \
+    -debug-typedef  \
+    -debug-typemap  \
+    -debug-tmsearch \
+    -debug-tmused
   '
   SWIG_CFLAGS+=' -Wno-sentinel'
   SWIG_CFLAGS+=' -Wno-unused-command-line-argument'
@@ -221,21 +221,20 @@ declare -A SWIG_TARGET_SUFFIX_
   SWIG_SO="$(dirname ${SWIG_O})/${SWIG_SO_PREFIX}${EXAMPLE_SWIG}${SWIG_SO_SUFFIX}"
 
   EXAMPLE_I=src/${EXAMPLE_NAME}.i
-  EXAMPLE_H=src/${EXAMPLE_NAME}.h
+  EXAMPLE_H=$(ls src/${EXAMPLE_NAME}.h include/${EXAMPLE_NAME}.h 2>/dev/null)
   EXAMPLE_C=src/${EXAMPLE_NAME}.c
 
   NATIVE_LIB_C=src/${EXAMPLE_NAME}${EXAMPLE_SUFFIX}
   NATIVE_LIB_O=target/native/${EXAMPLE_NAME}.o
   NATIVE_MAIN_C=src/${EXAMPLE_NAME}-native${EXAMPLE_SUFFIX}
-  NATIVE_MAIN_E=target/native/${EXAMPLE_NAME}
+  NATIVE_MAIN_E=target/native/${EXAMPLE_NAME}-native
 }
-
 
 ####################################
 
 -cmd-build() {
   targets=("$@")
-  build-things
+  -cmd-all
 }
 
 -cmd-show() {
@@ -260,7 +259,6 @@ declare -A SWIG_TARGET_SUFFIX_
   :
 }
 
-# TODO:
 postgresql-make-extension() {
   echo ""
   echo "# Compile and install ${SWIG_TARGET} extension:"
@@ -276,8 +274,6 @@ postgresql-make-extension() {
       set -e
       -setup-example-vars
       echo "## Workflow - ${EXAMPLE}"
-      echo ""
-      -cmd-build-native |& tee $NATIVE_LIB_O.log
       echo ""
       -cmd-build-example-targets
       echo ""
@@ -297,20 +293,21 @@ postgresql-make-extension() {
 
 -cmd-build-native() {
   (
-  set -e -o pipefail
-  SWIG_TARGET=native
-  -setup-vars
-  mkdir -p $(dirname $NATIVE_MAIN_E)
+    set -e
+    SWIG_TARGET=native
+    -setup-vars
+    mkdir -p $(dirname $NATIVE_MAIN_E)
 
-	echo "### Compile Native Code"
-	echo ""
-	echo '```'
-	echo "# Compile native library:"
-	-run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
-	echo ""
-	echo "# Compile and link native program:"
-	-run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
-	echo '```'
+    echo "### Compile Native Code"
+    echo ""
+    echo '```'
+    echo "# Compile native library:"
+    -run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
+    echo ""
+    echo "# Compile and link main program:"
+    -run $CC $CFLAGS $INC_DIRS -o $NATIVE_MAIN_E $NATIVE_MAIN_C $NATIVE_LIB_O $LDFLAGS $LIB_DIRS $LIBS
+    echo '```'
+    echo ""
   ) || return $?
 }
 
@@ -321,29 +318,46 @@ postgresql-make-extension() {
   TARGET_DIR=$(dirname $SWIG_C)
   mkdir -p $TARGET_DIR
 
-	echo "### Build ${SWIG_TARGET} Bindings"
-	echo ""
-	echo '```'
+  if [[ ! -f $NATIVE_LIB_O || "$SWIG_TARGET" == native ]]
+  then
+    -cmd-build-native
+    return $?
+  fi
 
-	echo "# Generate ${SWIG_TARGET} bindings:"
+  example_base="${EXAMPLE%.*}"
+  example_suffix="${SWIG_TARGET_SUFFIX_[$SWIG_TARGET]}"
+  example_file="src/$example_base$example_suffix"
+  if ! [[ -e "$example_file" ]]
+  then
+    # declare -p EXAMPLE example_base example_suffix example_file
+    # echo "skipping $EXAMPLE $SWIG_TARGET : missing $example_file"
+    :
+    # return 0
+  fi
+
+  echo "### Build ${SWIG_TARGET} Bindings"
+  echo ""
+  echo '```'
+
+  echo "# Generate ${SWIG_TARGET} bindings:"
   -run $SWIG_EXE $SWIG_OPTS $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
-	echo ""
+  echo ""
   SWIG_GENERATED_FILES="$SWIG_C $SWIG_GENERATED_FILES_MORE"
 
-	echo "# Source code statistics:"
-	-run wc -l $EXAMPLE_H $EXAMPLE_I
-	echo ""
+  echo "# Source code statistics:"
+  -run wc -l $EXAMPLE_H $EXAMPLE_I
+  echo ""
 
-	echo "# Generated code statistics:"
-	-run wc -l "$SWIG_GENERATED_FILES"
-	echo ""
+  echo "# Generated code statistics:"
+  -run wc -l "$SWIG_GENERATED_FILES"
+  echo ""
 
-	echo "# Compile ${SWIG_TARGET} bindings:"
-	-run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
-	echo ""
+  echo "# Compile ${SWIG_TARGET} bindings:"
+  -run $CC $CFLAGS $INC_DIRS $SWIG_CFLAGS $SWIG_INC_DIRS -c -o $SWIG_O $SWIG_C
+  echo ""
 
-	echo "# Link $SWIG_TARGET dynamic library:"
-	-run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
+  echo "# Link $SWIG_TARGET dynamic library:"
+  -run $CC $CFLAGS_SO -o $SWIG_SO target/native/${EXAMPLE_NAME}.o $SWIG_O $LIB_DIRS $LDFLAGS $SWIG_LDFLAGS  $SWIG_LIB_DIRS $SWIG_LIBS $LIBS
 
   local extra
   for extra in $SWIG_EXTRA ''
@@ -368,13 +382,12 @@ postgresql-make-extension() {
   for EXAMPLE in $EXAMPLES
   do
     (
+    export SWIG_101_VERBOSE=1
     -setup-example-vars
-    -run-prog target/native/$EXAMPLE_NAME
-    echo ""
     for SWIG_TARGET in $SWIG_TARGETS
     do
       suffix=${SWIG_TARGET_SUFFIX_[$SWIG_TARGET]}
-      for prog in src/"$EXAMPLE_NAME$suffix" src/"$EXAMPLE_NAME"-*"$suffix"
+      for prog in target/native/"$EXAMPLE_NAME$suffix" src/"$EXAMPLE_NAME$suffix" src/"$EXAMPLE_NAME"-*"$suffix"
       do
         if [[ -x "$prog" ]]
         then
@@ -387,22 +400,79 @@ postgresql-make-extension() {
   done
 }
 
--run-prog() {
-  [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
+############################
+
+-cmd-build-readme-md() {
   (
-    set -e
-    echo '```'
-    echo "\$ $*"
-    bin/run "$@" || exit $?
-    echo '```'
-  ) || exit $?
+    set -ex
+    -cmd-clean
+    : "${readme_md:=README.md}"
+    erb doc/README.md.erb | doc/normalize-object-ids | tee $readme_md.tmp |
+    wc -l
+    wc -l $readme_md.tmp
+    mv $readme_md.tmp $readme_md
+    ls -l $readme_md
+  ) || return $?
+}
+
+-cmd-build-readme-md-html() {
+  (
+    set -ex
+    readme_html=README.md.html
+    readme_md=tmp/$readme_html.md
+    mkdir -p tmp
+    MARKDEEP=1 -cmd-build-readme-md
+    df-markdown -v -s dark -o $readme_html $readme_md
+    ls -l $readme_html
+  )
+}
+
+############################
+
+LOCAL_DIR="$(PWD)/local"
+SWIG_SRC="$LOCAL_DIR/src/swig"
+
+-cmd-swig-build() {
+  (
+    set -xe
+    SWIG_GIT_URL=https://github.com/kstephens/swig.git
+    SWIG_GIT_REF=postgresql-merge-84a2c45d66
+    PCRE2_VERSION=pcre2-10.42
+
+    PCRE2_DOWNLOAD_BASE=https://github.com/PCRE2Project/pcre2/releases/download
+    PCRE2_DOWNLOAD_URL="$PCRE2_DOWNLOAD_BASE/$PCRE2_VERSION/$PCRE2_VERSION.tar.gz"
+    export PATH="$(ls -d /opt/homebrew/Cellar/bison/*/bin):/opt/homebrew/bin:$PATH"
+    export BISON="$(which bison | head -1)"
+
+    mkdir -p local/src/swig
+    cd local/src/swig
+    [[ -d .git ]] || git clone ${SWIG_GIT_URL} .
+    git fetch
+    git checkout ${SWIG_GIT_REF}
+    rm -f configure Makefile swig
+
+    rm -rf pcre2-*
+    curl -L -O "$PCRE2_DOWNLOAD_URL"
+    ./Tools/pcre-build.sh
+
+    ./autogen.sh
+    ./configure --prefix="${LOCAL_DIR}"
+
+    make -j
+
+    make install
+  ) || return $?
+}
+
+-cmd-swig-clean() {
+  rm -f $LOCAL_DIR/bin/swig $SWIG_SRC/swig $SWIG_SRC/Makefile $SWIG_SRC/configure
 }
 
 ############################
 
 -cmd-clean() {
-	rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
-	rm -rf target/*
+  rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
+  rm -rf target/*
   rm -rf {bin,src}/__pycache__/
 }
 
@@ -417,6 +487,17 @@ postgresql-make-extension() {
 }
 
 ############################
+
+-run-prog() {
+  [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
+  (
+    set -e
+    echo '```'
+    echo "\$ $*"
+    bin/run "$@" || exit $?
+    echo '```'
+  ) || exit $?
+}
 
 -run() {
   echo "$*"

@@ -2,7 +2,7 @@
 
 from polynomial_v2_swig import *
 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')
 
 # polynomial<double>:
 poly         = PolynomialDoubleV2()
@@ -12,9 +12,9 @@ print(poly.evaluate(2))
 
 # polynomial<rational<int>>:
 poly        = PolynomialRationalV2()
-poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13, 17) ])
+poly.coeffs = VectorRationalV2([ RationalInt(7, 11), RationalInt(11, 13), RationalInt(13, 17) ])
 print(list(poly.coeffs))
-print(poly.evaluate(RationalV2(-5, 7)))
+print(poly.evaluate(RationalInt(-5, 7)))
 
 # polynomial<complex<double>>:
 poly        = PolynomialComplexV2()

@@ -9,7 +9,7 @@ Introduction to [SWIG](http://www.swig.org/).
 * https://www.swig.org/
 * https://www.swig.org/papers/PyTutorial98/PyTutorial98.pdf
 * https://github.com/swig/swig
-* https://github.com/kstephens/swig-101/tree/postgresql
+* https://github.com/kstephens/swig-101
 * https://github.com/kstephens/swig/tree/postgresql
 
 # What is SWIG?
@@ -43,24 +43,26 @@ SWIG vastly reduces the development cost of using native libraries within dynami
 # Comprehensive Native Code Support
 
 * C struct and union
+* C/C++ `#define` macros
 * C/C++ pointers, references, `const` declarations
 * C/C++ function signatures and calls
 * C++ classes
 * C++ methods: static, virtual and operator overrides
 * C++ templates
+* C++ STL support.
 * `in`, `out`, `in-out` parameters
-* C/C++ `#define` macros
-* Memory Management
+* Proper memory management
 
 # Target Languages
 
-SWIG can generate FFI bindings for multiple target languages from one set of interface files:
+SWIG can generate bindings for multiple target languages from one set of interface files:
 
 * Python
 * Ruby
 * Java
 * Perl 5
 * Tcl 8
+* PostgreSQL (proof-of-concept)
 * Lua
 * D
 * Go
@@ -112,14 +114,25 @@ SWIG can generate FFI bindings for multiple target languages from one set of int
 
 # Case Study
 
-Kind              |  Language     |  Files  |   Lines
-------------------|:-------------:|--------:|----------:
-Native Library    | C/C++ Header  |      40 |    3505
-SWIG Interfaces   | SWIG          |       9 |    2667
-Python Bindings   | Python        |       1 |    8922
-"                 | C++           |       1 |   35235
-Java Bindings     | Java          |      55 |    6741
-"                 | C++           |       1 |   17987
+|                      |      Language      |  Files  |   Lines
+|:--------------------:|-------------------:|--------:|--------------:
+| ***Source Code***    |                    |         |
+|   Native Library     |     C/C++ Header   |      40 |     3,505
+|   SWIG Interfaces    |     SWIG           |       9 |     2,667
+|                      |           _TOTAL:_ |      49 |  ***6,172***
+|                      |                    |         |
+| ***Generated Code*** |                    |         |
+|  Python Bindings     |     Python         |       1 |     8,922
+|                      |     C++            |       1 |    35,235
+|                      |           _TOTAL:_ |       2 | ***44,157***
+|                      |                    |         |
+|  Java Bindings       |     Java           |      55 |     6,741
+|                      |     C++            |       1 |    17,987
+|                      |           _TOTAL:_ |      56 | ***24,728***
+|                      |                    |         |
+|                      | ***GRAND TOTAL:*** |     107 | ***68,885***
+
+A ***10x gain*** for only **two** target languages.
 
 # Examples
 
@@ -134,14 +147,14 @@ The examples below target:
 
 
 
-## example1.c
+## mathlib.c
 
 
 
-### C Header : example1.h
+### C Header : mathlib.h
 
 ```c
-#define EXAMPLE1_VERSION "1.2.3"                                               //  1 
+#define MATHLIB_VERSION "1.2.3"                                                //  1 
 /* Returns: c0 + c1*x + c2*x^2 + c3*x^3 */                                    
 double cubic_poly(double x,                                                    //  3 
                   double c0,                                                   //  4 
@@ -152,10 +165,10 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Library : example1.c
+### C Library : mathlib.c
 
 ```c
-#include "example1.h"                                                          //  1 
+#include "mathlib.h"                                                           //  1 
 double cubic_poly(double x,                                                    //  2 
                   double c0,                                                   //  3 
                   double c1,                                                   //  4 
@@ -167,14 +180,14 @@ double cubic_poly(double x,                                                    /
 
 
 
-### C Main : example1-native.c
+### C Native : mathlib-native.c
 
 ```c
 #include <stdio.h>                                                             //  1 
-#include "example1.h"                                                          //  2 
+#include "mathlib.h"                                                           //  2 
                                                                               
 int main(int argc, char **argv) {                                              //  4 
-  printf("EXAMPLE1_VERSION = %s\n", EXAMPLE1_VERSION);                         //  5 
+  printf("MATHLIB_VERSION = %s\n", MATHLIB_VERSION);                           //  5 
   printf("%5.1f\n", cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0));                     //  6 
   return 0;                                                                    //  7 
 }                                                                              //  8 
@@ -184,78 +197,78 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+$ target/native/mathlib-native
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### C SWIG Interface : example1.i
+### C SWIG Interface : mathlib.i
 
 ```c
-%module example1_swig                                                          //  1 
-%include "example1.h"                                                          //  2 
+%module mathlib_swig                                                           //  1 
+%include "mathlib.h"                                                           //  2 
 %{                                                                             //  3 
-#include "example1.h"                                                          //  4 
+#include "mathlib.h"                                                           //  4 
 %}                                                                             //  5 
 ```
 
 
 
-### Python : example1.py
+### Python : mathlib.py
 
 ```python
 # Setup search path:                                                          
 import sys ; sys.path.append('target/python')                                  #   2 
                                                                               
 # Load SWIG bindings:                                                         
-import example1_swig as example1                                               #   5 
+import mathlib_swig as mathlib                                                 #   5 
                                                                               
 # Use SWIG bindings:                                                          
-print(f'EXAMPLE1_VERSION = {example1.EXAMPLE1_VERSION}')                       #   8 
-print(example1.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                           #   9 
+print(f'MATHLIB_VERSION = {mathlib.MATHLIB_VERSION}')                          #   8 
+print(mathlib.cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0))                            #   9 
 ```
 
 
 ---
 
 ```
-$ bin/run src/example1.py
-EXAMPLE1_VERSION = 1.2.3
+$ src/mathlib.py
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### Clojure (Java) : example1.clj
+### Clojure (Java) : mathlib.clj
 
 ```lisp
 ;; Load SWIG bindings:                                                        
-(clojure.lang.RT/loadLibrary "example1_swig")                                  ;;  2 
-(import 'example1_swig)                                                        ;;  3 
+(clojure.lang.RT/loadLibrary "mathlib_swig")                                   ;;  2 
+(import 'mathlib_swig)                                                         ;;  3 
                                                                               
 ;; Use SWIG bindings:                                                         
-(println (format "EXAMPLE1_VERSION = \"%s\""                                   ;;  6 
-               	 (example1_swig/EXAMPLE1_VERSION)))                            ;;  7 
-(prn (example1_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                          ;;  8 
+(println (format "MATHLIB_VERSION = %s"                                        ;;  6 
+                 (mathlib_swig/MATHLIB_VERSION)))                              ;;  7 
+(prn (mathlib_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                           ;;  8 
 ```
 
 
 ---
 
 ```
-$ bin/run src/example1.clj
-EXAMPLE1_VERSION = "1.2.3"
+$ src/mathlib.clj
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### Ruby : example1.rb
+### Ruby : mathlib.rb
 
 ```ruby
 # Setup search path:                                                          
@@ -263,11 +276,11 @@ ENV["LD_LIBRARY_PATH"] = 'target/ruby'                                         #
 $:.unshift 'target/ruby'                                                       #   3 
                                                                               
 # Load SWIG bindings:                                                         
-require 'example1_swig'                                                        #   6 
-include Example1_swig                                                          #   7 
+require 'mathlib_swig'                                                         #   6 
+include Mathlib_swig                                                           #   7 
                                                                               
 # Use SWIG bindings:                                                          
-puts "EXAMPLE1_VERSION = #{EXAMPLE1_VERSION.inspect}"                          #  10 
+puts "MATHLIB_VERSION = #{MATHLIB_VERSION.inspect}"                            #  10 
 puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #  11 
 ```
 
@@ -275,23 +288,23 @@ puts cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0)                                      #
 ---
 
 ```
-$ bin/run src/example1.rb
-EXAMPLE1_VERSION = "1.2.3"
+$ src/mathlib.rb
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
 ---
 
 
-### Guile : example1.scm
+### Guile : mathlib.scm
 
 ```scheme
 ;; Load SWIG bindings:                                                        
-(load-extension "target/guile/libexample1_swig.so" "SWIG_init")                ;;  2 
+(load-extension "target/guile/libmathlib_swig.so" "SWIG_init")                 ;;  2 
                                                                               
 ;; Use SWIG bindings:                                                         
-(write `(EXAMPLE1-VERSION = ,(EXAMPLE1-VERSION)))                              ;;  5 
-(newline)                                                                      ;;  6 
+(display `(MATHLIB-VERSION = ,(MATHLIB-VERSION))) (newline)                    ;;  5 
+                                                                              
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  7 
 (newline)                                                                      ;;  8 
 ```
@@ -300,22 +313,22 @@ EXAMPLE1_VERSION = "1.2.3"
 ---
 
 ```
-$ bin/run src/example1.scm
-(EXAMPLE1-VERSION = "1.2.3")
+$ src/mathlib.scm
+(MATHLIB-VERSION = 1.2.3)
 129.0
 ```
 
 ---
 
 
-### TCL : example1.tcl
+### TCL : mathlib.tcl
 
 ```shell
 # Load SWIG bindings:                                                         
-load target/tcl/example1_swig.so Example1_swig                                 #   2 
+load target/tcl/mathlib_swig.so Mathlib_swig                                   #   2 
                                                                               
 # Use SWIG bindings:                                                          
-puts "EXAMPLE1_VERSION = ${EXAMPLE1_VERSION}"                                  #   5 
+puts "MATHLIB_VERSION = ${MATHLIB_VERSION}"                                    #   5 
 puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #   6 
 ```
 
@@ -323,21 +336,21 @@ puts [cubic_poly 2.0 3.0 5.0 7.0 11.0]                                         #
 ---
 
 ```
-$ bin/run src/example1.tcl
-EXAMPLE1_VERSION = 1.2.3
+$ src/mathlib.tcl
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
 ---
 
 
-### PostgreSQL : example1-1.psql
+### PostgreSQL : mathlib-1.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION example1_swig;                                                --  2 
+CREATE EXTENSION mathlib_swig;                                                 --  2 
 -- Call the functions:                                                        
-SELECT EXAMPLE1_VERSION();                                                     --  4 
+SELECT MATHLIB_VERSION();                                                      --  4 
 SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   --  5 
 ```
 
@@ -345,11 +358,20 @@ SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);                                   -
 ---
 
 ```
-$ bin/run src/example1-1.psql
- example1_version
-------------------
+$ src/mathlib-1.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Call the functions:
+SELECT MATHLIB_VERSION();
+
+ mathlib_version
+-----------------
  1.2.3
 (1 row)
+
+SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 
  cubic_poly
 ------------
@@ -359,11 +381,11 @@ $ bin/run src/example1-1.psql
 
 ---
 
-### PostgreSQL : example1-2.psql
+### PostgreSQL : mathlib-2.psql
 
 ```sql
 -- Load the extension:                                                        
-CREATE EXTENSION example1_swig;                                                --  2 
+CREATE EXTENSION mathlib_swig;                                                 --  2 
 -- Create some coefficient and parameter tables:                              
 CREATE TABLE coefficients (                                                    --  4 
   c_id SERIAL PRIMARY KEY,                                                     --  5 
@@ -396,7 +418,44 @@ FROM   parameters, coefficients;                                               -
 ---
 
 ```
-$ bin/run src/example1-2.psql
+$ src/mathlib-2.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Create some coefficient and parameter tables:
+CREATE TABLE coefficients (
+  c_id SERIAL PRIMARY KEY,
+  c0 FLOAT8,
+  c1 FLOAT8,
+  c2 FLOAT8,
+  c3 FLOAT8
+);
+
+CREATE TABLE parameters (
+  x_id SERIAL PRIMARY KEY,
+  x FLOAT8
+);
+
+
+-- Create some coefficient and parameter data:
+INSERT INTO coefficients
+  ( c0  ,  c1 ,    c2 ,   c3 ) VALUES
+  ( 3.00, 5.00,   7.00, 11.00),
+  ( 2.30, 5.70,  11.13, 17.23),
+  (-5.20, 1.20, -99.00, 12.34);
+
+INSERT INTO parameters
+  (x) VALUES
+  ( 2),
+  (-3.7),
+  ( 3.1415926);
+
+
+-- Apply cubic_poly to parameters and coefficients:
+SELECT *, cubic_poly(x, c0, c1, c2, c3)
+FROM   parameters, coefficients;
+
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -422,8 +481,8 @@ $ bin/run src/example1-2.psql
 
 
 ```
-$ bin/run target/native/example1
-EXAMPLE1_VERSION = 1.2.3
+$ target/native/mathlib-native
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -432,8 +491,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1.py
-EXAMPLE1_VERSION = 1.2.3
+$ src/mathlib.py
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -441,8 +500,8 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1.clj
-EXAMPLE1_VERSION = "1.2.3"
+$ src/mathlib.clj
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -450,8 +509,8 @@ EXAMPLE1_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/example1.rb
-EXAMPLE1_VERSION = "1.2.3"
+$ src/mathlib.rb
+MATHLIB_VERSION = "1.2.3"
 129.0
 ```
 
@@ -459,8 +518,8 @@ EXAMPLE1_VERSION = "1.2.3"
 
 
 ```
-$ bin/run src/example1.scm
-(EXAMPLE1-VERSION = "1.2.3")
+$ src/mathlib.scm
+(MATHLIB-VERSION = 1.2.3)
 129.0
 ```
 
@@ -468,8 +527,8 @@ $ bin/run src/example1.scm
 
 
 ```
-$ bin/run src/example1.tcl
-EXAMPLE1_VERSION = 1.2.3
+$ src/mathlib.tcl
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -477,11 +536,20 @@ EXAMPLE1_VERSION = 1.2.3
 
 
 ```
-$ bin/run src/example1-1.psql
- example1_version
-------------------
+$ src/mathlib-1.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Call the functions:
+SELECT MATHLIB_VERSION();
+
+ mathlib_version
+-----------------
  1.2.3
 (1 row)
+
+SELECT cubic_poly(2.0, 3.0, 5.0, 7.0, 11.0);
 
  cubic_poly
 ------------
@@ -492,7 +560,44 @@ $ bin/run src/example1-1.psql
 ---
 
 ```
-$ bin/run src/example1-2.psql
+$ src/mathlib-2.psql
+-- Load the extension:
+CREATE EXTENSION mathlib_swig;
+
+
+-- Create some coefficient and parameter tables:
+CREATE TABLE coefficients (
+  c_id SERIAL PRIMARY KEY,
+  c0 FLOAT8,
+  c1 FLOAT8,
+  c2 FLOAT8,
+  c3 FLOAT8
+);
+
+CREATE TABLE parameters (
+  x_id SERIAL PRIMARY KEY,
+  x FLOAT8
+);
+
+
+-- Create some coefficient and parameter data:
+INSERT INTO coefficients
+  ( c0  ,  c1 ,    c2 ,   c3 ) VALUES
+  ( 3.00, 5.00,   7.00, 11.00),
+  ( 2.30, 5.70,  11.13, 17.23),
+  (-5.20, 1.20, -99.00, 12.34);
+
+INSERT INTO parameters
+  (x) VALUES
+  ( 2),
+  (-3.7),
+  ( 3.1415926);
+
+
+-- Apply cubic_poly to parameters and coefficients:
+SELECT *, cubic_poly(x, c0, c1, c2, c3)
+FROM   parameters, coefficients;
+
  x_id |     x     | c_id |  c0  | c1  |  c2   |  c3   |     cubic_poly
 ------+-----------+------+------+-----+-------+-------+---------------------
     1 |         2 |    1 |    3 |   5 |     7 |    11 |                 129
@@ -551,7 +656,7 @@ double Polynomial::evaluate(double x) const {                                  /
 
 
 
-### C++ Main : polynomial-native.cc
+### C++ Native : polynomial-native.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -577,7 +682,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial
+$ target/native/polynomial-native
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -614,7 +719,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 ```python
 from polynomial_swig import *                                                  #   1 
                                                                               
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')                            #   3 
                                                                               
 poly = Polynomial()                                                            #   5 
                                                                               
@@ -631,8 +736,8 @@ print(poly.evaluate(1.2))                                                      #
 ---
 
 ```
-$ bin/run src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
+$ src/polynomial.py
+POLYNOMIAL_VERSION = 1.2.1
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
@@ -669,7 +774,7 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ src/polynomial-test.py
 
 ```
 
@@ -682,26 +787,27 @@ $ bin/run src/polynomial-test.py
 (clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  1 
 (import 'polynomial_swig)                                                      ;;  2 
                                                                               
-(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  4 
+(println (format "POLYNOMIAL_VERSION = %s"                                     ;;  4 
+                 (polynomial_swig/POLYNOMIAL_VERSION)))                        ;;  5 
                                                                               
-(def p (Polynomial.))                                                          ;;  6 
+(def p (Polynomial.))                                                          ;;  7 
                                                                               
 ;; Note: does not coerce java.lang.Long 3 to 3.0                              
-(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))                            ;;  9 
-(prn (.getCoeffs p))                                                           ;; 10 
-(prn (.evaluate p 2))                                                          ;; 11 
+(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))                            ;; 10 
+(prn (.getCoeffs p))                                                           ;; 11 
+(prn (.evaluate p 2))                                                          ;; 12 
                                                                               
-(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 13 
-(prn (.getCoeffs p))                                                           ;; 14 
-(prn (.evaluate p 1.2))                                                        ;; 15 
+(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 14 
+(prn (.getCoeffs p))                                                           ;; 15 
+(prn (.evaluate p 1.2))                                                        ;; 16 
 ```
 
 
 ---
 
 ```
-$ bin/run src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
+$ src/polynomial.clj
+POLYNOMIAL_VERSION = 1.2.1
 [3.0 5.0 7.0 11.0]
 129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
@@ -734,7 +840,7 @@ pp p.evaluate(1.2)                                                             #
 ---
 
 ```
-$ bin/run src/polynomial.rb
+$ src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -750,7 +856,7 @@ $ bin/run src/polynomial.rb
 ```scheme
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")              ;;  1 
                                                                               
-(write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
+(display `(POLYNOMIAL-VERSION = ,(POLYNOMIAL-VERSION))) (newline)              ;;  3 
                                                                               
 (define p (new-Polynomial))                                                    ;;  5 
                                                                               
@@ -767,11 +873,11 @@ $ bin/run src/polynomial.rb
 ---
 
 ```
-$ bin/run src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13f608e00>
+$ src/polynomial.scm
+(POLYNOMIAL-VERSION = 1.2.1)
+#<swig-pointer std::vector< double > * 010000001>
 129.0
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 010000001>
 17.3020736
 ```
 
@@ -802,11 +908,11 @@ puts [poly evaluate 1.2]                                                       #
 ---
 
 ```
-$ bin/run src/polynomial.tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e03201000000_p_std__vectorT_double_t
+_0000000010000002_p_std__vectorT_double_t
 129.0
-_a042e03201000000_p_std__vectorT_double_t
+_0000000010000002_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -842,11 +948,11 @@ def test_more_than_one_coeff():                                                #
 ---
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.13, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
-plugins: cov-4.0.0
+plugins: cov-4.1.0, mock-3.8.2
 collected 3 items
 
 src/polynomial-test.py ...                                               [100%]
@@ -864,7 +970,7 @@ src/polynomial-test.py ...                                               [100%]
 
 
 ```
-$ bin/run target/native/polynomial
+$ target/native/polynomial-native
 POLYNOMIAL_VERSION = "1.2.1"
 129
 17.3020736
@@ -875,8 +981,8 @@ POLYNOMIAL_VERSION = "1.2.1"
 
 
 ```
-$ bin/run src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
+$ src/polynomial.py
+POLYNOMIAL_VERSION = 1.2.1
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
@@ -886,7 +992,7 @@ $ bin/run src/polynomial.py
 ---
 
 ```
-$ bin/run src/polynomial-test.py
+$ src/polynomial-test.py
 
 ```
 
@@ -894,8 +1000,8 @@ $ bin/run src/polynomial-test.py
 
 
 ```
-$ bin/run src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
+$ src/polynomial.clj
+POLYNOMIAL_VERSION = 1.2.1
 [3.0 5.0 7.0 11.0]
 129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
@@ -906,7 +1012,7 @@ $ bin/run src/polynomial.clj
 
 
 ```
-$ bin/run src/polynomial.rb
+$ src/polynomial.rb
 {:POLYNOMIAL_VERSION=>"1.2.1"}
 [3.0, 5.0, 7.0, 11.0]
 129.0
@@ -918,11 +1024,11 @@ $ bin/run src/polynomial.rb
 
 
 ```
-$ bin/run src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
-#<swig-pointer std::vector< double > * 13f608e00>
+$ src/polynomial.scm
+(POLYNOMIAL-VERSION = 1.2.1)
+#<swig-pointer std::vector< double > * 010000001>
 129.0
-#<swig-pointer std::vector< double > * 13f608e00>
+#<swig-pointer std::vector< double > * 010000001>
 17.3020736
 ```
 
@@ -930,11 +1036,11 @@ $ bin/run src/polynomial.scm
 
 
 ```
-$ bin/run src/polynomial.tcl
+$ src/polynomial.tcl
 POLYNOMIAL_VERSION 1.2.1
-_a042e03201000000_p_std__vectorT_double_t
+_0000000010000002_p_std__vectorT_double_t
 129.0
-_a042e03201000000_p_std__vectorT_double_t
+_0000000010000002_p_std__vectorT_double_t
 17.3020736
 ```
 
@@ -943,11 +1049,11 @@ _a042e03201000000_p_std__vectorT_double_t
 
 
 ```
-$ bin/run python3.10 -m pytest src/polynomial-test.py
+$ python3.10 -m pytest src/polynomial-test.py
 ============================= test session starts ==============================
-platform darwin -- Python 3.10.10, pytest-7.1.2, pluggy-1.0.0
+platform darwin -- Python 3.10.13, pytest-7.1.2, pluggy-1.0.0
 rootdir: .
-plugins: cov-4.0.0
+plugins: cov-4.1.0, mock-3.8.2
 collected 3 items
 
 src/polynomial-test.py ...                                               [100%]
@@ -956,6 +1062,167 @@ src/polynomial-test.py ...                                               [100%]
 ```
 
 ---
+
+---
+
+
+
+## rational.cc
+
+
+
+
+### C++ Library : rational.cc
+
+```c++
+#include "rational.h"                                                          //  1 
+```
+
+
+
+### C++ Native : rational-native.cc
+
+```c++
+#include "rational.h"                                                          //  1 
+#include <iostream>                                                            //  2 
+                                                                              
+int main(int argc, char **argv) {                                              //  4 
+  mathlib::rational<int> a(2, 3), b(5, 6);                                     //  5 
+#define P(x) std::cout << #x << " = " << (x) << "\n"                           //  6 
+  P(a);                                                                        //  7 
+  P(b);                                                                        //  8 
+  P(a + b);                                                                    //  9 
+  P(a * b);                                                                    // 10 
+  P(a > b);                                                                    // 11 
+  return 0;                                                                    // 12 
+}                                                                              // 13 
+```
+
+
+---
+
+```
+$ target/native/rational-native
+a = 2/3
+b = 5/6
+a + b = 3/2
+a * b = 5/9
+a > b = 0
+```
+
+---
+
+
+### C++ SWIG Interface : rational.i
+
+```c++
+// Name of generated bindings:                                                
+%module rational_swig                                                          //  2 
+                                                                              
+// Include C++ std lib interfaces:                                            
+%include "std_string.i"   // python __str__(), __repr__()                      //  5 
+                                                                              
+// Include C++ declarations as SWIG interface definitions:                    
+%include "rational.h"                                                          //  8 
+                                                                              
+// Prepend C++ code in generated bindings:                                    
+%{                                                                             // 11 
+#include "rational.h"                                                          // 12 
+%}                                                                             // 13 
+                                                                              
+// Enable access to operators:                                                
+%rename(__eq__)       mathlib::rational::operator==;                           // 16 
+%rename(__ne__)       mathlib::rational::operator!=;                           // 17 
+%rename(__gt__)       mathlib::rational::operator<;                            // 18 
+%rename(__ge__)       mathlib::rational::operator<=;                           // 19 
+%rename(__lt__)       mathlib::rational::operator>;                            // 20 
+%rename(__le__)       mathlib::rational::operator>=;                           // 21 
+%rename(__neg__)      mathlib::rational::operator-();                          // 22 
+%rename(__add__)      mathlib::rational::operator+;                            // 23 
+%rename(__sub__)      mathlib::rational::operator-;                            // 24 
+%rename(__mul__)      mathlib::rational::operator*;                            // 25 
+%rename(__truediv__)  mathlib::rational::operator/;                            // 26 
+                                                                              
+// Instantiate a template:                                                    
+%template(RationalInt) mathlib::rational<int>;                                 // 29 
+```
+
+
+
+### Python : rational.py
+
+```python
+from rational_swig import *                                                    #   1 
+                                                                              
+def P(x):                                                                      #   3 
+  print(f'{x} = {eval(x)}')                                                    #   4 
+                                                                              
+a = RationalInt(2, 3)                                                          #   6 
+b = RationalInt(5, 6)                                                          #   7 
+                                                                              
+P("a")                                                                         #   9 
+P("b")                                                                         #  10 
+P("a + b")                                                                     #  11 
+P("a * b")                                                                     #  12 
+P("a > b")                                                                     #  13 
+```
+
+
+---
+
+```
+$ src/rational.py
+a = 2/3
+b = 5/6
+a + b = 3/2
+a * b = 5/9
+a > b = True
+```
+
+---
+
+
+
+
+
+
+
+
+### Outputs - Recap
+
+
+
+
+
+```
+$ target/native/rational-native
+a = 2/3
+b = 5/6
+a + b = 3/2
+a * b = 5/9
+a > b = 0
+```
+
+---
+
+
+
+```
+$ src/rational.py
+a = 2/3
+b = 5/6
+a + b = 3/2
+a * b = 5/9
+a > b = True
+```
+
+---
+
+
+
+
+
+
 
 ---
 
@@ -1012,7 +1279,7 @@ namespace mathlib {                                                            /
 
 
 
-### C++ Main : polynomial_v2-native.cc
+### C++ Native : polynomial_v2-native.cc
 
 ```c++
 #include <iostream>                                                            //  1 
@@ -1052,7 +1319,7 @@ int main(int argc, char **argv) {                                              /
 ---
 
 ```
-$ bin/run target/native/polynomial_v2
+$ target/native/polynomial_v2-native
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1075,7 +1342,7 @@ POLYNOMIAL_VERSION = 2.0.2
                                                                               
 // Include C++ declarations as SWIG interface definitions:                    
 %include "polynomial_v2.h"                                                     //  9 
-%include "rational.h"                                                          // 10 
+%include "rational.i"     // python __eq__(), __add__(), etc.                  // 10 
                                                                               
 // Prepend C++ code in generated bindings:                                    
 %{                                                                             // 13 
@@ -1083,21 +1350,20 @@ POLYNOMIAL_VERSION = 2.0.2
 #include "rational.h"                                                          // 15 
 %}                                                                             // 16 
                                                                               
-%template(RationalV2)            mathlib::rational<int>;                       // 18 
-%template(VectorDoubleV2)        std::vector<double>;                          // 19 
-%template(VectorIntV2)           std::vector<int>;                             // 20 
-%template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 21 
-%template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 22 
-%template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 23 
-%template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 24 
+%template(VectorDoubleV2)        std::vector<double>;                          // 18 
+%template(VectorIntV2)           std::vector<int>;                             // 19 
+%template(VectorRationalV2)      std::vector<mathlib::rational<int>>;          // 20 
+%template(PolynomialDoubleV2)    mathlib::polynomial<double>;                  // 21 
+%template(PolynomialIntV2)       mathlib::polynomial<int>;                     // 22 
+%template(PolynomialRationalV2)  mathlib::polynomial<mathlib::rational<int>>;  // 23 
                                                                               
 // std::complex<double>:                                                      
-#if SWIGPYTHON || SWIGRUBY                                                     // 27 
-%include "std_complex.i"  // std::complex<double>                              // 28 
-%template(ComplexV2)             std::complex<double>;                         // 29 
-%template(VectorComplexV2)       std::vector<std::complex<double>>;            // 30 
-%template(PolynomialComplexV2)   mathlib::polynomial<std::complex<double>>;    // 31 
-#endif                                                                         // 32 
+#if SWIGPYTHON || SWIGRUBY                                                     // 26 
+%include "std_complex.i"  // std::complex<double>                              // 27 
+%template(ComplexV2)             std::complex<double>;                         // 28 
+%template(VectorComplexV2)       std::vector<std::complex<double>>;            // 29 
+%template(PolynomialComplexV2)   mathlib::polynomial<std::complex<double>>;    // 30 
+#endif                                                                         // 31 
 ```
 
 
@@ -1107,7 +1373,7 @@ POLYNOMIAL_VERSION = 2.0.2
 ```python
 from polynomial_v2_swig import *                                                                  #   1 
                                                                                                  
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                                 #   3 
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')                                               #   3 
                                                                                                  
 # polynomial<double>:                                                                            
 poly         = PolynomialDoubleV2()                                                               #   6 
@@ -1117,9 +1383,9 @@ print(poly.evaluate(2))                                                         
                                                                                                  
 # polynomial<rational<int>>:                                                                     
 poly        = PolynomialRationalV2()                                                              #  12 
-poly.coeffs = VectorRationalV2([ RationalV2(7, 11), RationalV2(11, 13), RationalV2(13, 17) ])     #  13 
+poly.coeffs = VectorRationalV2([ RationalInt(7, 11), RationalInt(11, 13), RationalInt(13, 17) ])  #  13 
 print(list(poly.coeffs))                                                                          #  14 
-print(poly.evaluate(RationalV2(-5, 7)))                                                           #  15 
+print(poly.evaluate(RationalInt(-5, 7)))                                                          #  15 
                                                                                                  
 # polynomial<complex<double>>:                                                                   
 poly        = PolynomialComplexV2()                                                               #  18 
@@ -1132,8 +1398,8 @@ print(poly.evaluate(complex(-5.7, 7.11)))                                       
 ---
 
 ```
-$ bin/run src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
+$ src/polynomial_v2.py
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
@@ -1148,36 +1414,37 @@ $ bin/run src/polynomial_v2.py
 ### Clojure (Java) : polynomial_v2.clj
 
 ```lisp
-(clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                 ;;  1 
-(import 'polynomial_v2_swig)                                                                       ;;  2 
-                                                                                                  
-(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                ;;  4 
-                                                                                                  
-;; polynomial<double>:                                                                            
-(def p1 (PolynomialDoubleV2.))                                                                     ;;  7 
-(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))                                             ;;  8 
-(prn (.getCoeffs p1))                                                                              ;;  9 
-(prn (.evaluate p1 2))                                                                             ;; 10 
-                                                                                                  
-;; polynomial<int> object:                                                                        
-(def p2 (PolynomialIntV2.))                                                                        ;; 13 
-(.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                          ;; 14 
-(prn (.getCoeffs p2))                                                                              ;; 15 
-(prn (.evaluate p2 -2))                                                                            ;; 16 
-                                                                                                  
-;; polynomial<rational<int>>:                                                                     
-(def p3 (PolynomialRationalV2.))                                                                   ;; 19 
-(.setCoeffs p3 (VectorRationalV2. [ (RationalV2. 7 11) (RationalV2. 11 13) (RationalV2. 13 17) ])) ;; 20 
-(prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                         ;; 21 
-(prn (.__str__ (.evaluate p3 (RationalV2. -5, 7))))                                                ;; 22 
+(clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                    ;;  1 
+(import 'polynomial_v2_swig)                                                                          ;;  2 
+                                                                                                     
+(println (format "POLYNOMIAL_VERSION = %s"                                                            ;;  4 
+                 (polynomial_v2_swig/POLYNOMIAL_VERSION)))                                            ;;  5 
+                                                                                                     
+;; polynomial<double>:                                                                               
+(def p1 (PolynomialDoubleV2.))                                                                        ;;  8 
+(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))                                                ;;  9 
+(prn (.getCoeffs p1))                                                                                 ;; 10 
+(prn (.evaluate p1 2))                                                                                ;; 11 
+                                                                                                     
+;; polynomial<int> object:                                                                           
+(def p2 (PolynomialIntV2.))                                                                           ;; 14 
+(.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                             ;; 15 
+(prn (.getCoeffs p2))                                                                                 ;; 16 
+(prn (.evaluate p2 -2))                                                                               ;; 17 
+                                                                                                     
+;; polynomial<rational<int>>:                                                                        
+(def p3 (PolynomialRationalV2.))                                                                      ;; 20 
+(.setCoeffs p3 (VectorRationalV2. [ (RationalInt. 7 11) (RationalInt. 11 13) (RationalInt. 13 17) ])) ;; 21 
+(prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                            ;; 22 
+(prn (.__str__ (.evaluate p3 (RationalInt. -5, 7))))                                                  ;; 23 
 ```
 
 
 ---
 
 ```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
+$ src/polynomial_v2.clj
+POLYNOMIAL_VERSION = 2.0.2
 [3.0 5.0 7.0 11.0]
 129.0
 [2 3 5 7 11 -13]
@@ -1192,42 +1459,42 @@ $ bin/run src/polynomial_v2.clj
 ### Ruby : polynomial_v2.rb
 
 ```ruby
-require 'polynomial_v2_swig'                                                                                                     #   1 
-PV2 = Polynomial_v2_swig                                                                                                         #   2 
-                                                                                                                                
-pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION                                                                                   #   4 
-                                                                                                                                
-# polynomial<double>:                                                                                                           
-poly        = PV2::PolynomialDoubleV2.new                                                                                        #   7 
-poly.coeffs = PV2::VectorDoubleV2.new([ 3, 5.0, 7.0, 11.0 ])                                                                     #   8 
-pp poly.coeffs.to_a                                                                                                              #   9 
-pp poly.evaluate(2)                                                                                                              #  10 
-                                                                                                                                
-# polynomial<int>                                                                                                               
-poly        = PV2::PolynomialIntV2.new                                                                                           #  13 
-poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                      #  14 
-pp poly.coeffs.to_a                                                                                                              #  15 
-pp poly.evaluate(-2)                                                                                                             #  16 
-                                                                                                                                
-# polynomial<rational<int>>:                                                                                                    
-poly        = PV2::PolynomialRationalV2.new()                                                                                    #  19 
-poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalV2.new(7, 11), PV2::RationalV2.new(11, 13), PV2::RationalV2.new(13,17) ]) #  20 
-pp poly.coeffs.to_a                                                                                                              #  21 
-pp poly.evaluate(PV2::RationalV2.new(-5, 7))                                                                                     #  22 
-                                                                                                                                
-# polynomial<complex<double>>                                                                                                   
-poly        = PV2::PolynomialComplexV2.new()                                                                                     #  25 
-poly.coeffs = PV2::VectorComplexV2.new([ 7.2+11.3i, 11.5+13.7i, 13.11+17.13i ])                                                  #  26 
-pp poly.coeffs.to_a                                                                                                              #  27 
-pp poly.evaluate(-5.7+7.11i)                                                                                                     #  28 
+require 'polynomial_v2_swig'                                                                                                        #   1 
+PV2 = Polynomial_v2_swig                                                                                                            #   2 
+                                                                                                                                   
+puts "POLYNOMIAL_VERSION = #{PV2::POLYNOMIAL_VERSION}"                                                                              #   4 
+                                                                                                                                   
+# polynomial<double>:                                                                                                              
+poly        = PV2::PolynomialDoubleV2.new                                                                                           #   7 
+poly.coeffs = PV2::VectorDoubleV2.new([ 3, 5.0, 7.0, 11.0 ])                                                                        #   8 
+pp poly.coeffs.to_a                                                                                                                 #   9 
+pp poly.evaluate(2)                                                                                                                 #  10 
+                                                                                                                                   
+# polynomial<int>                                                                                                                  
+poly        = PV2::PolynomialIntV2.new                                                                                              #  13 
+poly.coeffs = PV2::VectorIntV2.new([ 2, 3, 5, 7, 11, -13 ])                                                                         #  14 
+pp poly.coeffs.to_a                                                                                                                 #  15 
+pp poly.evaluate(-2)                                                                                                                #  16 
+                                                                                                                                   
+# polynomial<rational<int>>:                                                                                                       
+poly        = PV2::PolynomialRationalV2.new()                                                                                       #  19 
+poly.coeffs = PV2::VectorRationalV2.new([ PV2::RationalInt.new(7, 11), PV2::RationalInt.new(11, 13), PV2::RationalInt.new(13,17) ]) #  20 
+pp poly.coeffs.to_a                                                                                                                 #  21 
+pp poly.evaluate(PV2::RationalInt.new(-5, 7))                                                                                       #  22 
+                                                                                                                                   
+# polynomial<complex<double>>                                                                                                      
+poly        = PV2::PolynomialComplexV2.new()                                                                                        #  25 
+poly.coeffs = PV2::VectorComplexV2.new([ 7.2+11.3i, 11.5+13.7i, 13.11+17.13i ])                                                     #  26 
+pp poly.coeffs.to_a                                                                                                                 #  27 
+pp poly.evaluate(-5.7+7.11i)                                                                                                        #  28 
 ```
 
 
 ---
 
 ```
-$ bin/run src/polynomial_v2.rb
-{:POLYNOMIAL_VERSION=>"2.0.2"}
+$ src/polynomial_v2.rb
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2, 3, 5, 7, 11, -13]
@@ -1245,43 +1512,43 @@ rational<int>(50283,119119)
 ### TCL : polynomial_v2.tcl
 
 ```shell
-load target/tcl/polynomial_v2_swig.so Polynomial_v2_swig                                      #   1 
-                                                                                             
-puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                                            #   3 
-                                                                                             
-# polynomial<double>:                                                                        
-PolynomialDoubleV2 poly                                                                       #   6 
-VectorDoubleV2 c { 3 5.0 7.0 11.0 }                                                           #   7 
-poly configure -coeffs c                                                                      #   8 
-puts [poly cget -coeffs]                                                                      #   9 
-puts [poly evaluate 2]                                                                        #  10 
-                                                                                             
-# polynomial<int>:                                                                           
-PolynomialIntV2 poly                                                                          #  13 
-VectorIntV2 c { 2 3 5 7 11 -13 }                                                              #  14 
-poly configure -coeffs c                                                                      #  15 
-puts [poly cget -coeffs]                                                                      #  16 
-puts [poly evaluate -2]                                                                       #  17 
-                                                                                             
-# polynomial<rational<int>>:                                                                 
-PolynomialRationalV2 poly                                                                     #  20 
-VectorRationalV2 c [list [new_RationalV2 7 11] [new_RationalV2 11 13] [new_RationalV2 13 17]] #  21 
-poly configure -coeffs c                                                                      #  22 
-puts [poly cget -coeffs]                                                                      #  23 
-puts [RationalV2___repr__ [poly evaluate [new_RationalV2 -5 7]]]                              #  24 
+load target/tcl/polynomial_v2_swig.so Polynomial_v2_swig                                         #   1 
+                                                                                                
+puts [list POLYNOMIAL_VERSION $POLYNOMIAL_VERSION]                                               #   3 
+                                                                                                
+# polynomial<double>:                                                                           
+PolynomialDoubleV2 poly                                                                          #   6 
+VectorDoubleV2 c { 3 5.0 7.0 11.0 }                                                              #   7 
+poly configure -coeffs c                                                                         #   8 
+puts [poly cget -coeffs]                                                                         #   9 
+puts [poly evaluate 2]                                                                           #  10 
+                                                                                                
+# polynomial<int>:                                                                              
+PolynomialIntV2 poly                                                                             #  13 
+VectorIntV2 c { 2 3 5 7 11 -13 }                                                                 #  14 
+poly configure -coeffs c                                                                         #  15 
+puts [poly cget -coeffs]                                                                         #  16 
+puts [poly evaluate -2]                                                                          #  17 
+                                                                                                
+# polynomial<rational<int>>:                                                                    
+PolynomialRationalV2 poly                                                                        #  20 
+VectorRationalV2 c [list [new_RationalInt 7 11] [new_RationalInt 11 13] [new_RationalInt 13 17]] #  21 
+poly configure -coeffs c                                                                         #  22 
+puts [poly cget -coeffs]                                                                         #  23 
+puts [RationalInt___repr__ [poly evaluate [new_RationalInt -5 7]]]                               #  24 
 ```
 
 
 ---
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a042602c01000000_p_std__vectorT_double_t
+_0000000010000003_p_std__vectorT_double_t
 129.0
-_2043602c01000000_p_std__vectorT_int_t
+_0000000010000004_p_std__vectorT_int_t
 552
-_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_0000000010000005_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1297,7 +1564,7 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run target/native/polynomial_v2
+$ target/native/polynomial_v2-native
 POLYNOMIAL_VERSION = 2.0.2
 129
 552
@@ -1310,8 +1577,8 @@ POLYNOMIAL_VERSION = 2.0.2
 
 
 ```
-$ bin/run src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
+$ src/polynomial_v2.py
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
@@ -1324,8 +1591,8 @@ $ bin/run src/polynomial_v2.py
 
 
 ```
-$ bin/run src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
+$ src/polynomial_v2.clj
+POLYNOMIAL_VERSION = 2.0.2
 [3.0 5.0 7.0 11.0]
 129.0
 [2 3 5 7 11 -13]
@@ -1338,8 +1605,8 @@ $ bin/run src/polynomial_v2.clj
 
 
 ```
-$ bin/run src/polynomial_v2.rb
-{:POLYNOMIAL_VERSION=>"2.0.2"}
+$ src/polynomial_v2.rb
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2, 3, 5, 7, 11, -13]
@@ -1355,13 +1622,13 @@ rational<int>(50283,119119)
 
 
 ```
-$ bin/run src/polynomial_v2.tcl
+$ src/polynomial_v2.tcl
 POLYNOMIAL_VERSION 2.0.2
-_a042602c01000000_p_std__vectorT_double_t
+_0000000010000003_p_std__vectorT_double_t
 129.0
-_2043602c01000000_p_std__vectorT_int_t
+_0000000010000004_p_std__vectorT_int_t
 552
-_4043602c01000000_p_std__vectorT_mathlib__rationalT_int_t_t
+_0000000010000005_p_std__vectorT_mathlib__rationalT_int_t_t
 rational<int>(50283,119119)
 ```
 
@@ -1482,7 +1749,7 @@ void swig_mp_int_delete(mp_int* self) {                                        /
 
 
 
-### C Main : tommath-native.c
+### C Native : tommath-native.c
 
 ```c
 #include "libtommath/tommath.h"                                                          //  1 
@@ -1513,7 +1780,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/tommath
+$ target/native/tommath-native
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1530,20 +1797,14 @@ e = 305411158
 ```c
 %module tommath_swig                                                           //  1 
 %include "stdint.i" // mp_digit typedef                                        //  2 
- // "missing sentinel in function call"                                       
+// varargs NULL terminator up to 10 arguments:                                
 %varargs(10, mp_int *ip = NULL) mp_init_multi;                                 //  4 
 %varargs(10, mp_int *ip = NULL) mp_clear_multi;                                //  5 
-//%rename(bool)  _bool;                                                        //  6 
-//%rename(true)  _true;                                                        //  7 
-//%rename(false) _false;                                                       //  8 
-//%ignore bool;                                                                //  9 
-//%ignore true;                                                                // 10 
-//%ignore false;                                                               // 11 
-%{                                                                             // 12 
-#include "tommath.h"                                                           // 13 
-%}                                                                             // 14 
-%include "libtommath/tommath.h"                                                // 15 
-%include "tommath.h"                                                           // 16 
+%{                                                                             //  6 
+#include "tommath.h"                                                           //  7 
+%}                                                                             //  8 
+%include "libtommath/tommath.h"                                                //  9 
+%include "tommath.h"                                                           // 10 
 ```
 
 
@@ -1553,7 +1814,7 @@ e = 305411158
 ```python
 from tommath_swig import *                                                     #   1 
                                                                               
-print({"MP_ITER": MP_ITER})                                                    #   3 
+print(f'MP_ITER = {MP_ITER}')                                                  #   3 
                                                                               
 a = mp_int(); mp_set(a, 2357111317)    # <-- awkward!                          #   5 
 b = mp_int(1113171923)                 # <-- better!                           #   6 
@@ -1573,8 +1834,8 @@ print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #
 ---
 
 ```
-$ bin/run src/tommath.py
-{'MP_ITER': -4}
+$ src/tommath.py
+MP_ITER = -4
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
 ```
@@ -1588,31 +1849,44 @@ $ bin/run src/tommath.py
 ```ruby
 require 'tommath_swig'                                                         #   1 
 include Tommath_swig                                                           #   2 
+require 'show'                                                                 #   3 
                                                                               
-puts "MP_ITER = #{MP_ITER}"                                                    #   4 
+puts "MP_ITER = #{MP_ITER}"                                                    #   5 
                                                                               
-a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   6 
-b = Mp_int.new(1113171923)                 # <-- better!                       #   7 
-c = Mp_int.new()                                                               #   8 
-d = Mp_int.new()                                                               #   9 
-e = Mp_int.new("12343456", 16)             # <-- yey!                          #  10 
+a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   7 
+b = Mp_int.new(1113171923)                 # <-- better!                       #   8 
+c = Mp_int.new()                                                               #   9 
+d = Mp_int.new()                                                               #  10 
+e = Mp_int.new("12343456", 16)             # <-- yey!                          #  11 
                                                                               
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  12 
+def show!                                                                      #  13 
+  show_exprs "a", "b","c", "d", "e"                                            #  14 
+end                                                                            #  15 
                                                                               
-mp_mul(a, b, c);                                                               #  14 
-mp_mul(c, b, d);                                                               #  15 
+show!                                                                          #  17 
                                                                               
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  17 
+mp_mul(a, b, c);                                                               #  19 
+mp_mul(c, b, d);                                                               #  20 
+                                                                              
+show!                                                                          #  22 
 ```
 
 
 ---
 
 ```
-$ bin/run src/tommath-1.rb
+$ src/tommath-1.rb
 MP_ITER = -4
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1621,28 +1895,41 @@ MP_ITER = -4
 
 ```ruby
 require 'tommath-mpi'                                                          #   1 
+require 'show'                                                                 #   2 
                                                                               
-a = MPI[2357111317]                                                            #   3 
-b = MPI[1113171923]                                                            #   4 
-c = MPI[]                                                                      #   5 
-d = MPI[]                                                                      #   6 
-e = MPI["12343456", 16]                                                        #   7 
+a = MPI[2357111317]                                                            #   4 
+b = MPI[1113171923]                                                            #   5 
+c = MPI[]                                                                      #   6 
+d = MPI[]                                                                      #   7 
+e = MPI["12343456", 16]                                                        #   8 
                                                                               
-puts({a: a, b: b, c: c, d: d, e: e})                                           #   9 
+def show!                                                                      #  10 
+  show_exprs "a", "b","c", "d", "e"                                            #  11 
+end                                                                            #  12 
                                                                               
-c = a * b                                                                      #  11 
-d = c * b                                                                      #  12 
+show!                                                                          #  14 
                                                                               
-puts({a: a, b: b, c: c, d: d, e: e})                                           #  14 
+c = a * b                                                                      #  16 
+d = c * b                                                                      #  17 
+                                                                              
+show!                                                                          #  19 
 ```
 
 
 ---
 
 ```
-$ bin/run src/tommath-2.rb
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+$ src/tommath-2.rb
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1652,67 +1939,65 @@ $ bin/run src/tommath-2.rb
 ```ruby
 require 'tommath_swig'                                                         #   1 
                                                                               
-#########################################################                     
-# Sugar:                                                                      
-                                                                              
-module Tommath_swig                                                            #   6 
-  class Mp_int                                                                 #   7 
+# Syntactic Sugar:                                                            
+module Tommath_swig                                                            #   4 
+  class Mp_int                                                                 #   5 
     # Constructor:                                                            
-    def self.[] val = 0, radix = 10                                            #   9 
-      case val                                                                 #  10 
-      when self                                                                #  11 
-        val                                                                    #  12 
-      when Integer                                                             #  13 
-        inst = new                                                             #  14 
-        Tommath_swig.mp_set(inst, val)                                         #  15 
-        inst                                                                   #  16 
-      when String                                                              #  17 
-        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  18 
-      when nil                                                                 #  19 
-        self[0]                                                                #  20 
-      else                                                                     #  21 
-        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  22 
-      end                                                                      #  23 
-    end                                                                        #  24 
+    def self.[] val = 0, radix = 10                                            #   7 
+      case val                                                                 #   8 
+      when self                                                                #   9 
+        val                                                                    #  10 
+      when Integer                                                             #  11 
+        inst = new                                                             #  12 
+        Tommath_swig.mp_set(inst, val)                                         #  13 
+        inst                                                                   #  14 
+      when String                                                              #  15 
+        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  16 
+      when nil                                                                 #  17 
+        self[0]                                                                #  18 
+      else                                                                     #  19 
+        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  20 
+      end                                                                      #  21 
+    end                                                                        #  22 
                                                                               
-    def to_s radix = 10                                                        #  26 
-      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  27 
-    end                                                                        #  28 
+    def to_s radix = 10                                                        #  24 
+      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  25 
+    end                                                                        #  26 
                                                                               
-    def inspect                                                                #  30 
-      "MPI[#{to_s.inspect}]"                                                   #  31 
-    end                                                                        #  32 
+    def inspect                                                                #  28 
+      "MPI[#{to_s.inspect}]"                                                   #  29 
+    end                                                                        #  30 
                                                                               
-    def -@                                                                     #  34 
-      result = MPI.new                                                         #  35 
-      Tommath_swig.mp_neg(self, result)                                        #  36 
-      result                                                                   #  37 
-    end                                                                        #  38 
-    def + other                                                                #  39 
-      result = MPI.new                                                         #  40 
-      Tommath_swig.mp_add(self, MPI[other], result)                            #  41 
-      result                                                                   #  42 
-    end                                                                        #  43 
-    def - other                                                                #  44 
-      result = MPI.new                                                         #  45 
-      Tommath_swig.mp_sub(self, MPI[other], result)                            #  46 
-      result                                                                   #  47 
-    end                                                                        #  48 
-    def * other                                                                #  49 
-      result = MPI.new                                                         #  50 
-      Tommath_swig.mp_mul(self, MPI[other], result)                            #  51 
-      result                                                                   #  52 
-    end                                                                        #  53 
-    def / other                                                                #  54 
-      result = MPI.new                                                         #  55 
-      remainder = MPI.new                                                      #  56 
-      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  57 
-      result                                                                   #  58 
-    end                                                                        #  59 
-  end                                                                          #  60 
-  MPI = Mp_int                                                                 #  61 
-end                                                                            #  62 
-MPI = Tommath_swig::MPI                                                        #  63 
+    def -@                                                                     #  32 
+      result = MPI.new                                                         #  33 
+      Tommath_swig.mp_neg(self, result)                                        #  34 
+      result                                                                   #  35 
+    end                                                                        #  36 
+    def + other                                                                #  37 
+      result = MPI.new                                                         #  38 
+      Tommath_swig.mp_add(self, MPI[other], result)                            #  39 
+      result                                                                   #  40 
+    end                                                                        #  41 
+    def - other                                                                #  42 
+      result = MPI.new                                                         #  43 
+      Tommath_swig.mp_sub(self, MPI[other], result)                            #  44 
+      result                                                                   #  45 
+    end                                                                        #  46 
+    def * other                                                                #  47 
+      result = MPI.new                                                         #  48 
+      Tommath_swig.mp_mul(self, MPI[other], result)                            #  49 
+      result                                                                   #  50 
+    end                                                                        #  51 
+    def / other                                                                #  52 
+      result = MPI.new                                                         #  53 
+      remainder = MPI.new                                                      #  54 
+      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  55 
+      result                                                                   #  56 
+    end                                                                        #  57 
+  end                                                                          #  58 
+  MPI = Mp_int                                                                 #  59 
+end                                                                            #  60 
+MPI = Tommath_swig::MPI                                                        #  61 
 ```
 
 
@@ -1722,7 +2007,7 @@ MPI = Tommath_swig::MPI                                                        #
 ```scheme
 (load-extension "target/guile/libtommath_swig.so" "SWIG_init")                 ;;  1 
                                                                               
-(write `(MP-ITER ,(MP-ITER))) (newline)                                        ;;  3 
+(display `(MP-ITER = ,(MP-ITER))) (newline)                                    ;;  3 
                                                                               
 (define a (new-mp-int))                                                        ;;  5 
 (mp-set a 2357111317)                   ;; <-- awkward!                        ;;  6 
@@ -1734,8 +2019,8 @@ MPI = Tommath_swig::MPI                                                        #
 (define (show!)                                                                ;; 12 
   (newline)                                                                    ;; 13 
   (let ((r (lambda (n-v)                                                       ;; 14 
-        (write (car n-v)) (display " => ")                                     ;; 15 
-        (display (mp-int---str-- (cadr n-v))) (newline))))                     ;; 16 
+             (write (car n-v)) (display " = ")                                 ;; 15 
+             (display (mp-int---str-- (cadr n-v))) (newline))))                ;; 16 
     (for-each r `((a ,a) (b ,b) (c ,c) (d ,d) (e ,e)))))                       ;; 17 
                                                                               
 (show!)                                                                        ;; 19 
@@ -1750,20 +2035,20 @@ MPI = Tommath_swig::MPI                                                        #
 ---
 
 ```
-$ bin/run src/tommath.scm
-(MP-ITER -4)
+$ src/tommath.scm
+(MP-ITER = -4)
 
-a => 2357111317
-b => 1113171923
-c => 0
-d => 0
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
 
-a => 2357111317
-b => 1113171923
-c => 2623870137469952591
-d => 2920818566629701480442302493
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1779,7 +2064,7 @@ e => 305411158
 
 
 ```
-$ bin/run target/native/tommath
+$ target/native/tommath-native
 MP_ITER = -4
 a = 2357111317
 b = 1113171923
@@ -1793,8 +2078,8 @@ e = 305411158
 
 
 ```
-$ bin/run src/tommath.py
-{'MP_ITER': -4}
+$ src/tommath.py
+MP_ITER = -4
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
 ```
@@ -1804,38 +2089,54 @@ $ bin/run src/tommath.py
 
 
 ```
-$ bin/run src/tommath-1.rb
+$ src/tommath-1.rb
 MP_ITER = -4
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
 
 ```
-$ bin/run src/tommath-2.rb
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+$ src/tommath-2.rb
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
 
 
 ```
-$ bin/run src/tommath.scm
-(MP-ITER -4)
+$ src/tommath.scm
+(MP-ITER = -4)
 
-a => 2357111317
-b => 1113171923
-c => 0
-d => 0
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
 
-a => 2357111317
-b => 1113171923
-c => 2623870137469952591
-d => 2920818566629701480442302493
-e => 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1873,76 +2174,74 @@ double black_scholes_normal(double zz)                                          
     if (zz == 0)                                                                                             //  6 
         return 0.5;                                                                                          //  7 
                                                                                                             
-    double z = zz;  //zz is input variable,  use z for calculations                                          //  9 
+    double z = zz;                                                                                           //  9 
                                                                                                             
     if (zz < 0)                                                                                              // 11 
-        z = -zz;  //change negative values to positive                                                       // 12 
+        z = -zz;                                                                                             // 12 
                                                                                                             
-    //set constants                                                                                         
-    double p = 0.2316419;                                                                                    // 15 
-    double b1 = 0.31938153;                                                                                  // 16 
-    double b2 = -0.356563782;                                                                                // 17 
-    double b3 = 1.781477937;                                                                                 // 18 
-    double b4 = -1.821255978;                                                                                // 19 
-    double b5 = 1.330274428;                                                                                 // 20 
+    double p = 0.2316419;                                                                                    // 14 
+    double b1 = 0.31938153;                                                                                  // 15 
+    double b2 = -0.356563782;                                                                                // 16 
+    double b3 = 1.781477937;                                                                                 // 17 
+    double b4 = -1.821255978;                                                                                // 18 
+    double b5 = 1.330274428;                                                                                 // 19 
                                                                                                             
-    //CALCULATIONS                                                                                          
-    double f = 1 / sqrt(2 * M_PI);                                                                           // 23 
-    double ff = exp(-pow(z, 2) / 2) * f;                                                                     // 24 
-    double s1 = b1 / (1 + p * z);                                                                            // 25 
-    double s2 = b2 / pow((1 + p * z), 2);                                                                    // 26 
-    double s3 = b3 / pow((1 + p * z), 3);                                                                    // 27 
-    double s4 = b4 / pow((1 + p * z), 4);                                                                    // 28 
-    double s5 = b5 / pow((1 + p * z), 5);                                                                    // 29 
+    double f = 1 / sqrt(2 * M_PI);                                                                           // 21 
+    double ff = exp(-pow(z, 2) / 2) * f;                                                                     // 22 
+    double s1 = b1 / (1 + p * z);                                                                            // 23 
+    double s2 = b2 / pow((1 + p * z), 2);                                                                    // 24 
+    double s3 = b3 / pow((1 + p * z), 3);                                                                    // 25 
+    double s4 = b4 / pow((1 + p * z), 4);                                                                    // 26 
+    double s5 = b5 / pow((1 + p * z), 5);                                                                    // 27 
                                                                                                             
     //sz is the right-tail approximation                                                                    
-    double  sz = ff * (s1 + s2 + s3 + s4 + s5);                                                              // 32 
+    double  sz = ff * (s1 + s2 + s3 + s4 + s5);                                                              // 30 
                                                                                                             
-    double rz;                                                                                               // 34 
+    double rz;                                                                                               // 32 
     //cdf of negative input is right-tail of input's absolute value                                         
-    if (zz < 0)                                                                                              // 36 
-        rz = sz;                                                                                             // 37 
+    if (zz < 0)                                                                                              // 34 
+        rz = sz;                                                                                             // 35 
                                                                                                             
     //cdf of positive input is one minus right-tail                                                         
-    if (zz > 0)                                                                                              // 40 
-        rz = (1 - sz);                                                                                       // 41 
+    if (zz > 0)                                                                                              // 38 
+        rz = (1 - sz);                                                                                       // 39 
                                                                                                             
-    return rz;                                                                                               // 43 
-}                                                                                                            // 44 
+    return rz;                                                                                               // 41 
+}                                                                                                            // 42 
                                                                                                             
-double black_scholes_call_or_put(double strike, double s, double sd, double r, double days, int call_or_put) // 46 
-{                                                                                                            // 47 
-    double ls = log(s);                                                                                      // 48 
-    double lx = log(strike);                                                                                 // 49 
-    double t = days / 365;                                                                                   // 50 
-    double sd2 = pow(sd, 2);                                                                                 // 51 
-    double n = (ls - lx + r * t + sd2 * t / 2);                                                              // 52 
-    double sqrtT = sqrt(days / 365);                                                                         // 53 
-    double d = sd * sqrtT;                                                                                   // 54 
-    double d1 = n / d;                                                                                       // 55 
-    double d2 = d1 - sd * sqrtT;                                                                             // 56 
-    double nd1 = black_scholes_normal(d1);                                                                   // 57 
-    double nd2 = black_scholes_normal(d2);                                                                   // 58 
-    if ( call_or_put )                                                                                       // 59 
-        return s * nd1 - strike * exp(-r * t) * nd2;                                                         // 60 
-    else                                                                                                     // 61 
-        return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);                                             // 62 
-}                                                                                                            // 63 
+double black_scholes_call_or_put(double strike, double s, double sd, double r, double days, int call_or_put) // 44 
+{                                                                                                            // 45 
+    double ls = log(s);                                                                                      // 46 
+    double lx = log(strike);                                                                                 // 47 
+    double t = days / 365;                                                                                   // 48 
+    double sd2 = pow(sd, 2);                                                                                 // 49 
+    double n = (ls - lx + r * t + sd2 * t / 2);                                                              // 50 
+    double sqrtT = sqrt(days / 365);                                                                         // 51 
+    double d = sd * sqrtT;                                                                                   // 52 
+    double d1 = n / d;                                                                                       // 53 
+    double d2 = d1 - sd * sqrtT;                                                                             // 54 
+    double nd1 = black_scholes_normal(d1);                                                                   // 55 
+    double nd2 = black_scholes_normal(d2);                                                                   // 56 
+    if ( call_or_put )                                                                                       // 57 
+        return s * nd1 - strike * exp(-r * t) * nd2;                                                         // 58 
+    else                                                                                                     // 59 
+        return strike * exp(-r * t) * (1 - nd2) - s * (1 - nd1);                                             // 60 
+}                                                                                                            // 61 
                                                                                                             
-double black_scholes_call(double strike, double s, double sd, double r, double days)                         // 65 
-{                                                                                                            // 66 
-    return black_scholes_call_or_put(strike, s, sd, r, days, 1);                                             // 67 
-}                                                                                                            // 68 
+double black_scholes_call(double strike, double s, double sd, double r, double days)                         // 63 
+{                                                                                                            // 64 
+    return black_scholes_call_or_put(strike, s, sd, r, days, 1);                                             // 65 
+}                                                                                                            // 66 
                                                                                                             
-double black_scholes_put(double strike, double s, double sd, double r, double days)                          // 70 
-{                                                                                                            // 71 
-    return black_scholes_call_or_put(strike, s, sd, r, days, 0);                                             // 72 
-}                                                                                                            // 73 
+double black_scholes_put(double strike, double s, double sd, double r, double days)                          // 68 
+{                                                                                                            // 69 
+    return black_scholes_call_or_put(strike, s, sd, r, days, 0);                                             // 70 
+}                                                                                                            // 71 
 ```
 
 
 
-### C Main : black_scholes-native.c
+### C Native : black_scholes-native.c
 
 ```c
 #include <stdio.h>                                                                     //  1 
@@ -1957,7 +2256,7 @@ int main(int argc, char **argv) {                                               
     { 1.50, 2.00, 0.5,  2.25, 10.0 },                                                  // 10 
     { 1.50, 2.00, 0.5,  2.25,  5.0 },                                                  // 11 
     { 1.50, 2.00, 0.5,  2.25,  2.0 },                                                  // 12 
-     // vary strike:.0                                                                
+     // vary strike:                                                                  
     { 0.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 14 
     { 1.00, 2.00, 0.25, 2.25, 15.0 },                                                  // 15 
     { 1.50, 2.00, 0.25, 2.25, 15.0 },                                                  // 16 
@@ -1981,7 +2280,7 @@ int main(int argc, char **argv) {                                               
 ---
 
 ```
-$ bin/run target/native/black_scholes
+$ target/native/black_scholes-native
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2045,7 +2344,7 @@ for r in data:                                                                  
 ---
 
 ```
-$ bin/run src/black_scholes.py
+$ src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2115,7 +2414,49 @@ SELECT * FROM bs_eval;                                                          
 ---
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ src/black_scholes-1.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2190,7 +2531,7 @@ WITH hd_rand AS (                                                               
   , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation                                   -- 50 
   , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate                                               -- 51 
   , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry                                                             -- 52 
-  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs                                                        -- 53 
+  FROM bs_data as bsd, (SELECT generate_series(1, 1000) as h_id) gs                                                       -- 53 
 ),                                                                                                                        -- 54 
 hd_rand_eval AS (                                                                                                         -- 55 
 SELECT *                                                                                                                  -- 56 
@@ -2218,7 +2559,49 @@ LIMIT 10;                                                                       
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ src/black_scholes-2.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2235,31 +2618,80 @@ $ bin/run src/black_scholes-2.psql
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
 
+
+-- Any profitable calls?
+SELECT * FROM bs_eval
+WHERE call_val > asset_price OR put_val > asset_price;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
 (0 rows)
 
- h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
-------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
-   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
-   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
-    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
-   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
-   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
-   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
-   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
-   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
-(10 rows)
+
+-- Create some random scenarios:
+CREATE TABLE bs_hypo_eval
+AS
+WITH hd_rand AS (
+  SELECT gs.*, bsd.id
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
+  FROM bs_data as bsd, (SELECT generate_series(1, 1000) as h_id) gs
+),
+hd_rand_eval AS (
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM hd_rand
+)
+SELECT *
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
+FROM hd_rand_eval;
+
+
+-- Select the most profitable random calls:
+SELECT * FROM bs_hypo_eval
+WHERE call_val > asset_price
+ORDER BY call_profit_pcnt DESC
+LIMIT 10;
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
-   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
-   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
-   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
-(4 rows)
+  306 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             14 |    2.043 |       0 |           32.404 |            -100
+  852 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             17 |    2.003 |       0 |           32.036 |            -100
+  654 |  6 |          0.5 |       1.501 |               0.25 |           2.25 |             14 |    1.974 |       0 |           31.512 |            -100
+  526 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             12 |    1.968 |       0 |             31.2 |            -100
+  779 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             17 |    1.981 |       0 |           31.018 |            -100
+  885 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             17 |     1.96 |       0 |           30.492 |            -100
+  927 |  6 |          0.5 |       1.566 |               0.25 |           2.25 |             15 |    2.037 |       0 |           30.076 |            -100
+  155 |  6 |          0.5 |       1.549 |               0.25 |           2.25 |             14 |    1.994 |       0 |           28.728 |            -100
+  204 |  6 |          0.5 |       1.591 |               0.25 |           2.25 |             18 |     2.03 |       0 |           27.592 |            -100
+  795 |  6 |          0.5 |       1.538 |               0.25 |           2.25 |             13 |    1.955 |       0 |           27.113 |            -100
+(10 rows)
+
+
+-- Select the most profitable random puts:
+SELECT * FROM bs_hypo_eval
+WHERE put_val > asset_price
+ORDER BY put_profit_pcnt DESC
+LIMIT 10;
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+  264 | 12 |          3.5 |       1.544 |               0.25 |           2.25 |             15 |        0 |   1.667 |             -100 |           7.966
+   98 | 12 |          3.5 |       1.528 |               0.25 |           2.25 |             17 |        0 |   1.609 |             -100 |           5.301
+  819 | 12 |          3.5 |       1.601 |               0.25 |           2.25 |             14 |        0 |   1.677 |             -100 |           4.747
+  154 | 12 |          3.5 |       1.667 |               0.25 |           2.25 |             16 |        0 |   1.745 |             -100 |           4.679
+  897 | 12 |          3.5 |       1.593 |               0.25 |           2.25 |             14 |        0 |   1.662 |             -100 |           4.331
+  653 | 12 |          3.5 |       1.649 |               0.25 |           2.25 |             16 |        0 |   1.712 |             -100 |            3.82
+  340 | 12 |          3.5 |       1.624 |               0.25 |           2.25 |             16 |        0 |   1.686 |             -100 |           3.817
+  928 | 12 |          3.5 |       1.532 |               0.25 |           2.25 |             12 |        0 |   1.587 |             -100 |            3.59
+  523 | 12 |          3.5 |       1.542 |               0.25 |           2.25 |             16 |        0 |   1.595 |             -100 |           3.437
+  410 | 12 |          3.5 |       1.604 |               0.25 |           2.25 |             11 |        0 |   1.644 |             -100 |           2.493
+(10 rows)
 ```
 
 ---
@@ -2273,7 +2705,7 @@ $ bin/run src/black_scholes-2.psql
 
 
 ```
-$ bin/run target/native/black_scholes
+$ target/native/black_scholes-native
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2293,7 +2725,7 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes.py
+$ src/black_scholes.py
 inputs: [  1.50,  2.00,  0.50,  2.25, 30.00 ], call:  0.753, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 15.00 ], call:  0.632, put:  0.000
 inputs: [  1.50,  2.00,  0.50,  2.25, 10.00 ], call:  0.590, put:  0.000
@@ -2316,7 +2748,49 @@ inputs: [  3.50,  2.00,  0.25,  2.25, 15.00 ], call:  0.000, put:  1.191
 
 
 ```
-$ bin/run src/black_scholes-1.psql
+$ src/black_scholes-1.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2337,7 +2811,49 @@ $ bin/run src/black_scholes-1.psql
 ---
 
 ```
-$ bin/run src/black_scholes-2.psql
+$ src/black_scholes-2.psql
+-- Load the extension:
+CREATE EXTENSION black_scholes_swig;
+
+-- Create some sample input data:
+CREATE TABLE bs_data (
+  id SERIAL PRIMARY KEY,
+  strike_price FLOAT8,
+  asset_price FLOAT8,
+  standard_deviation FLOAT8,
+  risk_free_rate FLOAT8,
+  days_to_expiry FLOAT8
+);
+
+INSERT INTO bs_data
+  ( strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry )
+VALUES
+  -- vary expiry:
+  ( 1.50, 2.00, 0.5,  2.25, 30 ),
+  ( 1.50, 2.00, 0.5,  2.25, 15 ),
+  ( 1.50, 2.00, 0.5,  2.25, 10 ),
+  ( 1.50, 2.00, 0.5,  2.25,  5 ),
+  ( 1.50, 2.00, 0.5,  2.25,  2 ),
+  --  vary strike:
+  ( 0.50, 2.00, 0.25, 2.25, 15 ),
+  ( 1.00, 2.00, 0.25, 2.25, 15 ),
+  ( 1.50, 2.00, 0.25, 2.25, 15 ),
+  ( 2.00, 2.00, 0.25, 2.25, 15 ),
+  ( 2.50, 2.00, 0.25, 2.25, 15 ),
+  ( 3.00, 2.00, 0.25, 2.25, 15 ),
+  ( 3.50, 2.00, 0.25, 2.25, 15 );
+
+-- Apply Black-Scholes to data:
+CREATE TABLE bs_eval
+AS
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM bs_data;
+
+
+SELECT * FROM bs_eval;
+
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
   1 |          1.5 |           2 |                0.5 |           2.25 |             30 |    0.753 |       0
@@ -2353,32 +2869,81 @@ $ bin/run src/black_scholes-2.psql
  11 |            3 |           2 |               0.25 |           2.25 |             15 |        0 |   0.735
  12 |          3.5 |           2 |               0.25 |           2.25 |             15 |        0 |    1.19
 (12 rows)
+
+
+-- Any profitable calls?
+SELECT * FROM bs_eval
+WHERE call_val > asset_price OR put_val > asset_price;
 
  id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val
 ----+--------------+-------------+--------------------+----------------+----------------+----------+---------
 (0 rows)
 
- h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
-------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   93 |  6 |          0.5 |       1.551 |               0.25 |           2.25 |             18 |    1.843 |       0 |           18.826 |            -100
-   75 |  6 |          0.5 |       1.638 |               0.25 |           2.25 |             12 |    1.932 |       0 |           17.948 |            -100
-   88 |  6 |          0.5 |       1.675 |               0.25 |           2.25 |             11 |    1.941 |       0 |            15.88 |            -100
-   82 |  6 |          0.5 |       1.743 |               0.25 |           2.25 |             18 |    2.011 |       0 |           15.375 |            -100
-    8 |  6 |          0.5 |       1.779 |               0.25 |           2.25 |             17 |    2.024 |       0 |           13.771 |            -100
-   63 |  6 |          0.5 |       1.799 |               0.25 |           2.25 |             12 |    2.039 |       0 |            13.34 |            -100
-   77 |  6 |          0.5 |       1.731 |               0.25 |           2.25 |             14 |    1.949 |       0 |           12.593 |            -100
-   42 |  6 |          0.5 |       1.616 |               0.25 |           2.25 |             12 |    1.813 |       0 |            12.19 |            -100
-   44 |  6 |          0.5 |       1.801 |               0.25 |           2.25 |             12 |    1.966 |       0 |            9.161 |            -100
-   62 |  6 |          0.5 |       1.904 |               0.25 |           2.25 |             17 |    2.037 |       0 |            6.985 |            -100
-(10 rows)
+
+-- Create some random scenarios:
+CREATE TABLE bs_hypo_eval
+AS
+WITH hd_rand AS (
+  SELECT gs.*, bsd.id
+  , strike_price -- random_offset(strike_price, 0.25) AS strike_price
+  , truncf(random_offset(asset_price, 0.25)) AS asset_price
+  , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
+  , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
+  , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
+  FROM bs_data as bsd, (SELECT generate_series(1, 1000) as h_id) gs
+),
+hd_rand_eval AS (
+SELECT *
+  , truncf(black_scholes_call(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS call_val
+  , truncf(black_scholes_put(strike_price, asset_price, standard_deviation, risk_free_rate, days_to_expiry)) AS put_val
+FROM hd_rand
+)
+SELECT *
+  , truncf((call_val / asset_price - 1) * 100, 3) AS call_profit_pcnt
+  , truncf((put_val  / asset_price - 1) * 100, 3) AS put_profit_pcnt
+FROM hd_rand_eval;
+
+
+-- Select the most profitable random calls:
+SELECT * FROM bs_hypo_eval
+WHERE call_val > asset_price
+ORDER BY call_profit_pcnt DESC
+LIMIT 10;
 
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   71 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             15 |        0 |   1.685 |             -100 |           5.576
-   72 | 12 |          3.5 |       1.519 |               0.25 |           2.25 |             16 |        0 |   1.599 |             -100 |           5.266
-   95 | 12 |          3.5 |       1.581 |               0.25 |           2.25 |             16 |        0 |   1.632 |             -100 |           3.225
-   19 | 12 |          3.5 |       1.602 |               0.25 |           2.25 |             16 |        0 |    1.65 |             -100 |           2.996
-(4 rows)
+  306 |  6 |          0.5 |       1.543 |               0.25 |           2.25 |             14 |    2.043 |       0 |           32.404 |            -100
+  852 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             17 |    2.003 |       0 |           32.036 |            -100
+  654 |  6 |          0.5 |       1.501 |               0.25 |           2.25 |             14 |    1.974 |       0 |           31.512 |            -100
+  526 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             12 |    1.968 |       0 |             31.2 |            -100
+  779 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             17 |    1.981 |       0 |           31.018 |            -100
+  885 |  6 |          0.5 |       1.502 |               0.25 |           2.25 |             17 |     1.96 |       0 |           30.492 |            -100
+  927 |  6 |          0.5 |       1.566 |               0.25 |           2.25 |             15 |    2.037 |       0 |           30.076 |            -100
+  155 |  6 |          0.5 |       1.549 |               0.25 |           2.25 |             14 |    1.994 |       0 |           28.728 |            -100
+  204 |  6 |          0.5 |       1.591 |               0.25 |           2.25 |             18 |     2.03 |       0 |           27.592 |            -100
+  795 |  6 |          0.5 |       1.538 |               0.25 |           2.25 |             13 |    1.955 |       0 |           27.113 |            -100
+(10 rows)
+
+
+-- Select the most profitable random puts:
+SELECT * FROM bs_hypo_eval
+WHERE put_val > asset_price
+ORDER BY put_profit_pcnt DESC
+LIMIT 10;
+
+ h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
+------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
+  264 | 12 |          3.5 |       1.544 |               0.25 |           2.25 |             15 |        0 |   1.667 |             -100 |           7.966
+   98 | 12 |          3.5 |       1.528 |               0.25 |           2.25 |             17 |        0 |   1.609 |             -100 |           5.301
+  819 | 12 |          3.5 |       1.601 |               0.25 |           2.25 |             14 |        0 |   1.677 |             -100 |           4.747
+  154 | 12 |          3.5 |       1.667 |               0.25 |           2.25 |             16 |        0 |   1.745 |             -100 |           4.679
+  897 | 12 |          3.5 |       1.593 |               0.25 |           2.25 |             14 |        0 |   1.662 |             -100 |           4.331
+  653 | 12 |          3.5 |       1.649 |               0.25 |           2.25 |             16 |        0 |   1.712 |             -100 |            3.82
+  340 | 12 |          3.5 |       1.624 |               0.25 |           2.25 |             16 |        0 |   1.686 |             -100 |           3.817
+  928 | 12 |          3.5 |       1.532 |               0.25 |           2.25 |             12 |        0 |   1.587 |             -100 |            3.59
+  523 | 12 |          3.5 |       1.542 |               0.25 |           2.25 |             16 |        0 |   1.595 |             -100 |           3.437
+  410 | 12 |          3.5 |       1.604 |               0.25 |           2.25 |             11 |        0 |   1.644 |             -100 |           2.493
+(10 rows)
 ```
 
 ---
@@ -2467,17 +3032,17 @@ $ bin/run src/black_scholes-2.psql
 # Workflow Examples
 
 
-## Workflow - example1.c                                                      
+## Workflow - mathlib.c                                                       
                                                                               
 ### Compile Native Code                                                       
                                                                               
 ```                                                                           
 # Compile native library:                                                     
-cc -Isrc -c -o target/native/example1.o src/example1.c                        
+cc -Isrc -c -o target/native/mathlib.o src/mathlib.c                          
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/example1 src/example1-native.c                        \
-  target/native/example1.o -L/opt/homebrew/lib                                
+# Compile and link main program:                                              
+cc -Isrc -o target/native/mathlib-native src/mathlib-native.c                   \
+  target/native/mathlib.o -L/opt/homebrew/lib                                 
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -2485,27 +3050,27 @@ cc -Isrc -o target/native/example1 src/example1-native.c                        
 ```                                                                           
 # Generate python bindings:                                                   
 swig -python -addextern -I- -Isrc -outdir target/python/ -o                     \
-  target/python/example1_swig.c src/example1.i                                
+  target/python/mathlib_swig.c src/mathlib.i                                  
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/python/example1_swig.c target/python/example1_swig.py            
-3662 target/python/example1_swig.c                                            
-65 target/python/example1_swig.py                                             
-3727 total                                                                    
+wc -l target/python/mathlib_swig.c target/python/mathlib_swig.py              
+3832 target/python/mathlib_swig.c                                             
+65 target/python/mathlib_swig.py                                              
+3897 total                                                                    
                                                                               
 # Compile python bindings:                                                    
-cc -Isrc -dynamic -c -o target/python/example1_swig.c.o                         \
-  target/python/example1_swig.c                                               
+cc -Isrc -dynamic -c -o target/python/mathlib_swig.c.o                          \
+  target/python/mathlib_swig.c                                                
                                                                               
 # Link python dynamic library:                                                
-cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      \
-  target/python/example1_swig.c.o -ldl -framework CoreFoundation              
+cc -dynamiclib -o target/python/_mathlib_swig.so target/native/mathlib.o        \
+  target/python/mathlib_swig.c.o -ldl -framework CoreFoundation               
                                                                               
 ```                                                                           
                                                                               
@@ -2514,30 +3079,29 @@ cc -dynamiclib -o target/python/_example1_swig.so target/native/example1.o      
 ```                                                                           
 # Generate clojure bindings:                                                  
 swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      \
-  target/clojure/example1_swig.c src/example1.i                               
+  target/clojure/mathlib_swig.c src/mathlib.i                                 
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/clojure/example1_swig.c target/clojure/example1*.java            
-239 target/clojure/example1_swig.c                                            
-15 target/clojure/example1_swig.java                                          
-12 target/clojure/example1_swigConstants.java                                 
-13 target/clojure/example1_swigJNI.java                                       
-279 total                                                                     
+wc -l target/clojure/mathlib_swig.c target/clojure/mathlib*.java              
+269 target/clojure/mathlib_swig.c                                             
+15 target/clojure/mathlib_swig.java                                           
+12 target/clojure/mathlib_swigConstants.java                                  
+13 target/clojure/mathlib_swigJNI.java                                        
+309 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
-  target/clojure/example1_swig.c.o target/clojure/example1_swig.c             
+  target/clojure/mathlib_swig.c.o target/clojure/mathlib_swig.c               
                                                                               
 # Link clojure dynamic library:                                               
-cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        \
-  target/native/example1.o target/clojure/example1_swig.c.o                     \
-  -L/opt/homebrew/lib                                                         
+cc -dynamiclib -o target/clojure/libmathlib_swig.jnilib                         \
+  target/native/mathlib.o target/clojure/mathlib_swig.c.o -L/opt/homebrew/lib 
                                                                               
 ```                                                                           
                                                                               
@@ -2546,26 +3110,26 @@ cc -dynamiclib -o target/clojure/libexample1_swig.jnilib                        
 ```                                                                           
 # Generate ruby bindings:                                                     
 swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         \
-  target/ruby/example1_swig.c src/example1.i                                  
+  target/ruby/mathlib_swig.c src/mathlib.i                                    
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/ruby/example1_swig.c                                             
-2282 target/ruby/example1_swig.c                                              
+wc -l target/ruby/mathlib_swig.c                                              
+2323 target/ruby/mathlib_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
-cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
-  target/ruby/example1_swig.c.o target/ruby/example1_swig.c                   
+cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
+  target/ruby/mathlib_swig.c.o target/ruby/mathlib_swig.c                     
                                                                               
 # Link ruby dynamic library:                                                  
-cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     \
-  target/ruby/example1_swig.c.o -L/opt/homebrew/lib                           
+cc -dynamiclib -o target/ruby/mathlib_swig.bundle target/native/mathlib.o       \
+  target/ruby/mathlib_swig.c.o -L/opt/homebrew/lib                            
                                                                               
 ```                                                                           
                                                                               
@@ -2574,25 +3138,25 @@ cc -dynamiclib -o target/ruby/example1_swig.bundle target/native/example1.o     
 ```                                                                           
 # Generate tcl bindings:                                                      
 swig -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                           \
-  target/tcl/example1_swig.c src/example1.i                                   
+  target/tcl/mathlib_swig.c src/mathlib.i                                     
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/tcl/example1_swig.c                                              
-2178 target/tcl/example1_swig.c                                               
+wc -l target/tcl/mathlib_swig.c                                               
+2224 target/tcl/mathlib_swig.c                                                
                                                                               
 # Compile tcl bindings:                                                       
-cc -Isrc -I$TCL_HOME/include -c -o target/tcl/example1_swig.c.o                 \
-  target/tcl/example1_swig.c                                                  
+cc -Isrc -I$TCL_HOME/include -c -o target/tcl/mathlib_swig.c.o                  \
+  target/tcl/mathlib_swig.c                                                   
                                                                               
 # Link tcl dynamic library:                                                   
-cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          \
-  target/tcl/example1_swig.c.o -L/opt/homebrew/lib                            
+cc -dynamiclib -o target/tcl/mathlib_swig.so target/native/mathlib.o            \
+  target/tcl/mathlib_swig.c.o -L/opt/homebrew/lib                             
                                                                               
 ```                                                                           
                                                                               
@@ -2601,25 +3165,25 @@ cc -dynamiclib -o target/tcl/example1_swig.so target/native/example1.o          
 ```                                                                           
 # Generate guile bindings:                                                    
 swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       \
-  target/guile/example1_swig.c src/example1.i                                 
+  target/guile/mathlib_swig.c src/mathlib.i                                   
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/guile/example1_swig.c                                            
-1631 target/guile/example1_swig.c                                             
+wc -l target/guile/mathlib_swig.c                                             
+1660 target/guile/mathlib_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
-  target/guile/example1_swig.c.o target/guile/example1_swig.c                 
+  target/guile/mathlib_swig.c.o target/guile/mathlib_swig.c                   
                                                                               
 # Link guile dynamic library:                                                 
-cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     \
-  target/guile/example1_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread 
+cc -dynamiclib -o target/guile/libmathlib_swig.so target/native/mathlib.o       \
+  target/guile/mathlib_swig.c.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread  
                                                                               
 ```                                                                           
                                                                               
@@ -2629,30 +3193,31 @@ cc -dynamiclib -o target/guile/libexample1_swig.so target/native/example1.o     
 # Generate postgresql bindings:                                               
 swig -postgresql -extension-version 1.2.3 -addextern -I- -Isrc                  \
   -I$POSTGRESQL_INC_DIR -outdir target/postgresql/ -o                           \
-  target/postgresql/example1_swig.c src/example1.i                            
+  target/postgresql/mathlib_swig.c src/mathlib.i                              
                                                                               
 # Source code statistics:                                                     
-wc -l src/example1.h src/example1.i                                           
-7 src/example1.h                                                              
-5 src/example1.i                                                              
+wc -l src/mathlib.h src/mathlib.i                                             
+7 src/mathlib.h                                                               
+5 src/mathlib.i                                                               
 12 total                                                                      
                                                                               
 # Generated code statistics:                                                  
-wc -l target/postgresql/example1_swig.c target/postgresql/example1_swig-*.sql   \
-  target/postgresql/example1_swig.control target/postgresql/example1_swig.make
-1489 target/postgresql/example1_swig.c                                        
-20 target/postgresql/example1_swig--1.2.3.sql                                 
-8 target/postgresql/example1_swig.control                                     
-13 target/postgresql/example1_swig.make                                       
-1530 total                                                                    
+wc -l target/postgresql/mathlib_swig.c target/postgresql/mathlib_swig-*.sql     \
+  target/postgresql/mathlib_swig.control target/postgresql/mathlib_swig.make  
+1519 target/postgresql/mathlib_swig.c                                         
+20 target/postgresql/mathlib_swig--1.2.3.sql                                  
+8 target/postgresql/mathlib_swig.control                                      
+13 target/postgresql/mathlib_swig.make                                        
+1560 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
-cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/example1_swig.c.o        \
-  target/postgresql/example1_swig.c                                           
+cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/mathlib_swig.c.o         \
+  target/postgresql/mathlib_swig.c                                            
                                                                               
 # Link postgresql dynamic library:                                            
-cc -dynamiclib -o target/postgresql/example1_swig.so target/native/example1.o   \
-  target/postgresql/example1_swig.c.o -L/opt/homebrew/lib                     
+cc -dynamiclib -o target/postgresql/mathlib_swig.so target/native/mathlib.o     \
+  target/postgresql/mathlib_swig.c.o -L/opt/homebrew/lib                      
+                                                                              
                                                                               
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
@@ -2661,10 +3226,9 @@ $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            
   '$POSTGRESQL_SHARE_DIR/extension'                                           
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
   '$POSTGRESQL_LIB_DIR'                                                       
-install -c -m 644 ./example1_swig.control '$POSTGRESQL_SHARE_DIR/extension/'  
-install -c -m 644 ./example1_swig--1.2.3.sql                                    \
-  '$POSTGRESQL_SHARE_DIR/extension/'                                          
-install -c -m 755 example1_swig.so '$POSTGRESQL_LIB_DIR/'                     
+install -c -m 644 ./mathlib_swig.control '$POSTGRESQL_SHARE_DIR/extension/'   
+install -c -m 644 ./mathlib_swig--1.2.3.sql '$POSTGRESQL_SHARE_DIR/extension/'
+install -c -m 755 mathlib_swig.so '$POSTGRESQL_LIB_DIR/'                      
                                                                               
 ```                                                                           
                                                                               
@@ -2680,9 +3244,9 @@ install -c -m 755 example1_swig.so '$POSTGRESQL_LIB_DIR/'
 # Compile native library:                                                     
 cc++ -std=c++17 -Isrc -c -o target/native/polynomial.o src/polynomial.cc      
                                                                               
-# Compile and link native program:                                            
-cc++ -std=c++17 -Isrc -o target/native/polynomial src/polynomial-native.cc      \
-  target/native/polynomial.o -L/opt/homebrew/lib                              
+# Compile and link main program:                                              
+cc++ -std=c++17 -Isrc -o target/native/polynomial-native                        \
+  src/polynomial-native.cc target/native/polynomial.o -L/opt/homebrew/lib     
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -2700,9 +3264,9 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py       
-8512 target/python/polynomial_swig.cc                                         
+8502 target/python/polynomial_swig.cc                                         
 241 target/python/polynomial_swig.py                                          
-8753 total                                                                    
+8743 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_swig.cc.o         \
@@ -2730,11 +3294,11 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java       
-680 target/clojure/polynomial_swig.cc                                         
+726 target/clojure/polynomial_swig.cc                                         
 11 target/clojure/polynomial_swig.java                                        
 12 target/clojure/polynomial_swigConstants.java                               
 32 target/clojure/polynomial_swigJNI.java                                     
-735 total                                                                     
+781 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -2762,11 +3326,11 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_swig.cc                                          
-8577 target/ruby/polynomial_swig.cc                                           
+8622 target/ruby/polynomial_swig.cc                                           
                                                                               
 # Compile ruby bindings:                                                      
-cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-2.7.0                           \
-  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
   target/ruby/polynomial_swig.cc.o target/ruby/polynomial_swig.cc             
                                                                               
 # Link ruby dynamic library:                                                  
@@ -2791,7 +3355,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_swig.cc                                           
-3004 target/tcl/polynomial_swig.cc                                            
+3050 target/tcl/polynomial_swig.cc                                            
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -2818,7 +3382,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_swig.cc                                         
-2317 target/guile/polynomial_swig.cc                                          
+2346 target/guile/polynomial_swig.cc                                          
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -2835,6 +3399,167 @@ cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          
 ---
 
 
+## Workflow - rational.cc                                                     
+                                                                              
+### Compile Native Code                                                       
+                                                                              
+```                                                                           
+# Compile native library:                                                     
+cc++ -std=c++17 -Isrc -c -o target/native/rational.o src/rational.cc          
+                                                                              
+# Compile and link main program:                                              
+cc++ -std=c++17 -Isrc -o target/native/rational-native src/rational-native.cc   \
+  target/native/rational.o -L/opt/homebrew/lib                                
+```                                                                           
+                                                                              
+### Build python Bindings                                                     
+                                                                              
+```                                                                           
+# Generate python bindings:                                                   
+swig -c++ -python -addextern -I- -Isrc -outdir target/python/ -o                \
+  target/python/rational_swig.cc src/rational.i                               
+                                                                              
+# Source code statistics:                                                     
+wc -l include/rational.h src/rational.i                                       
+77 include/rational.h                                                         
+29 src/rational.i                                                             
+106 total                                                                     
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/python/rational_swig.cc target/python/rational_swig.py           
+4883 target/python/rational_swig.cc                                           
+118 target/python/rational_swig.py                                            
+5001 total                                                                    
+                                                                              
+# Compile python bindings:                                                    
+cc++ -std=c++17 -Isrc -dynamic -c -o target/python/rational_swig.cc.o           \
+  target/python/rational_swig.cc                                              
+                                                                              
+# Link python dynamic library:                                                
+cc++ -dynamiclib -o target/python/_rational_swig.so target/native/rational.o    \
+  target/python/rational_swig.cc.o -ldl -framework CoreFoundation             
+                                                                              
+```                                                                           
+                                                                              
+### Build clojure Bindings                                                    
+                                                                              
+```                                                                           
+# Generate clojure bindings:                                                  
+swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
+  target/clojure/rational_swig.cc src/rational.i                              
+                                                                              
+# Source code statistics:                                                     
+wc -l include/rational.h src/rational.i                                       
+77 include/rational.h                                                         
+29 src/rational.i                                                             
+106 total                                                                     
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/clojure/rational_swig.cc target/clojure/rational*.java           
+707 target/clojure/rational_swig.cc                                           
+11 target/clojure/rational_swig.java                                          
+35 target/clojure/rational_swigJNI.java                                       
+753 total                                                                     
+                                                                              
+# Compile clojure bindings:                                                   
+cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
+  -o target/clojure/rational_swig.cc.o target/clojure/rational_swig.cc        
+                                                                              
+# Link clojure dynamic library:                                               
+cc++ -dynamiclib -o target/clojure/librational_swig.jnilib                      \
+  target/native/rational.o target/clojure/rational_swig.cc.o                    \
+  -L/opt/homebrew/lib                                                         
+                                                                              
+```                                                                           
+                                                                              
+### Build ruby Bindings                                                       
+                                                                              
+```                                                                           
+# Generate ruby bindings:                                                     
+swig -c++ -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                    \
+  target/ruby/rational_swig.cc src/rational.i                                 
+include/rational.h:40: Warning 378: operator!= ignored                        
+                                                                              
+# Source code statistics:                                                     
+wc -l include/rational.h src/rational.i                                       
+77 include/rational.h                                                         
+29 src/rational.i                                                             
+106 total                                                                     
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/ruby/rational_swig.cc                                            
+3204 target/ruby/rational_swig.cc                                             
+                                                                              
+# Compile ruby bindings:                                                      
+cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
+  target/ruby/rational_swig.cc.o target/ruby/rational_swig.cc                 
+                                                                              
+# Link ruby dynamic library:                                                  
+cc++ -dynamiclib -o target/ruby/rational_swig.bundle target/native/rational.o   \
+  target/ruby/rational_swig.cc.o -L/opt/homebrew/lib                          
+                                                                              
+```                                                                           
+                                                                              
+### Build tcl Bindings                                                        
+                                                                              
+```                                                                           
+# Generate tcl bindings:                                                      
+swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
+  target/tcl/rational_swig.cc src/rational.i                                  
+include/rational.h:40: Warning 378: operator!= ignored                        
+                                                                              
+# Source code statistics:                                                     
+wc -l include/rational.h src/rational.i                                       
+77 include/rational.h                                                         
+29 src/rational.i                                                             
+106 total                                                                     
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/tcl/rational_swig.cc                                             
+2993 target/tcl/rational_swig.cc                                              
+                                                                              
+# Compile tcl bindings:                                                       
+cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o target/tcl/rational_swig.cc.o   \
+  target/tcl/rational_swig.cc                                                 
+                                                                              
+# Link tcl dynamic library:                                                   
+cc++ -dynamiclib -o target/tcl/rational_swig.so target/native/rational.o        \
+  target/tcl/rational_swig.cc.o -L/opt/homebrew/lib                           
+                                                                              
+```                                                                           
+                                                                              
+### Build guile Bindings                                                      
+                                                                              
+```                                                                           
+# Generate guile bindings:                                                    
+swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
+  target/guile/rational_swig.cc src/rational.i                                
+                                                                              
+# Source code statistics:                                                     
+wc -l include/rational.h src/rational.i                                       
+77 include/rational.h                                                         
+29 src/rational.i                                                             
+106 total                                                                     
+                                                                              
+# Generated code statistics:                                                  
+wc -l target/guile/rational_swig.cc                                           
+2494 target/guile/rational_swig.cc                                            
+                                                                              
+# Compile guile bindings:                                                     
+cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
+  target/guile/rational_swig.cc.o target/guile/rational_swig.cc               
+                                                                              
+# Link guile dynamic library:                                                 
+cc++ -dynamiclib -o target/guile/librational_swig.so target/native/rational.o   \
+  target/guile/rational_swig.cc.o -L$GUILE_HOME/lib -lguile-3.0 -lgc -lpthread
+                                                                              
+```                                                                           
+                                                                              
+
+---
+
+
 ## Workflow - polynomial_v2.cc                                                
                                                                               
 ### Compile Native Code                                                       
@@ -2843,8 +3568,8 @@ cc++ -dynamiclib -o target/guile/libpolynomial_swig.so                          
 # Compile native library:                                                     
 cc++ -std=c++17 -Isrc -c -o target/native/polynomial_v2.o src/polynomial_v2.cc
                                                                               
-# Compile and link native program:                                            
-cc++ -std=c++17 -Isrc -o target/native/polynomial_v2                            \
+# Compile and link main program:                                              
+cc++ -std=c++17 -Isrc -o target/native/polynomial_v2-native                     \
   src/polynomial_v2-native.cc target/native/polynomial_v2.o                     \
   -L/opt/homebrew/lib                                                         
 ```                                                                           
@@ -2859,14 +3584,14 @@ swig -c++ -python -addextern -I- -Isrc -outdir target/python/ -o                
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-32 src/polynomial_v2.i                                                        
-45 total                                                                      
+31 src/polynomial_v2.i                                                        
+44 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-15618 target/python/polynomial_v2_swig.cc                                     
-631 target/python/polynomial_v2_swig.py                                       
-16249 total                                                                   
+15963 target/python/polynomial_v2_swig.cc                                     
+655 target/python/polynomial_v2_swig.py                                       
+16618 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
@@ -2885,26 +3610,20 @@ cc++ -dynamiclib -o target/python/_polynomial_v2_swig.so                        
 # Generate clojure bindings:                                                  
 swig -c++ -java -addextern -I- -Isrc -outdir target/clojure/ -o                 \
   target/clojure/polynomial_v2_swig.cc src/polynomial_v2.i                    
-include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
-  a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-32 src/polynomial_v2.i                                                        
-45 total                                                                      
+31 src/polynomial_v2.i                                                        
+44 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1675 target/clojure/polynomial_v2_swig.cc                                     
+1991 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
-85 target/clojure/polynomial_v2_swigJNI.java                                  
-1783 total                                                                    
+96 target/clojure/polynomial_v2_swigJNI.java                                  
+2110 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -2924,20 +3643,21 @@ cc++ -dynamiclib -o target/clojure/libpolynomial_v2_swig.jnilib                 
 # Generate ruby bindings:                                                     
 swig -c++ -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                    \
   target/ruby/polynomial_v2_swig.cc src/polynomial_v2.i                       
+include/rational.h:40: Warning 378: operator!= ignored                        
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-32 src/polynomial_v2.i                                                        
-45 total                                                                      
+31 src/polynomial_v2.i                                                        
+44 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-17281 target/ruby/polynomial_v2_swig.cc                                       
+17654 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
-cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-2.7.0                           \
-  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
   target/ruby/polynomial_v2_swig.cc.o target/ruby/polynomial_v2_swig.cc       
                                                                               
 # Link ruby dynamic library:                                                  
@@ -2953,18 +3673,17 @@ cc++ -dynamiclib -o target/ruby/polynomial_v2_swig.bundle                       
 # Generate tcl bindings:                                                      
 swig -c++ -tcl -addextern -I- -Isrc -outdir target/tcl/ -o                      \
   target/tcl/polynomial_v2_swig.cc src/polynomial_v2.i                        
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
-  a valid identifier.                                                         
+include/rational.h:40: Warning 378: operator!= ignored                        
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-32 src/polynomial_v2.i                                                        
-45 total                                                                      
+31 src/polynomial_v2.i                                                        
+44 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-4726 target/tcl/polynomial_v2_swig.cc                                         
+5070 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -2983,22 +3702,16 @@ cc++ -dynamiclib -o target/tcl/polynomial_v2_swig.so                            
 # Generate guile bindings:                                                    
 swig -c++ -guile -addextern -I- -Isrc -outdir target/guile/ -o                  \
   target/guile/polynomial_v2_swig.cc src/polynomial_v2.i                      
-include/rational.h:25: Warning 503: Can't wrap 'operator +' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:28: Warning 503: Can't wrap 'operator *' unless renamed to   \
-  a valid identifier.                                                         
-include/rational.h:31: Warning 503: Can't wrap 'operator ==' unless renamed to  \
-  a valid identifier.                                                         
                                                                               
 # Source code statistics:                                                     
 wc -l src/polynomial_v2.h src/polynomial_v2.i                                 
 13 src/polynomial_v2.h                                                        
-32 src/polynomial_v2.i                                                        
-45 total                                                                      
+31 src/polynomial_v2.i                                                        
+44 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-4044 target/guile/polynomial_v2_swig.cc                                       
+4489 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3023,9 +3736,9 @@ cc++ -dynamiclib -o target/guile/libpolynomial_v2_swig.so                       
 # Compile native library:                                                     
 cc -Isrc -c -o target/native/tommath.o src/tommath.c                          
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/tommath src/tommath-native.c target/native/tommath.o  \
-  -ltommath                                                                   
+# Compile and link main program:                                              
+cc -Isrc -o target/native/tommath-native src/tommath-native.c                   \
+  target/native/tommath.o -ltommath                                           
 ```                                                                           
                                                                               
 ### Build python Bindings                                                     
@@ -3038,14 +3751,14 @@ swig -python -addextern -I- -Isrc -outdir target/python/ -o                     
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/tommath_swig.c target/python/tommath_swig.py              
-9365 target/python/tommath_swig.c                                             
+9524 target/python/tommath_swig.c                                             
 478 target/python/tommath_swig.py                                             
-9843 total                                                                    
+10002 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/tommath_swig.c.o                          \
@@ -3067,16 +3780,16 @@ swig -java -addextern -I- -Isrc -outdir target/clojure/ -o                      
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/tommath_swig.c target/clojure/tommath*.java              
-3134 target/clojure/tommath_swig.c                                            
+3164 target/clojure/tommath_swig.c                                            
 545 target/clojure/tommath_swig.java                                          
 15 target/clojure/tommath_swigConstants.java                                  
 178 target/clojure/tommath_swigJNI.java                                       
-3872 total                                                                    
+3902 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -3098,16 +3811,16 @@ swig -ruby -addextern -I- -Isrc -outdir target/ruby/ -o                         
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/tommath_swig.c                                              
-7892 target/ruby/tommath_swig.c                                               
+7937 target/ruby/tommath_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
-cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
   target/ruby/tommath_swig.c.o target/ruby/tommath_swig.c                     
                                                                               
 # Link ruby dynamic library:                                                  
@@ -3126,12 +3839,12 @@ swig -guile -addextern -I- -Isrc -outdir target/guile/ -o                       
 # Source code statistics:                                                     
 wc -l src/tommath.h src/tommath.i                                             
 52 src/tommath.h                                                              
-16 src/tommath.i                                                              
-68 total                                                                      
+10 src/tommath.i                                                              
+62 total                                                                      
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/tommath_swig.c                                             
-6423 target/guile/tommath_swig.c                                              
+6452 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -3156,8 +3869,8 @@ cc -dynamiclib -o target/guile/libtommath_swig.so target/native/tommath.o       
 # Compile native library:                                                     
 cc -Isrc -c -o target/native/black_scholes.o src/black_scholes.c              
                                                                               
-# Compile and link native program:                                            
-cc -Isrc -o target/native/black_scholes src/black_scholes-native.c              \
+# Compile and link main program:                                              
+cc -Isrc -o target/native/black_scholes-native src/black_scholes-native.c       \
   target/native/black_scholes.o -L/opt/homebrew/lib                           
 ```                                                                           
                                                                               
@@ -3176,9 +3889,9 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/black_scholes_swig.c target/python/black_scholes_swig.py  
-3697 target/python/black_scholes_swig.c                                       
+3867 target/python/black_scholes_swig.c                                       
 70 target/python/black_scholes_swig.py                                        
-3767 total                                                                    
+3937 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/black_scholes_swig.c.o                    \
@@ -3206,10 +3919,10 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/black_scholes_swig.c target/clojure/black_scholes*.java  
-263 target/clojure/black_scholes_swig.c                                       
+293 target/clojure/black_scholes_swig.c                                       
 23 target/clojure/black_scholes_swig.java                                     
 14 target/clojure/black_scholes_swigJNI.java                                  
-300 total                                                                     
+330 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -3237,11 +3950,11 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/black_scholes_swig.c                                        
-2326 target/ruby/black_scholes_swig.c                                         
+2367 target/ruby/black_scholes_swig.c                                         
                                                                               
 # Compile ruby bindings:                                                      
-cc -Isrc -I$RUBY_HOME/include/ruby-2.7.0                                        \
-  -I$RUBY_HOME/include/ruby-2.7.0/$RUBY_ARCH -c -o                              \
+cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
+  -I$RUBY_HOME/include/ruby-3.1.0/$RUBY_ARCH -c -o                              \
   target/ruby/black_scholes_swig.c.o target/ruby/black_scholes_swig.c         
                                                                               
 # Link ruby dynamic library:                                                  
@@ -3266,7 +3979,7 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/black_scholes_swig.c                                         
-2229 target/tcl/black_scholes_swig.c                                          
+2275 target/tcl/black_scholes_swig.c                                          
                                                                               
 # Compile tcl bindings:                                                       
 cc -Isrc -I$TCL_HOME/include -c -o target/tcl/black_scholes_swig.c.o            \
@@ -3294,7 +4007,7 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/black_scholes_swig.c                                       
-1676 target/guile/black_scholes_swig.c                                        
+1705 target/guile/black_scholes_swig.c                                        
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -3326,11 +4039,11 @@ wc -l target/postgresql/black_scholes_swig.c                                    
   target/postgresql/black_scholes_swig-*.sql                                    \
   target/postgresql/black_scholes_swig.control                                  \
   target/postgresql/black_scholes_swig.make                                   
-1552 target/postgresql/black_scholes_swig.c                                   
+1582 target/postgresql/black_scholes_swig.c                                   
 33 target/postgresql/black_scholes_swig--1.2.3.sql                            
 8 target/postgresql/black_scholes_swig.control                                
 13 target/postgresql/black_scholes_swig.make                                  
-1606 total                                                                    
+1636 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
 cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/black_scholes_swig.c.o   \
@@ -3340,6 +4053,7 @@ cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/black_scholes_swig.c.o   
 cc -dynamiclib -o target/postgresql/black_scholes_swig.so                       \
   target/native/black_scholes.o target/postgresql/black_scholes_swig.c.o        \
   -L/opt/homebrew/lib                                                         
+                                                                              
                                                                               
 # Compile and install postgresql extension:                                   
 $POSTGRESQL_LIB_DIR/pgxs/src/makefiles/../../config/install-sh -c -d            \
@@ -3412,6 +4126,14 @@ Guile 3.0 is required.  `bin/build guile` will build and install into `./local/`
 ```Shell
 rbenv shell 2.7.6
 bin/build clean demo
+```
+
+### PostgreSQL
+
+Create a private database:
+
+```
+$ createdb $USER
 ```
 
 # Development

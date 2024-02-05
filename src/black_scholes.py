@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.10
+
 import sys ; sys.path.append('target/python')
 import black_scholes_swig as bs
 

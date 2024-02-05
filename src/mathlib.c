@@ -1,4 +1,4 @@
-#include "example1.h"
+#include "mathlib.h"
 double cubic_poly(double x,
                   double c0,
                   double c1,

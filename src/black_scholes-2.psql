@@ -73,7 +73,7 @@ WITH hd_rand AS (
   , standard_deviation -- random_offset(standard_deviation, 0.25) AS standard_deviation
   , risk_free_rate -- random_offset(risk_free_rate, 0.25) AS risk_free_rate
   , trunc(random_offset(days_to_expiry, 0.25)) days_to_expiry
-  FROM bs_data as bsd, (SELECT generate_series(1, 100) as h_id) gs
+  FROM bs_data as bsd, (SELECT generate_series(1, 1000) as h_id) gs
 ),
 hd_rand_eval AS (
 SELECT *
