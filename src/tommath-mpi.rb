@@ -2,9 +2,7 @@
 
 require 'tommath_swig'
 
-#########################################################
-# Sugar:
-
+# Syntactic Sugar:
 module Tommath_swig
   class Mp_int
     # Constructor:
@@ -24,11 +22,11 @@ module Tommath_swig
         raise TypeError, "#{val.inspect} #{radix.inspect}"
       end
     end
-    
+
     def to_s radix = 10
       Tommath_swig.swig_mp_int_to_charP(self, radix)
     end
-    
+
     def inspect
       "MPI[#{to_s.inspect}]"
     end

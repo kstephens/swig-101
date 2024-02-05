@@ -435,6 +435,48 @@ postgresql-make-extension() {
 
 ############################
 
+LOCAL_DIR="$(PWD)/local"
+SWIG_SRC="$LOCAL_DIR/src/swig"
+
+-cmd-swig-build() {
+  (
+    set -xe
+    SWIG_GIT_URL=https://github.com/kstephens/swig.git
+    SWIG_GIT_REF=postgresql-merge-84a2c45d66
+    PCRE2_VERSION=pcre2-10.42
+
+    PCRE2_DOWNLOAD_BASE=https://github.com/PCRE2Project/pcre2/releases/download
+    PCRE2_DOWNLOAD_URL="$PCRE2_DOWNLOAD_BASE/$PCRE2_VERSION/$PCRE2_VERSION.tar.gz"
+    export PATH="$(ls -d /opt/homebrew/Cellar/bison/*/bin):/opt/homebrew/bin:$PATH"
+    export BISON="$(which bison | head -1)"
+
+    mkdir -p local/src/swig
+    cd local/src/swig
+    [[ -d .git ]] || git clone ${SWIG_GIT_URL} .
+    git fetch
+    git checkout ${SWIG_GIT_REF}
+    rm -f configure Makefile swig
+
+    rm -rf pcre2-*
+    curl -L -O "$PCRE2_DOWNLOAD_URL"
+    ./Tools/pcre-build.sh
+
+    ./autogen.sh
+    ./configure --prefix="${LOCAL_DIR}"
+
+    make -j
+
+    make install
+  )
+  return $?
+}
+
+-cmd-swig-clean() {
+  rm -f $LOCAL_DIR/bin/swig $SWIG_SRC/swig $SWIG_SRC/Makefile $SWIG_SRC/configure
+}
+
+############################
+
 -cmd-clean() {
   rm -f ~/.cache/guile/**/swig-101/**/*-guile.go
   rm -rf target/*

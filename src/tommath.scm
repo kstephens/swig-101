@@ -3,7 +3,7 @@
 
 (load-extension "target/guile/libtommath_swig.so" "SWIG_init")
 
-(write `(MP-ITER ,(MP-ITER))) (newline)
+(display `(MP-ITER = ,(MP-ITER))) (newline)
 
 (define a (new-mp-int))
 (mp-set a 2357111317)                   ;; <-- awkward!

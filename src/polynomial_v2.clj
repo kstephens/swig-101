@@ -3,7 +3,8 @@
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")
 (import 'polynomial_v2_swig)
 
-(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})
+(println (format "POLYNOMIAL_VERSION = %s"
+                 (polynomial_v2_swig/POLYNOMIAL_VERSION)))
 
 ;; polynomial<double>:
 (def p1 (PolynomialDoubleV2.))

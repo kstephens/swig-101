@@ -2,7 +2,7 @@
 
 from polynomial_swig import *
 
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')
 
 poly = Polynomial()
 

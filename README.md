@@ -252,8 +252,8 @@ MATHLIB_VERSION = 1.2.3
 (import 'mathlib_swig)                                                         ;;  3 
                                                                               
 ;; Use SWIG bindings:                                                         
-(println (format "MATHLIB_VERSION = \"%s\""                                    ;;  6 
-               	 (mathlib_swig/MATHLIB_VERSION)))                              ;;  7 
+(println (format "MATHLIB_VERSION = %s"                                        ;;  6 
+                 (mathlib_swig/MATHLIB_VERSION)))                              ;;  7 
 (prn (mathlib_swig/cubic_poly 2.0 3.0 5.0 7.0 11.0))                           ;;  8 
 ```
 
@@ -262,7 +262,7 @@ MATHLIB_VERSION = 1.2.3
 
 ```
 $ src/mathlib.clj
-MATHLIB_VERSION = "1.2.3"
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -304,8 +304,8 @@ MATHLIB_VERSION = "1.2.3"
 (load-extension "target/guile/libmathlib_swig.so" "SWIG_init")                 ;;  2 
                                                                               
 ;; Use SWIG bindings:                                                         
-(write `(MATHLIB-VERSION = ,(MATHLIB-VERSION)))                                ;;  5 
-(newline)                                                                      ;;  6 
+(display `(MATHLIB-VERSION = ,(MATHLIB-VERSION))) (newline)                    ;;  5 
+                                                                              
 (write (cubic-poly 2.0 3.0 5.0 7.0 11.0))                                      ;;  7 
 (newline)                                                                      ;;  8 
 ```
@@ -315,7 +315,7 @@ MATHLIB_VERSION = "1.2.3"
 
 ```
 $ src/mathlib.scm
-(MATHLIB-VERSION = "1.2.3")
+(MATHLIB-VERSION = 1.2.3)
 129.0
 ```
 
@@ -502,7 +502,7 @@ MATHLIB_VERSION = 1.2.3
 
 ```
 $ src/mathlib.clj
-MATHLIB_VERSION = "1.2.3"
+MATHLIB_VERSION = 1.2.3
 129.0
 ```
 
@@ -520,7 +520,7 @@ MATHLIB_VERSION = "1.2.3"
 
 ```
 $ src/mathlib.scm
-(MATHLIB-VERSION = "1.2.3")
+(MATHLIB-VERSION = 1.2.3)
 129.0
 ```
 
@@ -720,7 +720,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 ```python
 from polynomial_swig import *                                                  #   1 
                                                                               
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                              #   3 
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')                            #   3 
                                                                               
 poly = Polynomial()                                                            #   5 
                                                                               
@@ -738,7 +738,7 @@ print(poly.evaluate(1.2))                                                      #
 
 ```
 $ src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
+POLYNOMIAL_VERSION = 1.2.1
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
@@ -788,18 +788,19 @@ $ src/polynomial-test.py
 (clojure.lang.RT/loadLibrary "polynomial_swig")                                ;;  1 
 (import 'polynomial_swig)                                                      ;;  2 
                                                                               
-(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})               ;;  4 
+(println (format "POLYNOMIAL_VERSION = %s"                                     ;;  4 
+                 (polynomial_swig/POLYNOMIAL_VERSION)))                        ;;  5 
                                                                               
-(def p (Polynomial.))                                                          ;;  6 
+(def p (Polynomial.))                                                          ;;  7 
                                                                               
 ;; Note: does not coerce java.lang.Long 3 to 3.0                              
-(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))                            ;;  9 
-(prn (.getCoeffs p))                                                           ;; 10 
-(prn (.evaluate p 2))                                                          ;; 11 
+(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))                            ;; 10 
+(prn (.getCoeffs p))                                                           ;; 11 
+(prn (.evaluate p 2))                                                          ;; 12 
                                                                               
-(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 13 
-(prn (.getCoeffs p))                                                           ;; 14 
-(prn (.evaluate p 1.2))                                                        ;; 15 
+(.setCoeffs p (VectorDouble. [ 2.3 3.5 5.7 7.11 11.13 -13.17 ]))               ;; 14 
+(prn (.getCoeffs p))                                                           ;; 15 
+(prn (.evaluate p 1.2))                                                        ;; 16 
 ```
 
 
@@ -807,7 +808,7 @@ $ src/polynomial-test.py
 
 ```
 $ src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
+POLYNOMIAL_VERSION = 1.2.1
 [3.0 5.0 7.0 11.0]
 129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
@@ -856,7 +857,7 @@ $ src/polynomial.rb
 ```scheme
 (load-extension "target/guile/libpolynomial_swig.so" "SWIG_init")              ;;  1 
                                                                               
-(write `(POLYNOMIAL-VERSION ,(POLYNOMIAL-VERSION))) (newline)                  ;;  3 
+(display `(POLYNOMIAL-VERSION = ,(POLYNOMIAL-VERSION))) (newline)              ;;  3 
                                                                               
 (define p (new-Polynomial))                                                    ;;  5 
                                                                               
@@ -874,7 +875,7 @@ $ src/polynomial.rb
 
 ```
 $ src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
+(POLYNOMIAL-VERSION = 1.2.1)
 #<swig-pointer std::vector< double > * 010000001>
 129.0
 #<swig-pointer std::vector< double > * 010000001>
@@ -982,7 +983,7 @@ POLYNOMIAL_VERSION = "1.2.1"
 
 ```
 $ src/polynomial.py
-{'POLYNOMIAL_VERSION': '1.2.1'}
+POLYNOMIAL_VERSION = 1.2.1
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2.3, 3.5, 5.7, 7.11, 11.13, -13.17]
@@ -1001,7 +1002,7 @@ $ src/polynomial-test.py
 
 ```
 $ src/polynomial.clj
-{:POLYNOMIAL_VERSION "1.2.1"}
+POLYNOMIAL_VERSION = 1.2.1
 [3.0 5.0 7.0 11.0]
 129.0
 [2.3 3.5 5.7 7.11 11.13 -13.17]
@@ -1025,7 +1026,7 @@ $ src/polynomial.rb
 
 ```
 $ src/polynomial.scm
-(POLYNOMIAL-VERSION "1.2.1")
+(POLYNOMIAL-VERSION = 1.2.1)
 #<swig-pointer std::vector< double > * 010000001>
 129.0
 #<swig-pointer std::vector< double > * 010000001>
@@ -1373,7 +1374,7 @@ POLYNOMIAL_VERSION = 2.0.2
 ```python
 from polynomial_v2_swig import *                                                                  #   1 
                                                                                                  
-print({"POLYNOMIAL_VERSION": POLYNOMIAL_VERSION})                                                 #   3 
+print(f'POLYNOMIAL_VERSION = {POLYNOMIAL_VERSION}')                                               #   3 
                                                                                                  
 # polynomial<double>:                                                                            
 poly         = PolynomialDoubleV2()                                                               #   6 
@@ -1399,7 +1400,7 @@ print(poly.evaluate(complex(-5.7, 7.11)))                                       
 
 ```
 $ src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
@@ -1417,25 +1418,26 @@ $ src/polynomial_v2.py
 (clojure.lang.RT/loadLibrary "polynomial_v2_swig")                                                    ;;  1 
 (import 'polynomial_v2_swig)                                                                          ;;  2 
                                                                                                      
-(prn {:POLYNOMIAL_VERSION (polynomial_v2_swig/POLYNOMIAL_VERSION)})                                   ;;  4 
+(println (format "POLYNOMIAL_VERSION = %s"                                                            ;;  4 
+                 (polynomial_v2_swig/POLYNOMIAL_VERSION)))                                            ;;  5 
                                                                                                      
 ;; polynomial<double>:                                                                               
-(def p1 (PolynomialDoubleV2.))                                                                        ;;  7 
-(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))                                                ;;  8 
-(prn (.getCoeffs p1))                                                                                 ;;  9 
-(prn (.evaluate p1 2))                                                                                ;; 10 
+(def p1 (PolynomialDoubleV2.))                                                                        ;;  8 
+(.setCoeffs p1 (VectorDoubleV2. [ 3.0 5.0 7.0 11.0 ]))                                                ;;  9 
+(prn (.getCoeffs p1))                                                                                 ;; 10 
+(prn (.evaluate p1 2))                                                                                ;; 11 
                                                                                                      
 ;; polynomial<int> object:                                                                           
-(def p2 (PolynomialIntV2.))                                                                           ;; 13 
-(.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                             ;; 14 
-(prn (.getCoeffs p2))                                                                                 ;; 15 
-(prn (.evaluate p2 -2))                                                                               ;; 16 
+(def p2 (PolynomialIntV2.))                                                                           ;; 14 
+(.setCoeffs p2 (VectorIntV2. (map int [2 3 5 7 11 -13])))                                             ;; 15 
+(prn (.getCoeffs p2))                                                                                 ;; 16 
+(prn (.evaluate p2 -2))                                                                               ;; 17 
                                                                                                      
 ;; polynomial<rational<int>>:                                                                        
-(def p3 (PolynomialRationalV2.))                                                                      ;; 19 
-(.setCoeffs p3 (VectorRationalV2. [ (RationalInt. 7 11) (RationalInt. 11 13) (RationalInt. 13 17) ])) ;; 20 
-(prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                            ;; 21 
-(prn (.__str__ (.evaluate p3 (RationalInt. -5, 7))))                                                  ;; 22 
+(def p3 (PolynomialRationalV2.))                                                                      ;; 20 
+(.setCoeffs p3 (VectorRationalV2. [ (RationalInt. 7 11) (RationalInt. 11 13) (RationalInt. 13 17) ])) ;; 21 
+(prn (mapv #(.__str__ %) (.getCoeffs p3)))                                                            ;; 22 
+(prn (.__str__ (.evaluate p3 (RationalInt. -5, 7))))                                                  ;; 23 
 ```
 
 
@@ -1443,7 +1445,7 @@ $ src/polynomial_v2.py
 
 ```
 $ src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0 5.0 7.0 11.0]
 129.0
 [2 3 5 7 11 -13]
@@ -1461,7 +1463,7 @@ $ src/polynomial_v2.clj
 require 'polynomial_v2_swig'                                                                                                        #   1 
 PV2 = Polynomial_v2_swig                                                                                                            #   2 
                                                                                                                                    
-pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION                                                                                      #   4 
+puts "POLYNOMIAL_VERSION = #{PV2::POLYNOMIAL_VERSION}"                                                                              #   4 
                                                                                                                                    
 # polynomial<double>:                                                                                                              
 poly        = PV2::PolynomialDoubleV2.new                                                                                           #   7 
@@ -1493,7 +1495,7 @@ pp poly.evaluate(-5.7+7.11i)                                                    
 
 ```
 $ src/polynomial_v2.rb
-{:POLYNOMIAL_VERSION=>"2.0.2"}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2, 3, 5, 7, 11, -13]
@@ -1577,7 +1579,7 @@ POLYNOMIAL_VERSION = 2.0.2
 
 ```
 $ src/polynomial_v2.py
-{'POLYNOMIAL_VERSION': '2.0.2'}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [rational<int>(7,11), rational<int>(11,13), rational<int>(13,17)]
@@ -1591,7 +1593,7 @@ $ src/polynomial_v2.py
 
 ```
 $ src/polynomial_v2.clj
-{:POLYNOMIAL_VERSION "2.0.2"}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0 5.0 7.0 11.0]
 129.0
 [2 3 5 7 11 -13]
@@ -1605,7 +1607,7 @@ $ src/polynomial_v2.clj
 
 ```
 $ src/polynomial_v2.rb
-{:POLYNOMIAL_VERSION=>"2.0.2"}
+POLYNOMIAL_VERSION = 2.0.2
 [3.0, 5.0, 7.0, 11.0]
 129.0
 [2, 3, 5, 7, 11, -13]
@@ -1813,7 +1815,7 @@ e = 305411158
 ```python
 from tommath_swig import *                                                     #   1 
                                                                               
-print({"MP_ITER": MP_ITER})                                                    #   3 
+print(f'MP_ITER = {MP_ITER}')                                                  #   3 
                                                                               
 a = mp_int(); mp_set(a, 2357111317)    # <-- awkward!                          #   5 
 b = mp_int(1113171923)                 # <-- better!                           #   6 
@@ -1834,7 +1836,7 @@ print({"a": a, "b": b, "c": c, "d": d, "e": e})                                #
 
 ```
 $ src/tommath.py
-{'MP_ITER': -4}
+MP_ITER = -4
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
 ```
@@ -1848,21 +1850,26 @@ $ src/tommath.py
 ```ruby
 require 'tommath_swig'                                                         #   1 
 include Tommath_swig                                                           #   2 
+require 'show'                                                                 #   3 
                                                                               
-puts "MP_ITER = #{MP_ITER}"                                                    #   4 
+puts "MP_ITER = #{MP_ITER}"                                                    #   5 
                                                                               
-a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   6 
-b = Mp_int.new(1113171923)                 # <-- better!                       #   7 
-c = Mp_int.new()                                                               #   8 
-d = Mp_int.new()                                                               #   9 
-e = Mp_int.new("12343456", 16)             # <-- yey!                          #  10 
+a = Mp_int.new(); mp_set(a, 2357111317)    # <-- awkward!                      #   7 
+b = Mp_int.new(1113171923)                 # <-- better!                       #   8 
+c = Mp_int.new()                                                               #   9 
+d = Mp_int.new()                                                               #  10 
+e = Mp_int.new("12343456", 16)             # <-- yey!                          #  11 
                                                                               
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  12 
+def show!                                                                      #  13 
+  show_exprs "a", "b","c", "d", "e"                                            #  14 
+end                                                                            #  15 
                                                                               
-mp_mul(a, b, c);                                                               #  14 
-mp_mul(c, b, d);                                                               #  15 
+show!                                                                          #  17 
                                                                               
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #  17 
+mp_mul(a, b, c);                                                               #  19 
+mp_mul(c, b, d);                                                               #  20 
+                                                                              
+show!                                                                          #  22 
 ```
 
 
@@ -1871,8 +1878,16 @@ puts({"a": a, "b": b, "c": c, "d": d, "e": e})                                 #
 ```
 $ src/tommath-1.rb
 MP_ITER = -4
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1881,19 +1896,24 @@ MP_ITER = -4
 
 ```ruby
 require 'tommath-mpi'                                                          #   1 
+require 'show'                                                                 #   2 
                                                                               
-a = MPI[2357111317]                                                            #   3 
-b = MPI[1113171923]                                                            #   4 
-c = MPI[]                                                                      #   5 
-d = MPI[]                                                                      #   6 
-e = MPI["12343456", 16]                                                        #   7 
+a = MPI[2357111317]                                                            #   4 
+b = MPI[1113171923]                                                            #   5 
+c = MPI[]                                                                      #   6 
+d = MPI[]                                                                      #   7 
+e = MPI["12343456", 16]                                                        #   8 
                                                                               
-puts({a: a, b: b, c: c, d: d, e: e})                                           #   9 
+def show!                                                                      #  10 
+  show_exprs "a", "b","c", "d", "e"                                            #  11 
+end                                                                            #  12 
                                                                               
-c = a * b                                                                      #  11 
-d = c * b                                                                      #  12 
+show!                                                                          #  14 
                                                                               
-puts({a: a, b: b, c: c, d: d, e: e})                                           #  14 
+c = a * b                                                                      #  16 
+d = c * b                                                                      #  17 
+                                                                              
+show!                                                                          #  19 
 ```
 
 
@@ -1901,8 +1921,16 @@ puts({a: a, b: b, c: c, d: d, e: e})                                           #
 
 ```
 $ src/tommath-2.rb
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -1912,67 +1940,65 @@ $ src/tommath-2.rb
 ```ruby
 require 'tommath_swig'                                                         #   1 
                                                                               
-#########################################################                     
-# Sugar:                                                                      
-                                                                              
-module Tommath_swig                                                            #   6 
-  class Mp_int                                                                 #   7 
+# Syntactic Sugar:                                                            
+module Tommath_swig                                                            #   4 
+  class Mp_int                                                                 #   5 
     # Constructor:                                                            
-    def self.[] val = 0, radix = 10                                            #   9 
-      case val                                                                 #  10 
-      when self                                                                #  11 
-        val                                                                    #  12 
-      when Integer                                                             #  13 
-        inst = new                                                             #  14 
-        Tommath_swig.mp_set(inst, val)                                         #  15 
-        inst                                                                   #  16 
-      when String                                                              #  17 
-        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  18 
-      when nil                                                                 #  19 
-        self[0]                                                                #  20 
-      else                                                                     #  21 
-        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  22 
-      end                                                                      #  23 
-    end                                                                        #  24 
+    def self.[] val = 0, radix = 10                                            #   7 
+      case val                                                                 #   8 
+      when self                                                                #   9 
+        val                                                                    #  10 
+      when Integer                                                             #  11 
+        inst = new                                                             #  12 
+        Tommath_swig.mp_set(inst, val)                                         #  13 
+        inst                                                                   #  14 
+      when String                                                              #  15 
+        Tommath_swig.swig_charP_to_mp_int(val, radix)                          #  16 
+      when nil                                                                 #  17 
+        self[0]                                                                #  18 
+      else                                                                     #  19 
+        raise TypeError, "#{val.inspect} #{radix.inspect}"                     #  20 
+      end                                                                      #  21 
+    end                                                                        #  22 
                                                                               
-    def to_s radix = 10                                                        #  26 
-      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  27 
-    end                                                                        #  28 
+    def to_s radix = 10                                                        #  24 
+      Tommath_swig.swig_mp_int_to_charP(self, radix)                           #  25 
+    end                                                                        #  26 
                                                                               
-    def inspect                                                                #  30 
-      "MPI[#{to_s.inspect}]"                                                   #  31 
-    end                                                                        #  32 
+    def inspect                                                                #  28 
+      "MPI[#{to_s.inspect}]"                                                   #  29 
+    end                                                                        #  30 
                                                                               
-    def -@                                                                     #  34 
-      result = MPI.new                                                         #  35 
-      Tommath_swig.mp_neg(self, result)                                        #  36 
-      result                                                                   #  37 
-    end                                                                        #  38 
-    def + other                                                                #  39 
-      result = MPI.new                                                         #  40 
-      Tommath_swig.mp_add(self, MPI[other], result)                            #  41 
-      result                                                                   #  42 
-    end                                                                        #  43 
-    def - other                                                                #  44 
-      result = MPI.new                                                         #  45 
-      Tommath_swig.mp_sub(self, MPI[other], result)                            #  46 
-      result                                                                   #  47 
-    end                                                                        #  48 
-    def * other                                                                #  49 
-      result = MPI.new                                                         #  50 
-      Tommath_swig.mp_mul(self, MPI[other], result)                            #  51 
-      result                                                                   #  52 
-    end                                                                        #  53 
-    def / other                                                                #  54 
-      result = MPI.new                                                         #  55 
-      remainder = MPI.new                                                      #  56 
-      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  57 
-      result                                                                   #  58 
-    end                                                                        #  59 
-  end                                                                          #  60 
-  MPI = Mp_int                                                                 #  61 
-end                                                                            #  62 
-MPI = Tommath_swig::MPI                                                        #  63 
+    def -@                                                                     #  32 
+      result = MPI.new                                                         #  33 
+      Tommath_swig.mp_neg(self, result)                                        #  34 
+      result                                                                   #  35 
+    end                                                                        #  36 
+    def + other                                                                #  37 
+      result = MPI.new                                                         #  38 
+      Tommath_swig.mp_add(self, MPI[other], result)                            #  39 
+      result                                                                   #  40 
+    end                                                                        #  41 
+    def - other                                                                #  42 
+      result = MPI.new                                                         #  43 
+      Tommath_swig.mp_sub(self, MPI[other], result)                            #  44 
+      result                                                                   #  45 
+    end                                                                        #  46 
+    def * other                                                                #  47 
+      result = MPI.new                                                         #  48 
+      Tommath_swig.mp_mul(self, MPI[other], result)                            #  49 
+      result                                                                   #  50 
+    end                                                                        #  51 
+    def / other                                                                #  52 
+      result = MPI.new                                                         #  53 
+      remainder = MPI.new                                                      #  54 
+      Tommath_swig.mp_div(self, MPI[other], result, remainder)                 #  55 
+      result                                                                   #  56 
+    end                                                                        #  57 
+  end                                                                          #  58 
+  MPI = Mp_int                                                                 #  59 
+end                                                                            #  60 
+MPI = Tommath_swig::MPI                                                        #  61 
 ```
 
 
@@ -1982,7 +2008,7 @@ MPI = Tommath_swig::MPI                                                        #
 ```scheme
 (load-extension "target/guile/libtommath_swig.so" "SWIG_init")                 ;;  1 
                                                                               
-(write `(MP-ITER ,(MP-ITER))) (newline)                                        ;;  3 
+(display `(MP-ITER = ,(MP-ITER))) (newline)                                    ;;  3 
                                                                               
 (define a (new-mp-int))                                                        ;;  5 
 (mp-set a 2357111317)                   ;; <-- awkward!                        ;;  6 
@@ -2011,7 +2037,7 @@ MPI = Tommath_swig::MPI                                                        #
 
 ```
 $ src/tommath.scm
-(MP-ITER -4)
+(MP-ITER = -4)
 
 a = 2357111317
 b = 1113171923
@@ -2054,7 +2080,7 @@ e = 305411158
 
 ```
 $ src/tommath.py
-{'MP_ITER': -4}
+MP_ITER = -4
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("0"), 'd': mp_int("0"), 'e': mp_int("305411158")}
 {'a': mp_int("2357111317"), 'b': mp_int("1113171923"), 'c': mp_int("2623870137469952591"), 'd': mp_int("2920818566629701480442302493"), 'e': mp_int("305411158")}
 ```
@@ -2066,16 +2092,32 @@ $ src/tommath.py
 ```
 $ src/tommath-1.rb
 MP_ITER = -4
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("0"), :d=>mp_int("0"), :e=>mp_int("305411158")}
-{:a=>mp_int("2357111317"), :b=>mp_int("1113171923"), :c=>mp_int("2623870137469952591"), :d=>mp_int("2920818566629701480442302493"), :e=>mp_int("305411158")}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
 
 ```
 $ src/tommath-2.rb
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["0"], :d=>MPI["0"], :e=>MPI["305411158"]}
-{:a=>MPI["2357111317"], :b=>MPI["1113171923"], :c=>MPI["2623870137469952591"], :d=>MPI["2920818566629701480442302493"], :e=>MPI["305411158"]}
+a = 2357111317
+b = 1113171923
+c = 0
+d = 0
+e = 305411158
+a = 2357111317
+b = 1113171923
+c = 2623870137469952591
+d = 2920818566629701480442302493
+e = 305411158
 ```
 
 ---
@@ -2083,7 +2125,7 @@ $ src/tommath-2.rb
 
 ```
 $ src/tommath.scm
-(MP-ITER -4)
+(MP-ITER = -4)
 
 a = 2357111317
 b = 1113171923
@@ -2619,16 +2661,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-  700 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             13 |    2.018 |       0 |           33.465 |            -100
-  576 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.973 |       0 |           31.009 |            -100
-  202 |  6 |          0.5 |       1.521 |               0.25 |           2.25 |             15 |    1.985 |       0 |           30.506 |            -100
-  653 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             12 |    1.967 |       0 |           29.152 |            -100
-  991 |  6 |          0.5 |       1.511 |               0.25 |           2.25 |             16 |    1.943 |       0 |            28.59 |            -100
-  639 |  6 |          0.5 |       1.568 |               0.25 |           2.25 |             15 |        2 |       0 |           27.551 |            -100
-  927 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             12 |    1.998 |       0 |           27.504 |            -100
-  951 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             18 |    1.919 |       0 |           27.339 |            -100
-  139 |  6 |          0.5 |       1.529 |               0.25 |           2.25 |             18 |    1.944 |       0 |           27.141 |            -100
-  516 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             16 |    1.884 |       0 |             25.6 |            -100
+  984 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             12 |        2 |       0 |           31.406 |            -100
+  827 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             11 |    1.966 |       0 |           30.544 |            -100
+  966 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             14 |    1.952 |       0 |           30.133 |            -100
+   50 |  6 |          0.5 |       1.525 |               0.25 |           2.25 |             18 |     1.98 |       0 |           29.836 |            -100
+  547 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             13 |    1.971 |       0 |           29.415 |            -100
+  560 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             15 |    1.955 |       0 |           28.872 |            -100
+  259 |  6 |          0.5 |       1.569 |               0.25 |           2.25 |             15 |     2.02 |       0 |           28.744 |            -100
+  393 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             15 |    2.017 |       0 |           28.717 |            -100
+  177 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.936 |       0 |           28.552 |            -100
+  979 |  6 |          0.5 |       1.533 |               0.25 |           2.25 |             17 |    1.963 |       0 |           28.049 |            -100
 (10 rows)
 
 
@@ -2639,16 +2681,16 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   70 | 12 |          3.5 |       1.507 |               0.25 |           2.25 |             17 |        0 |    1.75 |             -100 |          16.124
-  804 | 12 |          3.5 |       1.503 |               0.25 |           2.25 |             13 |        0 |   1.725 |             -100 |           14.77
-   15 | 12 |          3.5 |       1.586 |               0.25 |           2.25 |             16 |        0 |   1.757 |             -100 |          10.781
-  747 | 12 |          3.5 |       1.525 |               0.25 |           2.25 |             17 |        0 |   1.662 |             -100 |           8.983
-  963 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.634 |             -100 |           8.788
-  156 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             16 |        0 |   1.672 |             -100 |           7.731
-  103 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             14 |        0 |   1.666 |             -100 |           7.622
-  587 | 12 |          3.5 |       1.619 |               0.25 |           2.25 |             13 |        0 |   1.738 |             -100 |            7.35
-  236 | 12 |          3.5 |       1.509 |               0.25 |           2.25 |             18 |        0 |   1.582 |             -100 |           4.837
-   88 | 12 |          3.5 |       1.638 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           3.663
+  277 | 12 |          3.5 |       1.506 |               0.25 |           2.25 |             13 |        0 |   1.712 |             -100 |          13.678
+   71 | 12 |          3.5 |        1.54 |               0.25 |           2.25 |             14 |        0 |   1.747 |             -100 |          13.441
+  718 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             14 |        0 |   1.702 |             -100 |          13.315
+  531 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             17 |        0 |   1.742 |             -100 |          12.532
+  409 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             13 |        0 |   1.713 |             -100 |            7.33
+  403 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             14 |        0 |   1.657 |             -100 |           6.765
+  733 | 12 |          3.5 |       1.541 |               0.25 |           2.25 |             13 |        0 |   1.644 |             -100 |           6.683
+  861 | 12 |          3.5 |       1.564 |               0.25 |           2.25 |             17 |        0 |   1.661 |             -100 |           6.202
+  237 | 12 |          3.5 |       1.618 |               0.25 |           2.25 |             13 |        0 |   1.718 |             -100 |            6.18
+  122 | 12 |          3.5 |       1.573 |               0.25 |           2.25 |             12 |        0 |    1.67 |             -100 |           6.166
 (10 rows)
 ```
 
@@ -2865,16 +2907,16 @@ ORDER BY call_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-  700 |  6 |          0.5 |       1.512 |               0.25 |           2.25 |             13 |    2.018 |       0 |           33.465 |            -100
-  576 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.973 |       0 |           31.009 |            -100
-  202 |  6 |          0.5 |       1.521 |               0.25 |           2.25 |             15 |    1.985 |       0 |           30.506 |            -100
-  653 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             12 |    1.967 |       0 |           29.152 |            -100
-  991 |  6 |          0.5 |       1.511 |               0.25 |           2.25 |             16 |    1.943 |       0 |            28.59 |            -100
-  639 |  6 |          0.5 |       1.568 |               0.25 |           2.25 |             15 |        2 |       0 |           27.551 |            -100
-  927 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             12 |    1.998 |       0 |           27.504 |            -100
-  951 |  6 |          0.5 |       1.507 |               0.25 |           2.25 |             18 |    1.919 |       0 |           27.339 |            -100
-  139 |  6 |          0.5 |       1.529 |               0.25 |           2.25 |             18 |    1.944 |       0 |           27.141 |            -100
-  516 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             16 |    1.884 |       0 |             25.6 |            -100
+  984 |  6 |          0.5 |       1.522 |               0.25 |           2.25 |             12 |        2 |       0 |           31.406 |            -100
+  827 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             11 |    1.966 |       0 |           30.544 |            -100
+  966 |  6 |          0.5 |         1.5 |               0.25 |           2.25 |             14 |    1.952 |       0 |           30.133 |            -100
+   50 |  6 |          0.5 |       1.525 |               0.25 |           2.25 |             18 |     1.98 |       0 |           29.836 |            -100
+  547 |  6 |          0.5 |       1.523 |               0.25 |           2.25 |             13 |    1.971 |       0 |           29.415 |            -100
+  560 |  6 |          0.5 |       1.517 |               0.25 |           2.25 |             15 |    1.955 |       0 |           28.872 |            -100
+  259 |  6 |          0.5 |       1.569 |               0.25 |           2.25 |             15 |     2.02 |       0 |           28.744 |            -100
+  393 |  6 |          0.5 |       1.567 |               0.25 |           2.25 |             15 |    2.017 |       0 |           28.717 |            -100
+  177 |  6 |          0.5 |       1.506 |               0.25 |           2.25 |             17 |    1.936 |       0 |           28.552 |            -100
+  979 |  6 |          0.5 |       1.533 |               0.25 |           2.25 |             17 |    1.963 |       0 |           28.049 |            -100
 (10 rows)
 
 
@@ -2885,16 +2927,16 @@ ORDER BY put_profit_pcnt DESC
 LIMIT 10;
  h_id | id | strike_price | asset_price | standard_deviation | risk_free_rate | days_to_expiry | call_val | put_val | call_profit_pcnt | put_profit_pcnt
 ------+----+--------------+-------------+--------------------+----------------+----------------+----------+---------+------------------+-----------------
-   70 | 12 |          3.5 |       1.507 |               0.25 |           2.25 |             17 |        0 |    1.75 |             -100 |          16.124
-  804 | 12 |          3.5 |       1.503 |               0.25 |           2.25 |             13 |        0 |   1.725 |             -100 |           14.77
-   15 | 12 |          3.5 |       1.586 |               0.25 |           2.25 |             16 |        0 |   1.757 |             -100 |          10.781
-  747 | 12 |          3.5 |       1.525 |               0.25 |           2.25 |             17 |        0 |   1.662 |             -100 |           8.983
-  963 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             11 |        0 |   1.634 |             -100 |           8.788
-  156 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             16 |        0 |   1.672 |             -100 |           7.731
-  103 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             14 |        0 |   1.666 |             -100 |           7.622
-  587 | 12 |          3.5 |       1.619 |               0.25 |           2.25 |             13 |        0 |   1.738 |             -100 |            7.35
-  236 | 12 |          3.5 |       1.509 |               0.25 |           2.25 |             18 |        0 |   1.582 |             -100 |           4.837
-   88 | 12 |          3.5 |       1.638 |               0.25 |           2.25 |             18 |        0 |   1.698 |             -100 |           3.663
+  277 | 12 |          3.5 |       1.506 |               0.25 |           2.25 |             13 |        0 |   1.712 |             -100 |          13.678
+   71 | 12 |          3.5 |        1.54 |               0.25 |           2.25 |             14 |        0 |   1.747 |             -100 |          13.441
+  718 | 12 |          3.5 |       1.502 |               0.25 |           2.25 |             14 |        0 |   1.702 |             -100 |          13.315
+  531 | 12 |          3.5 |       1.548 |               0.25 |           2.25 |             17 |        0 |   1.742 |             -100 |          12.532
+  409 | 12 |          3.5 |       1.596 |               0.25 |           2.25 |             13 |        0 |   1.713 |             -100 |            7.33
+  403 | 12 |          3.5 |       1.552 |               0.25 |           2.25 |             14 |        0 |   1.657 |             -100 |           6.765
+  733 | 12 |          3.5 |       1.541 |               0.25 |           2.25 |             13 |        0 |   1.644 |             -100 |           6.683
+  861 | 12 |          3.5 |       1.564 |               0.25 |           2.25 |             17 |        0 |   1.661 |             -100 |           6.202
+  237 | 12 |          3.5 |       1.618 |               0.25 |           2.25 |             13 |        0 |   1.718 |             -100 |            6.18
+  122 | 12 |          3.5 |       1.573 |               0.25 |           2.25 |             12 |        0 |    1.67 |             -100 |           6.166
 (10 rows)
 ```
 
@@ -3023,9 +3065,9 @@ wc -l src/mathlib.h src/mathlib.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/mathlib_swig.c target/python/mathlib_swig.py              
-3662 target/python/mathlib_swig.c                                             
+3832 target/python/mathlib_swig.c                                             
 65 target/python/mathlib_swig.py                                              
-3727 total                                                                    
+3897 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/mathlib_swig.c.o                          \
@@ -3052,11 +3094,11 @@ wc -l src/mathlib.h src/mathlib.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/mathlib_swig.c target/clojure/mathlib*.java              
-239 target/clojure/mathlib_swig.c                                             
+269 target/clojure/mathlib_swig.c                                             
 15 target/clojure/mathlib_swig.java                                           
 12 target/clojure/mathlib_swigConstants.java                                  
 13 target/clojure/mathlib_swigJNI.java                                        
-279 total                                                                     
+309 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -3083,7 +3125,7 @@ wc -l src/mathlib.h src/mathlib.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/mathlib_swig.c                                              
-2282 target/ruby/mathlib_swig.c                                               
+2323 target/ruby/mathlib_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
@@ -3111,7 +3153,7 @@ wc -l src/mathlib.h src/mathlib.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/mathlib_swig.c                                               
-2178 target/tcl/mathlib_swig.c                                                
+2224 target/tcl/mathlib_swig.c                                                
                                                                               
 # Compile tcl bindings:                                                       
 cc -Isrc -I$TCL_HOME/include -c -o target/tcl/mathlib_swig.c.o                  \
@@ -3138,7 +3180,7 @@ wc -l src/mathlib.h src/mathlib.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/mathlib_swig.c                                             
-1631 target/guile/mathlib_swig.c                                              
+1660 target/guile/mathlib_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -3167,11 +3209,11 @@ wc -l src/mathlib.h src/mathlib.i
 # Generated code statistics:                                                  
 wc -l target/postgresql/mathlib_swig.c target/postgresql/mathlib_swig-*.sql     \
   target/postgresql/mathlib_swig.control target/postgresql/mathlib_swig.make  
-1489 target/postgresql/mathlib_swig.c                                         
+1519 target/postgresql/mathlib_swig.c                                         
 20 target/postgresql/mathlib_swig--1.2.3.sql                                  
 8 target/postgresql/mathlib_swig.control                                      
 13 target/postgresql/mathlib_swig.make                                        
-1530 total                                                                    
+1560 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
 cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/mathlib_swig.c.o         \
@@ -3238,9 +3280,9 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_swig.cc target/python/polynomial_swig.py       
-8512 target/python/polynomial_swig.cc                                         
+8502 target/python/polynomial_swig.cc                                         
 241 target/python/polynomial_swig.py                                          
-8753 total                                                                    
+8743 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_swig.cc.o         \
@@ -3268,11 +3310,11 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_swig.cc target/clojure/polynomial*.java       
-680 target/clojure/polynomial_swig.cc                                         
+726 target/clojure/polynomial_swig.cc                                         
 11 target/clojure/polynomial_swig.java                                        
 12 target/clojure/polynomial_swigConstants.java                               
 32 target/clojure/polynomial_swigJNI.java                                     
-735 total                                                                     
+781 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -3300,7 +3342,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_swig.cc                                          
-8577 target/ruby/polynomial_swig.cc                                           
+8622 target/ruby/polynomial_swig.cc                                           
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
@@ -3329,7 +3371,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_swig.cc                                           
-3004 target/tcl/polynomial_swig.cc                                            
+3050 target/tcl/polynomial_swig.cc                                            
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -3356,7 +3398,7 @@ wc -l src/polynomial.h src/polynomial.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_swig.cc                                         
-2317 target/guile/polynomial_swig.cc                                          
+2346 target/guile/polynomial_swig.cc                                          
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3412,9 +3454,9 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/rational_swig.cc target/python/rational_swig.py           
-4615 target/python/rational_swig.cc                                           
+4825 target/python/rational_swig.cc                                           
 115 target/python/rational_swig.py                                            
-4730 total                                                                    
+4940 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/rational_swig.cc.o           \
@@ -3441,10 +3483,10 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/rational_swig.cc target/clojure/rational*.java           
-647 target/clojure/rational_swig.cc                                           
+677 target/clojure/rational_swig.cc                                           
 11 target/clojure/rational_swig.java                                          
 33 target/clojure/rational_swigJNI.java                                       
-691 total                                                                     
+721 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -3473,7 +3515,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/rational_swig.cc                                            
-3105 target/ruby/rational_swig.cc                                             
+3146 target/ruby/rational_swig.cc                                             
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
@@ -3502,7 +3544,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/rational_swig.cc                                             
-2891 target/tcl/rational_swig.cc                                              
+2937 target/tcl/rational_swig.cc                                              
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o target/tcl/rational_swig.cc.o   \
@@ -3529,7 +3571,7 @@ wc -l include/rational.h src/rational.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/rational_swig.cc                                           
-2406 target/guile/rational_swig.cc                                            
+2434 target/guile/rational_swig.cc                                            
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3584,9 +3626,9 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/polynomial_v2_swig.cc target/python/polynomial_v2_swig.py 
-15882 target/python/polynomial_v2_swig.cc                                     
+15905 target/python/polynomial_v2_swig.cc                                     
 652 target/python/polynomial_v2_swig.py                                       
-16534 total                                                                   
+16557 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc++ -std=c++17 -Isrc -dynamic -c -o target/python/polynomial_v2_swig.cc.o      \
@@ -3614,11 +3656,11 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/polynomial_v2_swig.cc target/clojure/polynomial_v2*.java 
-1883 target/clojure/polynomial_v2_swig.cc                                     
+1961 target/clojure/polynomial_v2_swig.cc                                     
 11 target/clojure/polynomial_v2_swig.java                                     
 12 target/clojure/polynomial_v2_swigConstants.java                            
 94 target/clojure/polynomial_v2_swigJNI.java                                  
-2000 total                                                                    
+2078 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc++ -std=c++17 -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c   \
@@ -3648,7 +3690,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/polynomial_v2_swig.cc                                       
-17551 target/ruby/polynomial_v2_swig.cc                                       
+17596 target/ruby/polynomial_v2_swig.cc                                       
                                                                               
 # Compile ruby bindings:                                                      
 cc++ -std=c++17 -Isrc -I$RUBY_HOME/include/ruby-3.1.0                           \
@@ -3678,7 +3720,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/polynomial_v2_swig.cc                                        
-4968 target/tcl/polynomial_v2_swig.cc                                         
+5014 target/tcl/polynomial_v2_swig.cc                                         
                                                                               
 # Compile tcl bindings:                                                       
 cc++ -std=c++17 -Isrc -I$TCL_HOME/include -c -o                                 \
@@ -3706,7 +3748,7 @@ wc -l src/polynomial_v2.h src/polynomial_v2.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/polynomial_v2_swig.cc                                      
-4401 target/guile/polynomial_v2_swig.cc                                       
+4429 target/guile/polynomial_v2_swig.cc                                       
                                                                               
 # Compile guile bindings:                                                     
 cc++ -std=c++17 -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o      \
@@ -3762,9 +3804,9 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/tommath_swig.c target/python/tommath_swig.py              
-9365 target/python/tommath_swig.c                                             
+9524 target/python/tommath_swig.c                                             
 478 target/python/tommath_swig.py                                             
-9843 total                                                                    
+10002 total                                                                   
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/tommath_swig.c.o                          \
@@ -3791,11 +3833,11 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/tommath_swig.c target/clojure/tommath*.java              
-3134 target/clojure/tommath_swig.c                                            
+3164 target/clojure/tommath_swig.c                                            
 545 target/clojure/tommath_swig.java                                          
 15 target/clojure/tommath_swigConstants.java                                  
 178 target/clojure/tommath_swigJNI.java                                       
-3872 total                                                                    
+3902 total                                                                    
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -3822,7 +3864,7 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/tommath_swig.c                                              
-7892 target/ruby/tommath_swig.c                                               
+7937 target/ruby/tommath_swig.c                                               
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
@@ -3850,7 +3892,7 @@ wc -l src/tommath.h src/tommath.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/tommath_swig.c                                             
-6423 target/guile/tommath_swig.c                                              
+6452 target/guile/tommath_swig.c                                              
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -3906,9 +3948,9 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/python/black_scholes_swig.c target/python/black_scholes_swig.py  
-3697 target/python/black_scholes_swig.c                                       
+3867 target/python/black_scholes_swig.c                                       
 70 target/python/black_scholes_swig.py                                        
-3767 total                                                                    
+3937 total                                                                    
                                                                               
 # Compile python bindings:                                                    
 cc -Isrc -dynamic -c -o target/python/black_scholes_swig.c.o                    \
@@ -3936,10 +3978,10 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/clojure/black_scholes_swig.c target/clojure/black_scholes*.java  
-263 target/clojure/black_scholes_swig.c                                       
+293 target/clojure/black_scholes_swig.c                                       
 23 target/clojure/black_scholes_swig.java                                     
 14 target/clojure/black_scholes_swigJNI.java                                  
-300 total                                                                     
+330 total                                                                     
                                                                               
 # Compile clojure bindings:                                                   
 cc -Isrc -I$JAVA_HOME/include -I$JAVA_HOME/include/$JAVA_ARCH -c -o             \
@@ -3967,7 +4009,7 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/ruby/black_scholes_swig.c                                        
-2326 target/ruby/black_scholes_swig.c                                         
+2367 target/ruby/black_scholes_swig.c                                         
                                                                               
 # Compile ruby bindings:                                                      
 cc -Isrc -I$RUBY_HOME/include/ruby-3.1.0                                        \
@@ -3996,7 +4038,7 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/tcl/black_scholes_swig.c                                         
-2229 target/tcl/black_scholes_swig.c                                          
+2275 target/tcl/black_scholes_swig.c                                          
                                                                               
 # Compile tcl bindings:                                                       
 cc -Isrc -I$TCL_HOME/include -c -o target/tcl/black_scholes_swig.c.o            \
@@ -4024,7 +4066,7 @@ wc -l src/black_scholes.h src/black_scholes.i
                                                                               
 # Generated code statistics:                                                  
 wc -l target/guile/black_scholes_swig.c                                       
-1676 target/guile/black_scholes_swig.c                                        
+1705 target/guile/black_scholes_swig.c                                        
                                                                               
 # Compile guile bindings:                                                     
 cc -Isrc -D_THREAD_SAFE -I$GUILE_HOME/include/guile/3.0 -c -o                   \
@@ -4056,11 +4098,11 @@ wc -l target/postgresql/black_scholes_swig.c                                    
   target/postgresql/black_scholes_swig-*.sql                                    \
   target/postgresql/black_scholes_swig.control                                  \
   target/postgresql/black_scholes_swig.make                                   
-1552 target/postgresql/black_scholes_swig.c                                   
+1582 target/postgresql/black_scholes_swig.c                                   
 33 target/postgresql/black_scholes_swig--1.2.3.sql                            
 8 target/postgresql/black_scholes_swig.control                                
 13 target/postgresql/black_scholes_swig.make                                  
-1606 total                                                                    
+1636 total                                                                    
                                                                               
 # Compile postgresql bindings:                                                
 cc -Isrc -I$POSTGRESQL_INC_DIR -c -o target/postgresql/black_scholes_swig.c.o   \

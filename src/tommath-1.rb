@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-
 require 'tommath_swig'
 include Tommath_swig
+require 'show'
 
 puts "MP_ITER = #{MP_ITER}"
 
@@ -11,9 +11,14 @@ c = Mp_int.new()
 d = Mp_int.new()
 e = Mp_int.new("12343456", 16)             # <-- yey!
 
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})
+def show!
+  show_exprs "a", "b","c", "d", "e"
+end
+
+show!
 
 mp_mul(a, b, c);
 mp_mul(c, b, d);
 
-puts({"a": a, "b": b, "c": c, "d": d, "e": e})
+show!
+

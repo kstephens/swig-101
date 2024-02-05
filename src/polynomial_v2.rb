@@ -3,7 +3,7 @@
 require 'polynomial_v2_swig'
 PV2 = Polynomial_v2_swig
 
-pp POLYNOMIAL_VERSION: PV2::POLYNOMIAL_VERSION
+puts "POLYNOMIAL_VERSION = #{PV2::POLYNOMIAL_VERSION}"
 
 # polynomial<double>:
 poly        = PV2::PolynomialDoubleV2.new

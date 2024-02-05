@@ -3,12 +3,13 @@
 (clojure.lang.RT/loadLibrary "polynomial_swig")
 (import 'polynomial_swig)
 
-(prn {:POLYNOMIAL_VERSION (polynomial_swig/POLYNOMIAL_VERSION)})
+(println (format "POLYNOMIAL_VERSION = %s"
+                 (polynomial_swig/POLYNOMIAL_VERSION)))
 
 (def p (Polynomial.))
 
 ;; Note: does not coerce java.lang.Long 3 to 3.0
-(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ])) 
+(.setCoeffs p (VectorDouble. [ 3.0 5.0 7.0 11.0 ]))
 (prn (.getCoeffs p))
 (prn (.evaluate p 2))
 
