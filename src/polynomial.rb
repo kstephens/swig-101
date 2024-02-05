@@ -3,7 +3,7 @@
 require 'polynomial_swig'
 include Polynomial_swig
 
-pp POLYNOMIAL_VERSION: POLYNOMIAL_VERSION
+puts "POLYNOMIAL_VERSION = #{POLYNOMIAL_VERSION}"
 
 p = Polynomial.new
 

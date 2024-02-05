@@ -143,4 +143,9 @@ then
   export LD_RUN_PATH="$target_dir:$LD_RUN_PATH"
 fi
 
+if [[ "$debug" ]]
+then
+  echo "### exec ${cmd[*]@Q}" >&2
+fi
+
 exec "${cmd[@]}"

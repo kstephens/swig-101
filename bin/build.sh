@@ -260,9 +260,9 @@ declare -A SWIG_TARGET_SUFFIX_
 }
 
 postgresql-make-extension() {
-  echo ""
   echo "# Compile and install ${SWIG_TARGET} extension:"
-  ${MAKE} -C target/postgresql -f ${EXAMPLE_SWIG}.make install
+  -run ${MAKE} -C target/postgresql -f ${EXAMPLE_SWIG}.make install
+  echo ""
 }
 
 ############################
@@ -300,7 +300,7 @@ postgresql-make-extension() {
 
     echo "### Compile Native Code"
     echo ""
-    echo '```'
+    echo '```Shell'
     echo "# Compile native library:"
     -run $CC $CFLAGS $INC_DIRS -c -o $NATIVE_LIB_O $NATIVE_LIB_C
     echo ""
@@ -337,7 +337,7 @@ postgresql-make-extension() {
 
   echo "### Build ${SWIG_TARGET} Bindings"
   echo ""
-  echo '```'
+  echo '```Shell'
 
   echo "# Generate ${SWIG_TARGET} bindings:"
   -run $SWIG_EXE $SWIG_OPTS $INC_DIRS $SWIG_INC_DIRS -outdir $TARGET_DIR/ -o $SWIG_C $EXAMPLE_I
@@ -422,7 +422,7 @@ postgresql-make-extension() {
     readme_md=tmp/$readme_html.md
     mkdir -p tmp
     MARKDEEP=1 -cmd-build-readme-md
-    df-markdown -v -s dark -o $readme_html $readme_md
+    df-markdown -M -v -s dark -o $readme_html $readme_md
     ls -l $readme_html
   )
 }
@@ -492,7 +492,7 @@ SWIG_SRC="$LOCAL_DIR/src/swig"
   [[ "$1" != "${1%-test.py}" ]] && set -- pytest --no-header -v "$@"
   (
     set -e
-    echo '```'
+    echo '```none'
     echo "\$ $*"
     bin/run "$@" || exit $?
     echo '```'

@@ -161,7 +161,7 @@ The examples below target:
 <%       if f[:cmd] && f[:output] %>
 ---
 
-```
+```none
 $ <%= f[:cmd] %>
 <%= f[:output] %>
 ```
@@ -175,8 +175,8 @@ $ <%= f[:cmd] %>
 ### Outputs - Recap
 
 <%   targets.each do | t | %>
-<%     t[:files].select{|f| f[:cmd]}.each do | f | %>
-```
+<%     t[:files].select{|f| f[:cmd] && f[:output] }.each do | f | %>
+```none
 $ <%= f[:cmd] %>
 <%= f[:output] %>
 ```
