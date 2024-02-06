@@ -67,7 +67,7 @@ def trim_empty_lines!(lines)
 end
 
 def dedup_empty_lines(lines)
-  dedup_adjacent(lines, "")
+  dedup_adjacent(lines, /^\s+$/)
 end
 
 def dedup_adjacent(enum, pat)
